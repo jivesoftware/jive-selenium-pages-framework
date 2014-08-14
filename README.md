@@ -29,6 +29,31 @@ The framework also provides a Page abstraction for modeling your webapp's pages.
     </li>
 </ul>
 
+<h4>Sample code creating a Browser instance (Chrome)</h4>
+
+<pre>
+    // Create a TimeoutsConfig instance
+    TimeoutsConfig timeouts = TimeoutsConfig.builder()
+        .clickTimeoutSeconds(2)                  // Timeout waiting for a WebElement to be clickable (used by the framework)
+        .webElementPresenceTimeoutSeconds(5)     // Timeout when polling for a web element to be present (or visible, depending on the method)
+        .pageLoadTimoutSeconds(10)               // Timeout waiting for a new page to load (used by the framework, and to configure underlying WebDriver).
+        .implicitWaitTimeoutMillis(2000)         // Implicit wait timeout used by the underlying WebDriver.
+        .build();
+
+    // Create a ChromeBrowser
+    Browser browser = BrowserFactory.createLocalBrowser(BrowserType.CHROME,       // BrowserType -- currently only supports Chrome, Firefox, and IE
+                                                        "http://my.webapp.com/webapp",  // Base URL for testing. 
+                                                        timeouts,                  // TimeoutsConfig created above.
+                                                        Optional.<String>absent(), // Path to web driver -- Not required if Chromedriver is on your PATH 
+                                                        Optional.<String>absent(), // Path to browser binary -- Not required if Chrome binary is in standard location 
+                                                        Locale.US.toString(),      // Browser locale
+                                                        Optional.of(1280),         // Optional starting width for the browser window in pixels
+                                                        Optional.of(1024),         // Optional starting height in pixels
+                                                        Optional.of(Level.INFO),   // Optional Logging Level for the WebDriver's logs
+                                                        Optional.of("chromedriver.log") // Optional path to logfile, only supported for Chrome and IE. 
+                                                        );
+</pre>
+
 <h4>SeleniumActions</h4>
 <ul>
     <li>SeleniumActions are for interacting with the DOM and javascript of a page.</li>
