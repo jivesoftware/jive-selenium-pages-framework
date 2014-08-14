@@ -1,0 +1,9 @@
+.idea
+*.class
+*.swp
+*.iml
+target/
+*.log
+*.log*
+*.exe
+*.pyc

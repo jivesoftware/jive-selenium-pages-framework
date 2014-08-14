@@ -1,0 +1,109 @@
+package com.jivesoftware.selenium.pagefactory.framework.browser;
+
+import com.google.common.base.Optional;
+import com.jivesoftware.selenium.pagefactory.framework.actions.FirefoxSeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxBinary;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.util.Set;
+
+public class FirefoxBrowser extends Browser {
+
+    public FirefoxBrowser(String baseTestUrl,
+                          TimeoutsConfig timeouts,
+                          Optional<String> driverPath,
+                          Optional<String> browserBinaryPath,
+                          Optional<String> browserVersion,
+                          Optional<String> browserLocale,
+                          Optional<Integer> startWindowWidth,
+                          Optional<Integer> startWindowHeight) {
+
+        super(baseTestUrl, timeouts, driverPath, browserBinaryPath, browserVersion, browserLocale, startWindowWidth, startWindowHeight);
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(FirefoxBrowser.class);
+
+
+    @Override
+    public BrowserType getBrowserType() {
+        return BrowserType.FIREFOX;
+    }
+
+    @Override
+    public DesiredCapabilities getDesiredCapabilities() {
+        DesiredCapabilities desiredCapabilities = DesiredCapabilities.firefox();
+        desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
+
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setEnableNativeEvents(true);
+        desiredCapabilities.setCapability(FirefoxDriver.PROFILE, profile);
+
+        // If the browerBinaryPath is present, and it points to a real file, then set this as the Firefox Binary
+        Optional<String> browserBinaryPath = getBrowserBinaryPath();
+        if (browserBinaryPath.isPresent() && !browserBinaryPath.get().isEmpty()) {
+            final String browserBinaryPathStr = browserBinaryPath.get();
+            File file = new File(browserBinaryPathStr);
+            if (file.exists()) {
+                desiredCapabilities.setCapability(FirefoxDriver.BINARY, new FirefoxBinary(file));
+            }
+        }
+
+        // If a required version is present, then set this as a desired capability.
+        // Only affects remote browsers
+        Optional<String> browserVersion = getBrowserVersion();
+        if (browserVersion.isPresent() && !browserVersion.get().isEmpty()) {
+            desiredCapabilities.setCapability(CapabilityType.VERSION, browserVersion.get());
+        }
+
+        LoggingPreferences loggingPreferences = getLoggingPreferences();
+        desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
+
+        return desiredCapabilities;
+    }
+
+    @Override
+    protected WebDriver createWebDriver() {
+        DesiredCapabilities desiredCapabilities = getDesiredCapabilities();
+        return new FirefoxDriver(desiredCapabilities);
+    }
+
+    @Override
+    public boolean isRemote() {
+        return false;
+    }
+
+    @Override
+    public SeleniumActions getActions() {
+        return new FirefoxSeleniumActions(this);
+    }
+
+    @Nullable
+    public LogEntries getBrowserLogEntries() {
+        if (webDriver == null) {
+            logger.info("WebDriver was null in FirefoxBrowser#getBrowserLogEntries! Returning null.");
+            return null;
+        }
+        logger.debug("Getting available log types...");
+        Set<String> availableLogTypes = webDriver.manage().logs().getAvailableLogTypes();
+        logger.debug("Found log types: {}", availableLogTypes);
+        if (availableLogTypes == null || !availableLogTypes.contains(LogType.BROWSER)) {
+            return null;
+        }
+        LogEntries logs = webDriver.manage().logs().get(LogType.BROWSER);
+        logger.info("Success - obtained Browser logs for a local FirefoxBrowser!");
+        return logs;
+    }
+}
