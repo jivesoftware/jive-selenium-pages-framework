@@ -13,9 +13,9 @@ It simplifies the configuration and creation of Selenium WebDrivers for differen
 The framework also provides a Page abstraction for modeling your webapp's pages. 
 </p>
 
-<h2>Key Features:</h2>
+<h3>Key Features:</h3>
 
-<h3>Browser configuration and instantiation</h3>
+<h4>Browser configuration and instantiation</h4>
 <ul>
     <li>The Browser classes provide a facade for configuring and using Selenium WebDrivers.</li>
     <li>
@@ -29,7 +29,7 @@ The framework also provides a Page abstraction for modeling your webapp's pages.
     </li>
 </ul>
 
-<h3>SeleniumActions</h3>
+<h4>SeleniumActions</h4>
 <ul>
     <li>SeleniumActions are for interacting with the DOM and javascript of a page.</li>
     <li>Obtain a SeleniumActions from a Browser instance with browser.getActions()</li>
@@ -41,7 +41,7 @@ The framework also provides a Page abstraction for modeling your webapp's pages.
     <li>Provides much more functionality.</li>
 </ul>
 
-<h3>Pages</h3>
+<h4>Pages</h4>
 <ul>
     <li>Pages provide an abstraction for modeling the pages for your webapp.</li>
     <li>Pages should extend BaseTopLevelPage or BaseSubPage.</li>
