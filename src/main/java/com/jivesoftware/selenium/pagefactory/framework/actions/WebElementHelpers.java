@@ -24,8 +24,8 @@ public class WebElementHelpers {
      * Get the CSS classes of a given WebElement. Split on whitespace in case it's possible to have multiple spaces in the
      * "class" attribute of an HTML element.
      *
-     * @param webElement
-     * @return
+     * @param webElement - the WebElement to return a list of CSS classes for.
+     * @return - a List&lt;String&gt; of the CSS classes for the given WebElement
      */
     public static List<String> getCssClasses(WebElement webElement) {
         if (webElement.getAttribute("class") == null) {

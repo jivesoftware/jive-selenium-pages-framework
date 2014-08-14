@@ -73,8 +73,8 @@ public final class TimeoutsConfig {
      *
      * It doesn't make sense to pass in the DEFAULT timeout type, because that is a context-sensitive timeout.
      *
-     * @param timeout
-     * @return
+     * @param timeout - the TimeoutType (other than DEFAULT) to get the timeout in seconds for.
+     * @return - the timeout in seconds
      */
     public int getTimeoutInSeconds(TimeoutType timeout) {
         Preconditions.checkNotNull(timeout, "Cannot get timeout for null timeout.");
@@ -261,7 +261,7 @@ public final class TimeoutsConfig {
         /**
          * Set the pause between sending keys when entering text slowly.
          * @param pauseBetweenKeysMillis - time in ms
-         * @return
+         * @return - the Builder
          */
         public Builder pauseBetweenKeysMillis(int pauseBetweenKeysMillis) {
             this.pauseBetweenKeysMillis = pauseBetweenKeysMillis;
@@ -272,7 +272,7 @@ public final class TimeoutsConfig {
          * Set the pause between tries in milliseconds. This is used for pausing between checks to see if an element
          * is visible.
          * @param pauseBetweenTriesMillis - time in ms
-         * @return
+         * @return - the Builder
          */
         public Builder pauseBetweenTriesMillis(int pauseBetweenTriesMillis) {
             this.pauseBetweenTriesMillis = pauseBetweenTriesMillis;
@@ -283,7 +283,7 @@ public final class TimeoutsConfig {
          * Set the pause between refreshing the page when polling for something to be present by refreshing the page
          * repeatedly.
          * @param pauseBetweenRefreshSeconds - time in seconds
-         * @return
+         * @return - the Builder
          */
         public Builder pauseBetweenRefreshSeconds(int pauseBetweenRefreshSeconds) {
             this.pauseBetweenRefreshSeconds = pauseBetweenRefreshSeconds;
@@ -294,7 +294,7 @@ public final class TimeoutsConfig {
          * Set the timeout waiting for a new page to load in the web browser.
          * This is both used by the framework and passed on to the Selenium WebDriver for its configuration.
          * @param pageLoadTimeoutSeconds - time in seconds
-         * @return
+         * @return - the Builder
          */
         public Builder pageLoadTimoutSeconds(int pageLoadTimeoutSeconds) {
             this.pageLoadTimeoutSeconds = pageLoadTimeoutSeconds;
@@ -305,7 +305,7 @@ public final class TimeoutsConfig {
          * Set the implicit wait timeout for checking if a web element is present.
          * This is used when configuring a Selenium WebDriver.
          * @param implicitWaitTimeoutMillis
-         * @return
+         * @return - the Builder
          */
         public Builder implicitWaitTimeoutMillis(int implicitWaitTimeoutMillis) {
             this.implicitWaitTimeoutMillis = implicitWaitTimeoutMillis;

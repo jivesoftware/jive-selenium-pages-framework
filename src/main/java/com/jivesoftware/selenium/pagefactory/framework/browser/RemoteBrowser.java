@@ -84,7 +84,7 @@ public class RemoteBrowser extends Browser {
      * Added more logging to debug a 5 minute gap in time we saw in a recent failed test run.
      * The issue is probably unrelated to this, but it can't hurt to log more data so we can rule it out.
      *
-     * @return
+     * @return - a {@link org.openqa.selenium.logging.LogEntries} with all the log entries since last time this was called.
      */
     @Nullable
     public LogEntries getBrowserLogEntries() {

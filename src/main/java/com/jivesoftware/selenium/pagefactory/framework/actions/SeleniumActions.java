@@ -215,7 +215,7 @@ public interface SeleniumActions {
      * Get a WebElement using the implicit wait configured for the Selenium WebDriver.
      *
      * @return the WebElement when found. Null is never returned.
-     * @throw RuntimeException - if the web element isn't present after waiting.
+     * @throws RuntimeException - if the web element isn't present after waiting.
      */
     public
     @Nonnull

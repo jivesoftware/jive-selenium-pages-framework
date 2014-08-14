@@ -31,7 +31,7 @@ public class BrowserFactory {
      * @param browserLogLevel    - Log level for Browser logs and Remote Web Driver logs.
      * @param browserLogFile     - Path (either local or on remote Selenium node) to log file that will be created.
      *                             Currently only works for local Chrome and local/remote IE.
-     * @return
+     * @return - a fully configured {@link com.jivesoftware.selenium.pagefactory.framework.browser.RemoteBrowser}
      * @throws JiveWebDriverException, IllegalArgumentException
      */
     public static RemoteBrowser createRemoteBrowser(BrowserType browserType,
@@ -83,7 +83,7 @@ public class BrowserFactory {
      * @param browserLogLevel    - Log level for Browser logs and Remote Web Driver logs.
      * @param browserLogFile        - Path in the local file system to a log file.
      *                              Currently only works for local chrome or local/remote IE
-     * @return
+     * @return - a fully configured {@link com.jivesoftware.selenium.pagefactory.framework.browser.Browser}
      * @throws JiveWebDriverException, IllegalArgumentException
      */
     public static Browser createLocalBrowser(BrowserType browserType,

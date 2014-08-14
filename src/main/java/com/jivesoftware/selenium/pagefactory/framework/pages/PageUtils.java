@@ -27,7 +27,8 @@ public class PageUtils {
      * The path is extracted using reflection from the {@link WebPagePath} annotation, if present.
      *
      * @param pageClass
-     * @return
+     * @return - the Optional&lt;String&gt; that is present with a value if the given Page class was annotated with
+     *           {@link com.jivesoftware.selenium.pagefactory.framework.pages.WebPagePath}
      */
     public Optional<String> getWebPagePathForClass(Class<? extends TopLevelPage> pageClass) {
         WebPagePath annotation = pageClass.getAnnotation(WebPagePath.class);
@@ -55,7 +56,9 @@ public class PageUtils {
     /**
      * Use reflection to recursively get all fields annotated with {@link SubPageField} on a given class.
      * @param type
-     * @return
+     * @return - List of Fields that are annotated with {@link com.jivesoftware.selenium.pagefactory.framework.pages.SubPageField}
+     *           and are of type {@link com.jivesoftware.selenium.pagefactory.framework.pages.SubPage},
+     *           recursively including fields from super classes.
      */
     public static List<Field> getAllSubpageFields(Class<?> type) {
         List<Field> subpageFields = Lists.newArrayList();
