@@ -8,6 +8,27 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>jive-selenium-pages-framework</name>
+    <description>Framework for automated testing using Selenium. Provides easy configuration of WebDrivers with BrowserFactory. Provides a Page abstraction.</description>
+    <url>https://github.com/charlescapps/jive-selenium-pages-framework</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>git:git://github.com:charlescapps/jive-selenium-pages-framework.git</connection>
+        <url>https://github.com/charlescapps/jive-selenium-pages-framework</url>
+    </scm>
+    <developers>
+        <developer>
+            <id>charlescapps</id>
+            <name>Charles Capps</name>
+            <email>charles.capps@jivesoftware.com</email>
+        </developer>
+    </developers>
+
 
     <properties>
         <seleniumVersion>2.42.2</seleniumVersion>
