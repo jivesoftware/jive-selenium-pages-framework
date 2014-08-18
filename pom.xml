@@ -35,7 +35,6 @@
 
     <dependencies>
 
-        <!-- Needed for selenium 2.42.2. Otherwise you get a ClassNotFound exception instantiating a ChromeDriver due to missing apache libraries. -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -163,7 +162,7 @@
                         </executions>
                     </plugin>
 
-                    <!--Required to upload to centrol repository-->
+                    <!--Required to upload to central repository-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>

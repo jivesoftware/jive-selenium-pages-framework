@@ -29,6 +29,17 @@ The framework also provides a Page abstraction for modeling your webapp's pages.
     </li>
 </ul>
 
+<h3>Adding jive-selenium-pages-framework as a dependency</h3>
+This project is mavenized, so if your project uses maven you can just add this as a dependency with:
+
+<pre>
+    <dependency>
+        <groupId>com.jivesoftware</groupId>
+        <artifactId>jive-selenium-pages-framework</artifactId>
+        <version>1.0.1</version>
+    </dependency>
+</pre>
+
 <h3>Building</h3>
 This project uses maven. For maven, you must have JAVA_HOME set to a valid Java installation of Java7 or above. 
 As long as you have maven 3.0.5 or above installed and Java7 or above, then you should be
