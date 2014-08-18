@@ -33,11 +33,11 @@ The framework also provides a Page abstraction for modeling your webapp's pages.
 This project is mavenized, so if your project uses maven you can just add this as a dependency with:
 
 <pre>
-    <dependency>
-        <groupId>com.jivesoftware</groupId>
-        <artifactId>jive-selenium-pages-framework</artifactId>
-        <version>1.0.1</version>
-    </dependency>
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.jivesoftware&lt;/groupId&gt;
+        &lt;artifactId&gt;jive-selenium-pages-framework&lt;/artifactId&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
+    &lt;/dependency&gt;
 </pre>
 
 <h3>Building</h3>
