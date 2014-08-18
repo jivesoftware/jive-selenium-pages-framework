@@ -16,7 +16,8 @@ package com.jivesoftware.selenium.pagefactory.framework.config;
  * only be overridden when absolutely necessary.</p>
  *
  * @see com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig
- * @see com.jivesoftware.selenium.pagefactory.framework.browser.BrowserFactory
+ * @see com.jivesoftware.selenium.pagefactory.framework.browser.LocalBrowserBuilder
+ * @see com.jivesoftware.selenium.pagefactory.framework.browser.RemoteBrowserBuilder
  *
 */
 public enum TimeoutType {

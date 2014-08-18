@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.PageUtils;
 import com.jivesoftware.selenium.pagefactory.framework.pages.SubPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
@@ -193,11 +194,28 @@ public abstract class Browser {
 
     /**
      * Opens a new page in the Browser by URL. An absolute URL or the path can be provided.
+     * If a path is provided, then the baseTestUrl provided when creating the browser will be used as the
+     * base of the URL.
      *
      * Invalidates the cached page and loads a fresh new page.
      *
-     * @param href - the href from a link, which may be a relative path from baseUrl or may be absolute
-     * @param pageClass - the TopLevelPage class to load.
+     * @param href - the href from a link, which may be a relative path from baseTestUrl or may be absolute
+     * @return - a generic {@link com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage}
+     * page object. To open a page with more specific functionality, you must extend
+     * {@link com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage} and then
+     * call {@link #openPageByURL(String, Class)}.
+     */
+    public TopLevelPage openPageByURL(String href) throws URISyntaxException {
+       return openPageByURL(href, BaseTopLevelPage.class);
+    }
+
+    /**
+     * Opens a new page in the Browser by URL. An absolute URL or the path can be provided.
+     *
+     * Invalidates the cached page and loads a fresh new page.
+     *
+     * @param href - the href from a link, which may be a relative path from baseTestUrl or may be absolute
+     * @param pageClass - the {@link com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage} class to load.
      */
     public <T extends TopLevelPage> T openPageByURL(String href, Class<T> pageClass) throws URISyntaxException {
         URI uri = new URI(href);

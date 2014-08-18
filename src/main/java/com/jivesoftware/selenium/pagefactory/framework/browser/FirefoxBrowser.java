@@ -23,15 +23,15 @@ import java.util.Set;
 public class FirefoxBrowser extends Browser {
 
     public FirefoxBrowser(String baseTestUrl,
-                          TimeoutsConfig timeouts,
-                          Optional<String> driverPath,
+                          TimeoutsConfig timeoutsConfig,
+                          Optional<String> webDriverPath,
                           Optional<String> browserBinaryPath,
                           Optional<String> browserVersion,
                           Optional<String> browserLocale,
                           Optional<Integer> startWindowWidth,
                           Optional<Integer> startWindowHeight) {
 
-        super(baseTestUrl, timeouts, driverPath, browserBinaryPath, browserVersion, browserLocale, startWindowWidth, startWindowHeight);
+        super(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, browserVersion, browserLocale, startWindowWidth, startWindowHeight);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(FirefoxBrowser.class);
