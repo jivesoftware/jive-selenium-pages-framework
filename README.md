@@ -19,7 +19,7 @@ The framework also provides a Page abstraction for modeling your webapp's pages.
 <ul>
     <li>The Browser classes provide a facade for configuring and using Selenium WebDrivers.</li>
     <li>
-    Use BrowserFactory.createLocalBrowser() or BrowserFactory.createRemoteBrowser() to instantiate a 
+    Use LocalBrowserBuilder.getBuilder() or RemoteBrowserBuilder.getBuilder() to instantiate a 
     Chrome, Firefox, or Internet Explorer Browser that is either on the local machine or running in a 
     Selenium Grid.
     </li>
