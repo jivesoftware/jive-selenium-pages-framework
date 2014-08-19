@@ -35,12 +35,12 @@ public class RemoteBrowserBuilder {
 
     private TimeoutsConfig timeoutsConfig;
 
-    private Optional<String> browserVersion;
-    private Optional<String> browserLocale;
-    private Optional<Integer> startWindowWidth;
-    private Optional<Integer> startWindowHeight;
-    private Optional<Level> browserLogLevel;
-    private Optional<String> browserLogFile;
+    private Optional<String> browserVersion = Optional.absent();
+    private Optional<String> browserLocale = Optional.absent();
+    private Optional<Integer> startWindowWidth = Optional.absent();
+    private Optional<Integer> startWindowHeight = Optional.absent();
+    private Optional<Level> browserLogLevel = Optional.absent();
+    private Optional<String> browserLogFile = Optional.absent();
 
     private RemoteBrowserBuilder(BrowserType browserType,
                                  String baseTestUrl,

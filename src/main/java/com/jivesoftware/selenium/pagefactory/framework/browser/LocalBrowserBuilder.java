@@ -40,13 +40,13 @@ public class LocalBrowserBuilder {
 
     private TimeoutsConfig timeoutsConfig;
 
-    private Optional<String> webDriverPath;
-    private Optional<String> browserBinaryPath;
-    private Optional<String> browserLocale;
-    private Optional<Integer> startWindowWidth;
-    private Optional<Integer> startWindowHeight;
-    private Optional<Level> browserLogLevel;
-    private Optional<String> browserLogFile;
+    private Optional<String> webDriverPath = Optional.absent();
+    private Optional<String> browserBinaryPath = Optional.absent();
+    private Optional<String> browserLocale = Optional.absent();
+    private Optional<Integer> startWindowWidth = Optional.absent();
+    private Optional<Integer> startWindowHeight = Optional.absent();
+    private Optional<Level> browserLogLevel = Optional.absent();
+    private Optional<String> browserLogFile = Optional.absent();
 
     private LocalBrowserBuilder(BrowserType browserType, String baseTestUrl) {
         this.browserType = Preconditions.checkNotNull(browserType, "You must provide a non-null browserType!");
