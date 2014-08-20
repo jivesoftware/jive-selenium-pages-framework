@@ -1,10 +1,15 @@
-package com.jivesoftware.selenium.pagefactory.framework.browser;
+package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.web.BaseWebSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -12,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
@@ -24,13 +31,13 @@ import java.util.logging.Level;
  *
  * See <a href="http://code.google.com/p/selenium/wiki/Grid2">http://code.google.com/p/selenium/wiki/Grid2</a>
  */
-public class RemoteBrowser extends Browser {
-    protected Browser delegate;
+public class RemoteBrowser extends WebBrowser {
+    protected WebBrowser delegate;
     protected String seleniumHubURL;
     private static final Logger logger = LoggerFactory.getLogger(RemoteBrowser.class);
 
 
-    public RemoteBrowser(Browser delegate, String seleniumHubURL) {
+    public RemoteBrowser(WebBrowser delegate, String seleniumHubURL) {
         super(delegate.getBaseTestUrl(),
                 delegate.getTimeouts(),
                 delegate.getWebDriverPath(),
@@ -38,13 +45,13 @@ public class RemoteBrowser extends Browser {
                 delegate.getBrowserVersion(),
                 delegate.getBrowserLocale(),
                 delegate.getStartWindowWidth(),
-                delegate.getStartWindowHeight());
+                delegate.getStartWindowHeight(), delegate.getBrowserLogLevel(), delegate.getBrowserLogFile());
         this.delegate = delegate;
         this.seleniumHubURL = seleniumHubURL;
     }
 
     @Override
-    public BrowserType getBrowserType() {
+    public WebBrowserType getBrowserType() {
         return delegate.getBrowserType();
     }
 
@@ -68,11 +75,6 @@ public class RemoteBrowser extends Browser {
     }
 
     @Override
-    public boolean isRemote() {
-        return true;
-    }
-
-    @Override
     public SeleniumActions getActions() {
         SeleniumActions actions = delegate.getActions();
         actions.setBrowser(this);  //We are running remotely, so the Actions should use the RemoteBrowser and RemoteWebDriver
@@ -88,7 +90,7 @@ public class RemoteBrowser extends Browser {
      */
     @Nullable
     public LogEntries getBrowserLogEntries() {
-        if (delegate.getBrowserType() == BrowserType.IE) {
+        if (delegate.getBrowserType() == WebBrowserType.IE) {
             logger.info("IE does not support getting Browser Logs remotely. Returning null from getBrowserLogEntries");
             return null;
         }
@@ -118,5 +120,26 @@ public class RemoteBrowser extends Browser {
             logger.info("Error retrieving remote logs: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Save a screenshot in PNG format to given file name.
+     *
+     * @param filename
+     * @return - a File representing the saved screenshot.
+     */
+    @Override
+    public File saveScreenshotToFile(String filename) {
+        TakesScreenshot screenshotDriver;
+        screenshotDriver = (TakesScreenshot) new Augmenter().augment(getWebDriver());
+        File scrFile = screenshotDriver.getScreenshotAs(OutputType.FILE);
+        // Now you can do whatever you need to do with it, for example copy somewhere
+        File outFile = new File(filename);
+        try {
+            FileUtils.copyFile(scrFile, outFile);
+        } catch (IOException e) {
+            logger.error("Error saving screenshot!", e);
+        }
+        return outFile;
     }
 }

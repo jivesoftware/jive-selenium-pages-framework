@@ -1,7 +1,9 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
 import com.google.common.base.Optional;
+import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.PageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +47,8 @@ public class BaseTopLevelPage implements TopLevelPage {
 
 
     @Override
-    public String getPageIdentifierCSS() {
-        return "body";
+    public By getPageIdentifier() {
+        return null;
     }
 
     public final void initSubPages() {

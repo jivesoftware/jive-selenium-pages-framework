@@ -3,8 +3,10 @@ package com.jivesoftware.selenium.pagefactory.framework.pages;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.slf4j.Logger;
@@ -41,13 +43,13 @@ public class PageUtils {
     /**
      * Default implementation of pageLoadHook().
      *
-     * Just verify the page identifier CSS is present on the DOM.
+     * Just verify the page identifier Locator is present on the DOM.
      *
      * @param page
      * @param a
      */
     public void defaultPageLoadHook(Page page, SeleniumActions a) {
-        String pageIdentifier = page.getPageIdentifierCSS();
+        By pageIdentifier = page.getPageIdentifier();
         if (pageIdentifier != null) {
             a.verifyElementPresented(pageIdentifier, TimeoutType.PAGE_LOAD_TIMEOUT);
         }

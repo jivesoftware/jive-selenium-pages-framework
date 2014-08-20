@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.jivesoftware.selenium.pagefactory.framework.actions.web.WebElementHelpers;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
@@ -23,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -34,31 +33,33 @@ import static java.lang.String.format;
 /**
  * Default implementations of Selenium actions that aren't browser-specific.
  */
-public abstract class BaseSeleniumActions implements SeleniumActions {
+public abstract class BaseSeleniumActions <B extends Browser> implements SeleniumActions {
     private static final long DEFAULT_POLL_MILLIS = 100;
 
-    protected Browser browser;
+    protected B browser;
     protected final TimeoutsConfig timeoutsConfig;
     protected static Logger logger = LoggerFactory.getLogger(BaseSeleniumActions.class);
 
-    public BaseSeleniumActions(Browser browser) {
+    public BaseSeleniumActions(B browser) {
         this.browser = Preconditions.checkNotNull(browser, "Error: you must supply a non-null Browser to BaseSeleniumActions!");
         this.timeoutsConfig = Preconditions.checkNotNull(browser.getTimeouts(), "Error: you must supply a non-null Timeouts to BaseSeleniumActions!");
     }
 
     //Convenience method to reduce typing
-    private WebDriver webDriver() {
+    protected WebDriver webDriver() {
         return browser.getWebDriver();
     }
 
+/**
+ * Return the {@link com.jivesoftware.selenium.pagefactory.framework.browser.Browser} object this actions class is tied to.
+ */
     @Override
-    public Browser getBrowser() {
+    public B getBrowser() {
         return browser;
     }
 
-    @Override
     public void setBrowser(Browser browser) {
-        this.browser = browser;
+        this.browser = (B)browser;
     }
 
     @Override
@@ -81,14 +82,15 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement clearText(String css) {
-        WebElement el = verifyElementPresented(css, TimeoutType.DEFAULT);
+    public WebElement clearText(By locator) {
+        WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
         try {
             el.clear();
         } catch (Exception e) {
-            throw new RuntimeException(format("Error clearing text from element with CSS '%s': %s", css, e.getMessage()), e);
+            throw new RuntimeException(format("Error clearing text from element with Locator '%s': %s",
+                    locator.toString(), e.getMessage()), e);
         }
-        logger.info("Cleared text from element with CSS '{}'", css);
+        logger.info("Cleared text from element with Locator '{}'", locator);
         return el;
     }
 
@@ -105,21 +107,21 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement clickNoWait(String css) throws JiveWebDriverException {
-        WebElement el = getElement(css);
+    public WebElement clickNoWait(By locator) throws JiveWebDriverException {
+        WebElement el = getElement(locator);
         if (!isClickable(el)) {
-            throw new JiveWebDriverException("Element is not clickable: " + css);
+            throw new JiveWebDriverException("Element is not clickable: " + locator.toString());
         }
         el.click();
-        logger.info("Clicked element with CSS '{}', no waiting.", css);
+        logger.info("Clicked element with locator '{}', no waiting.", locator);
         return el;
     }
 
     @Override
-    public WebElement click(String css, TimeoutType timeout) {
-        WebElement el = waitUntilClickable(css, timeout);
+    public WebElement click(By locator, TimeoutType timeout) {
+        WebElement el = waitUntilClickable(locator, timeout);
         el.click();
-        logger.info("Clicked element with CSS '{}'", css);
+        logger.info("Clicked element with locator '{}'", locator);
         return el;
     }
 
@@ -133,48 +135,50 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement clickAndVerifyPresent(String cssToClick, String cssToVerifyPresent, TimeoutType timeout) {
-        click(cssToClick, timeout);
-        logger.info("After click, waiting for '{}' to be present.", cssToVerifyPresent);
+    public WebElement clickAndVerifyPresent(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout) {
+        click(locatorToClick, timeout);
+        logger.info("After click, waiting for '{}' to be present.", locatorToVerifyPresent);
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage = format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
-                cssToVerifyPresent, waitSeconds);
+        final String errorMessage =
+                format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
+                        locatorToVerifyPresent, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        return wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(cssToVerifyPresent)));
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
     }
 
     @Override
-    public WebElement clickAndVerifyPresent(WebElement el, String cssToVerifyPresent, TimeoutType timeout) {
+    public WebElement clickAndVerifyPresent(WebElement el, By locatorToVerifyPresent, TimeoutType timeout) {
         click(el, timeout);
-        logger.info("After click, waiting for '{}' to be present.", cssToVerifyPresent);
+        logger.info("After click, waiting for '{}' to be present.", locatorToVerifyPresent);
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage = format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
-                cssToVerifyPresent, waitSeconds);
+        final String errorMessage =
+                format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
+                        locatorToVerifyPresent, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        return wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(cssToVerifyPresent)));
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
     }
 
     @Override
-    public WebElement clickAndVerifyVisible(String cssToClick, String cssToVerifyVisible, TimeoutType timeout) {
-        click(cssToClick, timeout);
-        logger.info("After click, waiting for '{}' to be visible.", cssToVerifyVisible);
-        return verifyElementVisible(cssToVerifyVisible, timeout);
+    public WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyVisible, TimeoutType timeout) {
+        click(locatorToClick, timeout);
+        logger.info("After click, waiting for '{}' to be visible.", locatorToVerifyVisible);
+        return verifyElementVisible(locatorToVerifyVisible, timeout);
     }
 
     @Override
-    public WebElement clickAndVerifyVisible(WebElement el, String cssToVerifyVisible, TimeoutType timeout) {
+    public WebElement clickAndVerifyVisible(WebElement el, By locatorToVerifyVisible, TimeoutType timeout) {
         click(el, timeout);
-        logger.info("After click, waiting for '{}' to be visible.", cssToVerifyVisible);
-        return verifyElementVisible(cssToVerifyVisible, timeout);
+        logger.info("After click, waiting for '{}' to be visible.", locatorToVerifyVisible);
+        return verifyElementVisible(locatorToVerifyVisible, timeout);
     }
 
     @Override
-    public <T extends TopLevelPage> T clickAndLoadTopLevelPage(String cssToClick, Class<T> pageClass, TimeoutType timeout) {
-        click(cssToClick, TimeoutType.DEFAULT);
+    public <T extends TopLevelPage> T clickAndLoadTopLevelPage(By locatorToClick, Class<T> pageClass, TimeoutType timeout) {
+        click(locatorToClick, TimeoutType.DEFAULT);
         return loadTopLevelPage(pageClass);
     }
 
@@ -185,8 +189,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public <T extends SubPage> T clickAndLoadSubPage(String cssToClick, Class<T> pageClass, TimeoutType timeout) {
-        click(cssToClick, TimeoutType.DEFAULT);
+    public <T extends SubPage> T clickAndLoadSubPage(By locatorToClick, Class<T> pageClass, TimeoutType timeout) {
+        click(locatorToClick, TimeoutType.DEFAULT);
         return loadSubPage(pageClass);
     }
 
@@ -197,63 +201,56 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public void clickAndVerifyNotPresent(String cssToClick, String cssToVerifyNotPresent, TimeoutType timeout) {
-        click(cssToClick, timeout);
-        logger.info("After click, waiting for '{}' to NOT be present.", cssToVerifyNotPresent);
+    public void clickAndVerifyNotPresent(By locatorToClick, By locatorToVerifyNotPresent, TimeoutType timeout) {
+        click(locatorToClick, timeout);
+        logger.info("After click, waiting for '{}' to NOT be present.", locatorToVerifyNotPresent);
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in clickAndVerifyNotPresent: element '%s' never became removed from the DOM after %d seconds!",
-                cssToVerifyNotPresent, waitSeconds);
+                locatorToVerifyNotPresent, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
         wait.until(ExpectedConditions.not(
-                ExpectedConditions.presenceOfAllElementsLocatedBy((By.cssSelector(cssToVerifyNotPresent)))));
+                ExpectedConditions.presenceOfAllElementsLocatedBy(locatorToVerifyNotPresent)));
     }
 
     @Override
-    public void clickAndVerifyNotPresent(WebElement el, String cssToVerifyNotPresent, TimeoutType timeout) {
+    public void clickAndVerifyNotPresent(WebElement el, By locatorToVerifyNotPresent, TimeoutType timeout) {
         click(el, timeout);
-        logger.info("After click, waiting for '{}' to NOT be present.", cssToVerifyNotPresent);
+        logger.info("After click, waiting for '{}' to NOT be present.", locatorToVerifyNotPresent);
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in clickAndVerifyNotPresent: element '%s' never became removed from the DOM after %d seconds!",
-                cssToVerifyNotPresent, waitSeconds);
+                locatorToVerifyNotPresent, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
         wait.until(ExpectedConditions.not(
-                ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(cssToVerifyNotPresent))));
+                ExpectedConditions.presenceOfAllElementsLocatedBy(locatorToVerifyNotPresent)));
     }
 
     @Override
-    public void clickAndVerifyNotVisible(String cssToClick, String cssToVerifyNotVisible, TimeoutType timeout) {
-        click(cssToClick, timeout);
-        logger.info("After click, waiting for '{}' to NOT be visible.", cssToVerifyNotVisible);
-        verifyElementInvisible(cssToVerifyNotVisible, timeout);
+    public void clickAndVerifyNotVisible(By locatorToClick, By locatorToVerifyNotVisible, TimeoutType timeout) {
+        click(locatorToClick, timeout);
+        logger.info("After click, waiting for '{}' to NOT be visible.", locatorToVerifyNotVisible);
+        verifyElementInvisible(locatorToVerifyNotVisible, timeout);
     }
 
     @Override
-    public void clickAndVerifyNotVisible(WebElement el, String cssToVerifyNotVisible, TimeoutType timeout) {
+    public void clickAndVerifyNotVisible(WebElement el, By locatorToVerifyNotVisible, TimeoutType timeout) {
         click(el, timeout);
-        logger.info("After click, waiting for '{}' to NOT be visible.", cssToVerifyNotVisible);
-        verifyElementInvisible(cssToVerifyNotVisible, timeout);
+        logger.info("After click, waiting for '{}' to NOT be visible.", locatorToVerifyNotVisible);
+        verifyElementInvisible(locatorToVerifyNotVisible, timeout);
     }
 
     @Override
-    public void clickAndSelectFromList(String cssToClick, String popoverCSS) {
-        invokeMenuItemAndSelect(getElement(cssToClick), popoverCSS);
+    public void clickAndSelectFromList(By locatorToClick, By popoverLocator) {
+        invokeMenuItemAndSelect(getElement(locatorToClick), popoverLocator);
     }
 
     @Override
-    public void clickAndSelectFromList(WebElement clickable, String popoverCSS) {
-        invokeMenuItemAndSelect(clickable, popoverCSS);
+    public void clickAndSelectFromList(WebElement clickable, By popoverLocator) {
+        invokeMenuItemAndSelect(clickable, popoverLocator);
     }
-
-    @Override
-    public boolean doesElementHaveClass(String css, String cssClass) {
-        WebElement el = verifyElementPresented(css, TimeoutType.DEFAULT);
-        return WebElementHelpers.webElementHasClass(el, cssClass);
-    }
-
     @Override
     public Object executeJavascript(String script) {
         logger.trace("Executing javascript: '{}'", script);
@@ -263,7 +260,6 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
             throw new RuntimeException(format("Exception executing Javascript '%s':", script), e);
         }
     }
-
     @Override
     public void waitForJavascriptSymbolToBeDefined(final String symbol, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
@@ -313,28 +309,28 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
      * According to Selenium Javadoc, this is the correct way to check for existence of an element.
      */
     @Override
-    public boolean exists(String css) {
-        List<WebElement> elements = findElements(css, null);
+    public boolean exists(By locator) {
+        List<WebElement> elements = findElements(locator, null);
         return elements.size() > 0;
     }
 
     @Override
-    public boolean exists(String css, WebElement parentEl) {
-        List<WebElement> elements = findElements(css, parentEl);
+    public boolean exists(By locator, WebElement parentEl) {
+        List<WebElement> elements = findElements(locator, parentEl);
         return elements.size() > 0;
     }
 
     @Override
-    public WebElement findElementContainingText(String css, String text) {
-        List<WebElement> matches = findElements(css, null);
+    public WebElement findElementContainingText(By locator, String text) {
+        List<WebElement> matches = findElements(locator, null);
         for (WebElement el : matches) {
             try {
                 if (el.getText().contains(text)) {
-                    logger.info("SUCCESS: Found web element containing text '{}' with CSS '{}'", text, css);
+                    logger.info("SUCCESS: Found web element containing text '{}' with locator '{}'", text, locator);
                     return el;
                 }
             } catch (Exception e) { //Don't fail just because one web element was stale. Continue searching for the text.
-                logger.debug("Exception while searching for web elements containing text '{}' with CSS '{}'", text, css);
+                logger.debug("Exception while searching for web elements containing text '{}' with locator '{}'", text, locator);
                 logger.debug(Throwables.getStackTraceAsString(e));
             }
         }
@@ -342,16 +338,16 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement findVisibleElementContainingText(String css, String text) {
-        List<WebElement> matches = findElements(css, null);
+    public WebElement findVisibleElementContainingText(By locator, String text) {
+        List<WebElement> matches = findElements(locator, null);
         for (WebElement el : matches) {
             try {
                 if (el.getText().contains(text) && el.isDisplayed()) {
-                    logger.info("SUCCESS: Found visible web element containing text '{}' with CSS '{}'", text, css);
+                    logger.info("SUCCESS: Found visible web element containing text '{}' with locator '{}'", text, locator);
                     return el;
                 }
             } catch (Exception e) { //Don't fail just because one web element was stale. Continue searching for the text.
-                logger.debug("Exception while searching for web elements containing text '{}' with CSS '{}'", text, css);
+                logger.debug("Exception while searching for web elements containing text '{}' with locator '{}'", text, locator);
                 logger.debug(Throwables.getStackTraceAsString(e));
             }
         }
@@ -359,7 +355,7 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement findVisibleElementContainingTextWithWait(final String css, final String text, TimeoutType timeout) {
+    public WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.ignoring(StaleElementReferenceException.class);
@@ -367,7 +363,7 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
         return wait.until(new ExpectedCondition<WebElement>() {
             @Override
             public WebElement apply(@Nullable WebDriver input) {
-                WebElement el = findVisibleElementContainingText(css, text);
+                WebElement el = findVisibleElementContainingText(locator, text);
                 if (el == null) {
                     GeneralUtils.waitOneSecond();
                 }
@@ -377,24 +373,24 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement findElementWithRefresh(final String css, TimeoutType timeout) {
-        return findElementContainingTextWithRefresh(css, "", timeout);
+    public WebElement findElementWithRefresh(final By locator, TimeoutType timeout) {
+        return findElementContainingTextWithRefresh(locator, "", timeout);
     }
 
     @Override
-    public WebElement findElementContainingTextWithRefresh(final String css, final String text, TimeoutType timeout) {
+    public WebElement findElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.ignoring(StaleElementReferenceException.class);
 
-        logger.info("Waiting for element containing text '{}' defined by css '{}', timeout of {} seconds", new Object[]{text, css, waitSeconds});
+        logger.info("Waiting for element containing text '{}' defined by locator '{}', timeout of {} seconds", new Object[]{text, locator, waitSeconds});
         try {
             WebElement found = wait.until(new ExpectedCondition<WebElement>() {
                 @Override
                 public WebElement apply(@Nullable WebDriver input) {
                     long start = new Date().getTime();
                     while ((new Date().getTime() - start) / 1000 < timeoutsConfig.getPauseBetweenRefreshSeconds()) {
-                        WebElement el = findElementContainingText(css, text);
+                        WebElement el = findElementContainingText(locator, text);
                         if (el != null) {
                             return el;
                         }
@@ -404,34 +400,34 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
                     return null;
                 }
             });
-            logger.info("Success finding element containing text '{}' defined by css '{}'!", text, css);
+            logger.info("Success finding element containing text '{}' defined by locator '{}'!", text, locator);
             return found;
         } catch (TimeoutException e) {
-            logger.error("Timeout waiting to find text '{}' in an element matching css '{}'", text, css);
+            logger.error("Timeout waiting to find text '{}' in an element matching locator '{}'", text, locator);
             throw new TimeoutException(
-                    format("Timeout waiting to find text '%s' in an element matching css '%s'", text, css));
+                    format("Timeout waiting to find text '%s' in an element matching locator '%s'", text, locator));
         }
     }
 
     @Override
-    public WebElement findVisibleElementWithRefresh(final String css, TimeoutType timeout) {
-        return findVisibleElementContainingTextWithRefresh(css, "", timeout);
+    public WebElement findVisibleElementWithRefresh(final By locator, TimeoutType timeout) {
+        return findVisibleElementContainingTextWithRefresh(locator, "", timeout);
     }
 
     @Override
-    public WebElement findVisibleElementContainingTextWithRefresh(final String css, final String text, TimeoutType timeout) {
+    public WebElement findVisibleElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.ignoring(StaleElementReferenceException.class);
 
-        logger.info("Waiting for element containing text '{}' defined by css '{}', timeout of {} seconds", new Object[]{text, css, waitSeconds});
+        logger.info("Waiting for element containing text '{}' defined by locator '{}', timeout of {} seconds", new Object[]{text, locator, waitSeconds});
         try {
             WebElement found = wait.until(new ExpectedCondition<WebElement>() {
                 @Override
                 public WebElement apply(@Nullable WebDriver input) {
                     long start = new Date().getTime();
                     while ((new Date().getTime() - start) / 1000 < timeoutsConfig.getPauseBetweenRefreshSeconds()) {
-                        WebElement el = findVisibleElementContainingText(css, text);
+                        WebElement el = findVisibleElementContainingText(locator, text);
                         if (el != null) {
                             return el;
                         }
@@ -441,20 +437,20 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
                     return null;
                 }
             });
-            logger.info("Success finding element containing text '{}' defined by css '{}'!", text, css);
+            logger.info("Success finding element containing text '{}' defined by locator '{}'!", text, locator);
             return found;
         } catch (TimeoutException e) {
-            logger.error("Timeout waiting to find text '{}' in an element matching css '{}'", text, css);
+            logger.error("Timeout waiting to find text '{}' in an element matching locator '{}'", text, locator);
             throw new TimeoutException(
-                    format("Timeout waiting to find text '%s' in an element matching css '%s'", text, css));
+                    format("Timeout waiting to find text '%s' in an element matching locator '%s'", text, locator));
         }
     }
 
     @Override
-    public WebElement findElementContainingTextWithWait(final String css, final String text, TimeoutType timeout) {
+    public WebElement findElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
         final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String msg = format("Failure in findElementContainingTextWithWait: never found text '%s' in element " +
-                                  "with css '%s' with timeout of %d seconds", text, css, waitSeconds);
+                                  "with locator '%s' with timeout of %d seconds", text, locator, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.ignoring(StaleElementReferenceException.class)
             .withMessage(msg);
@@ -462,7 +458,7 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
         return wait.until(new ExpectedCondition<WebElement>() {
             @Override
             public WebElement apply(@Nullable WebDriver input) {
-                WebElement el = findElementContainingText(css, text);
+                WebElement el = findElementContainingText(locator, text);
                 if (el == null) {
                     GeneralUtils.waitOneSecond();
                 }
@@ -473,8 +469,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
 
     @Override
     @Nullable
-    public WebElement getChildElement(String css, WebElement parentEl) {
-        List<WebElement> elements = findElements(css, parentEl);
+    public WebElement getChildElement(By locator, WebElement parentEl) {
+        List<WebElement> elements = findElements(locator, parentEl);
         if (elements.size() > 0) {
             return elements.get(0);
         }
@@ -483,8 +479,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
 
     @Override
     @Nullable
-    public WebElement getElement(String css) {
-        List<WebElement> elements = findElements(css, null);
+    public WebElement getElement(By locator) {
+        List<WebElement> elements = findElements(locator, null);
         if (elements.size() > 0) {
             return elements.get(0);
         }
@@ -493,34 +489,34 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
 
     @Override
     @Nonnull
-    public List<WebElement> getChildElements(String css, WebElement parentEl) {
-        return findElements(css, parentEl);
+    public List<WebElement> getChildElements(By locator, WebElement parentEl) {
+        return findElements(locator, parentEl);
     }
 
     @Override
     @Nonnull
-    public List<WebElement> getElements(String css) {
-        return findElements(css, null);
+    public List<WebElement> getElements(By locator) {
+        return findElements(locator, null);
     }
 
     @Override
     @Nonnull
-    public WebElement getElementWithWait(String css) {
-        return getChildElementWithWait(css, null);
+    public WebElement getElementWithWait(By locator) {
+        return getChildElementWithWait(locator, null);
     }
 
 
     @Override
     @Nonnull
-    public WebElement getChildElementWithWait(String css, WebElement parentEl) {
+    public WebElement getChildElementWithWait(By locator, WebElement parentEl) {
         try {
-            WebElement el = findElement(css, parentEl);
-            logger.trace("Successfully found web element by CSS '{}'", css);
+            WebElement el = findElement(locator, parentEl);
+            logger.trace("Successfully found web element by locator '{}'", locator);
             return el;
         } catch (NoSuchElementException e) {
             long implicitWait = browser.getImplicitWaitTimeoutMillis();
             throw new RuntimeException(
-                    format("Timeout using implicit wait of %d ms waiting to find web element with CSS '%s' ", implicitWait, css));
+                    format("Timeout using implicit wait of %d ms waiting to find web element with locator '%s' ", implicitWait, locator));
         }
     }
 
@@ -532,13 +528,13 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
 
     @Override
     @Nonnull
-    public WebElement inputText(String css, String text) {
-        logger.info("Inputting text '{}' into element with CSS '{}'", text, css);
-        WebElement el = getElementWithWait(css);
+    public WebElement inputText(By locator, String text) {
+        logger.info("Inputting text '{}' into element with locator '{}'", text, locator);
+        WebElement el = getElementWithWait(locator);
         try {
             el.sendKeys(text);
         } catch (Exception e) {
-            throw new RuntimeException(format("Error inputting text '%s' into element with CSS '%s': %s", text, css, e.getMessage()), e);
+            throw new RuntimeException(format("Error inputting text '%s' into element with locator '%s': %s", text, locator, e.getMessage()), e);
         }
         return el;
     }
@@ -556,20 +552,20 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement inputTextAndSelectFromList(WebElement inputField, String value, String popoverCSS) throws SeleniumActionsException {
-        return inputTextAndSelectFromList(inputField, value, popoverCSS, 0);         // default is no retries
+    public WebElement inputTextAndSelectFromList(WebElement inputField, String value, By popoverLocator) throws SeleniumActionsException {
+        return inputTextAndSelectFromList(inputField, value, popoverLocator, 0);         // default is no retries
     }
 
     @Override
-    public WebElement inputTextAndSelectFromList(WebElement inputField, String value, String popoverCSS,
+    public WebElement inputTextAndSelectFromList(WebElement inputField, String value, By popoverLocator,
                                                  int withRetryCount) throws SeleniumActionsException {
-        return enterTextAndSelectFromList(inputField, value, popoverCSS, withRetryCount, false);
+        return enterTextAndSelectFromList(inputField, value, popoverLocator, withRetryCount, false);
     }
 
     @Override
-    public WebElement inputTextSlowly(String css, String text) {
-        WebElement el = getElementWithWait(css);
-        logger.info("Inputting text '{}' into web element with CSS '{}'", text, css);
+    public WebElement inputTextSlowly(By locator, String text) {
+        WebElement el = getElementWithWait(locator);
+        logger.info("Inputting text '{}' into web element with locator '{}'", text, locator);
         return inputTextSlowly(el, text);
     }
 
@@ -588,40 +584,40 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement inputTextSlowlyAndSelectFromList(WebElement inputField, String value, String popoverCSS) throws SeleniumActionsException {
-        return inputTextSlowlyAndSelectFromList(inputField, value, popoverCSS, 0);      // default is no retries
+    public WebElement inputTextSlowlyAndSelectFromList(WebElement inputField, String value, By popoverLocator) throws SeleniumActionsException {
+        return inputTextSlowlyAndSelectFromList(inputField, value, popoverLocator, 0);      // default is no retries
     }
 
     @Override
-    public WebElement inputTextSlowlyAndSelectFromList(WebElement inputField, String value, String popoverCSS,
+    public WebElement inputTextSlowlyAndSelectFromList(WebElement inputField, String value, By popoverLocator,
                                                        int withRetryCount) throws SeleniumActionsException {
-        return enterTextAndSelectFromList(inputField, value, popoverCSS, withRetryCount, true);
+        return enterTextAndSelectFromList(inputField, value, popoverLocator, withRetryCount, true);
     }
 
     @Override
-    public void enterTextForAutoCompleteAndSelectFirstMatch(String inputCSS, String text, String popupItemCss,
+    public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, String text, By popoverLocator,
                                                             String requiredPopupText) {
-        enterTextForAutoCompleteAndSelectFirstMatch(inputCSS, 0, text, popupItemCss, requiredPopupText);
+        enterTextForAutoCompleteAndSelectFirstMatch(inputLocator, 0, text, popoverLocator, requiredPopupText);
     }
 
     @Override
-    public void enterTextForAutoCompleteAndSelectFirstMatch(String inputCSS, int minChars, String text, String popupItemCss,
+    public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, int minChars, String text, By popoverLocator,
                                                             String requiredPopupText) {
         if (minChars > text.length()) {
             throw new RuntimeException(format("Minimum characters to enter (%d) is greater than the length of the input text '%s'!", minChars, text));
         }
-        scrollIntoView(inputCSS);
+        scrollIntoView(inputLocator);
         if (minChars > 0) {
-            inputText(inputCSS, text.substring(0, minChars));
+            inputText(inputLocator, text.substring(0, minChars));
         }
         for (int i = minChars; i < text.length(); i++) {
             String oneChar = String.valueOf(text.charAt(i));
-            inputText(inputCSS, oneChar);
+            inputText(inputLocator, oneChar);
 
             // If the last char is being entered, wait 5 full seconds for the expected popup. Otherwise, wait 1 second.
             TimeoutType timeout = (i == text.length() - 1) ? TimeoutType.FIVE_SECONDS : TimeoutType.ONE_SECOND;
             try {
-                WebElement matchingPopup = findElementContainingTextWithWait(popupItemCss, requiredPopupText, timeout);
+                WebElement matchingPopup = findElementContainingTextWithWait(popoverLocator, requiredPopupText, timeout);
                 if (matchingPopup != null) {
                     try {
                         getActionsBuilder().moveToElement(matchingPopup)
@@ -638,7 +634,7 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
                 continue;
             }
         }
-        throw new RuntimeException(format("No popup defined by CSS '%s' found with required text '%s'", popupItemCss, requiredPopupText));
+        throw new RuntimeException(format("No popup defined by Locator  '%s' found with required text '%s'", popoverLocator, requiredPopupText));
     }
 
     @Override
@@ -655,8 +651,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public boolean isClickable(String css) {
-        WebElement el = getElement(css);
+    public boolean isClickable(By locator) {
+        WebElement el = getElement(locator);
         if (el == null) {
             return false;
         }
@@ -685,8 +681,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public boolean isVisible(String css) {
-        WebElement el = getElement(css);
+    public boolean isVisible(By locator) {
+        WebElement el = getElement(locator);
         return isVisible(el);
     }
 
@@ -699,8 +695,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public void scrollIntoView(String css) {
-        WebElement el = verifyElementPresented(css, TimeoutType.DEFAULT);
+    public void scrollIntoView(By locator) {
+        WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
         scrollIntoView(el);
     }
 
@@ -712,137 +708,93 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public void scrollIntoView(String scrollContainerCSS, String css) {
-        WebElement parent = verifyElementPresented(scrollContainerCSS, TimeoutType.DEFAULT);
-        WebElement el = verifyElementPresented(css, TimeoutType.DEFAULT);
-        int currentScrollTop = ((Long) executeJavascript(format("return $('%s').scrollTop()", scrollContainerCSS))).intValue();
+    public void scrollIntoView(By scrollContainerLocator, By locator) {
+        WebElement parent = verifyElementPresented(scrollContainerLocator, TimeoutType.DEFAULT);
+        WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
+        int currentScrollTop = ((Long) executeJavascript(format("return $('%s').scrollTop()", scrollContainerLocator))).intValue();
         int y = el.getLocation().getY();
         int parentY = parent.getLocation().getY();
         int scrollTo = Math.max(0, y - parentY + currentScrollTop);
-        executeJavascript(format("$('%s').scrollTop(%d)", scrollContainerCSS, scrollTo));
+        executeJavascript(format("$('%s').scrollTop(%d)", scrollContainerLocator, scrollTo));
     }
 
     @Override
-    public void scrollIntoView(String scrollContainerCSS, WebElement el) {
-        WebElement parent = verifyElementPresented(scrollContainerCSS, TimeoutType.DEFAULT);
-        int currentScrollTop = ((Long) executeJavascript(format("return $('%s').scrollTop()", scrollContainerCSS))).intValue();
+    public void scrollIntoView(By scrollContainerLocator, WebElement el) {
+        WebElement parent = verifyElementPresented(scrollContainerLocator, TimeoutType.DEFAULT);
+        int currentScrollTop = ((Long) executeJavascript(format("return $('%s').scrollTop()", scrollContainerLocator))).intValue();
         int y = el.getLocation().getY();
         int parentY = parent.getLocation().getY();
         int scrollTo = Math.max(0, y - parentY + currentScrollTop);
-        executeJavascript(format("$('%s').scrollTop(%d)", scrollContainerCSS, scrollTo));
-    }
-
-    @Override
-    public void openWebPage(URI uri) {
-        try {
-            browser.openPageByURL(uri.toString(), BaseTopLevelPage.class);
-        } catch (URISyntaxException e) {
-            // This failure mode should be impossible, since we passed in a URI. 
-            throw new RuntimeException(e);
-        }
+        executeJavascript(format("$('%s').scrollTop(%d)", scrollContainerLocator, scrollTo));
     }
 
     @Override
     public <T extends TopLevelPage> T loadTopLevelPage(Class<T> pageClass) {
-        return browser.loadTopLevelPage(pageClass);
+        return (T) browser.loadTopLevelPage(pageClass);
     }
 
     @Override
     public <T extends SubPage> T loadSubPage(Class<T> pageClass) {
-        return browser.loadSubPage(pageClass);
+        return (T)browser.loadSubPage(pageClass);
     }
 
     @Override
-    public void verifyElementContainsText(final String css, final String text, TimeoutType timeout) {
+    public void verifyElementContainsText(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage = format("Failure in verifyElementContainsText: an element with CSS '%s' was never found containing text '%s'!",
-                css, text);
+        final String errorMessage = format("Failure in verifyElementContainsText: an element with Locator '%s' was never found containing text '%s'!",
+                locator, text);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(css), text));
-        logger.info("SUCCESS: Verified element with CSS '{}' contains text '{}'", css, text);
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+        logger.info("SUCCESS: Verified element with Locator '{}' contains text '{}'", locator, text);
     }
 
     @Override
-    public WebElement verifyElementHasClass(final String css, final String cssClass, TimeoutType timeout) {
-        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
-                                  @Nullable
-                                  @Override
-                                  public WebElement apply(SeleniumActions input) {
-                                      WebElement el = input.verifyElementPresented(css, TimeoutType.DEFAULT);
-                                      if (WebElementHelpers.webElementHasClass(el, cssClass)) {
-                                          return el;
-                                      }
-                                      return null;
-                                  }
-                              }, this,
-                format("Waiting for element with css '%s' to have css class '%s'", css, cssClass),
-                timeout);
-    }
-
-    @Override
-    public WebElement verifyElementDoesNotHaveClass(final String css, final String cssClass, TimeoutType timeout) {
-        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
-                                  @Nullable
-                                  @Override
-                                  public WebElement apply(SeleniumActions input) {
-                                      WebElement el = input.verifyElementPresented(css, TimeoutType.DEFAULT);
-                                      if (!WebElementHelpers.webElementHasClass(el, cssClass)) {
-                                          return el;
-                                      }
-                                      return null;
-                                  }
-                              }, this,
-                format("Waiting for element with css '%s' to NOT have css class '%s'", css, cssClass),
-                timeout);
-    }
-
-    @Override
-    public WebElement verifyElementPresented(String css, TimeoutType timeout) {
+    public WebElement verifyElementPresented(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage = format("Failure in verifyElementPresented: element '%s' never became presented after %d seconds!",
-                css, waitSeconds);
+        final String errorMessage =
+                format("Failure in verifyElementPresented: element '%s' never became presented after %d seconds!",
+                        locator.toString(), waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.withMessage(errorMessage)
-            .ignoring(StaleElementReferenceException.class);
-        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(css)));
-        logger.trace("SUCCESS: Verified element with CSS '{}' is present", css);
+        wait.withMessage(errorMessage).ignoring(StaleElementReferenceException.class);
+        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+        logger.trace("SUCCESS: Verified element with Locator '{}' is present", locator.toString());
         return el;
     }
 
     @Override
-    public void verifyElementNotPresented(String css, TimeoutType timeout) {
+    public void verifyElementNotPresented(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementNotPresented: element '%s' never became not presented after %d seconds!",
-                css, waitSeconds);
+                locator, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(css)));
-        logger.trace("SUCCESS: Verified element with CSS '{}' is NOT present", css);
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        logger.trace("SUCCESS: Verified element with locator '{}' is NOT present", locator);
     }
 
     @Override
-    public void verifyElementWithTextNotPresented(String css, String text, TimeoutType timeout) {
+    public void verifyElementWithTextNotPresented(By locator, String text, TimeoutType timeout) {
         try {
-            findElementContainingTextWithWait(css, text, timeout);
+            findElementContainingTextWithWait(locator, text, timeout);
             throw new RuntimeException(
-                    format("Error in verifyElementWithTextNotPresented: found element with css '%s' containing text '%s'!", css, text));
+                    format("Error in verifyElementWithTextNotPresented: found element with locator '%s' containing text '%s'!", locator, text));
         } catch (Exception e) {
             return;
         }
     }
 
     @Override
-    public void verifyElementSelected(String css, TimeoutType timeout) {
+    public void verifyElementSelected(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementSelected: Element '%s' never became selected after %d seconds!",
-                css, waitSeconds);
+                locator, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        wait.until(ExpectedConditions.elementToBeSelected(By.cssSelector(css)));
+        wait.until(ExpectedConditions.elementToBeSelected(locator));
     }
 
     @Override
@@ -857,15 +809,15 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public void verifyElementNotSelected(String css, TimeoutType timeout) {
+    public void verifyElementNotSelected(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementNotSelected: Element '%s' never became deselected after %d seconds!",
-                css, waitSeconds);
+                locator, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        wait.until(ExpectedConditions.elementSelectionStateToBe(By.cssSelector(css), false));
-        logger.info("SUCCESS: Verified element with CSS '{}' is NOT selected", css);
+        wait.until(ExpectedConditions.elementSelectionStateToBe(locator, false));
+        logger.info("SUCCESS: Verified element with locator '{}' is NOT selected", locator);
     }
 
     @Override
@@ -877,38 +829,38 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement verifyElementVisible(final String css, TimeoutType timeout) {
-        final String errorMessage = format("Error in verifyElementVisible: element with css '%s' never became visible", css);
-        return waitOnExpectedCondition(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(css)), errorMessage, timeout);
+    public WebElement verifyElementVisible(final By locator, TimeoutType timeout) {
+        final String errorMessage = format("Error in verifyElementVisible: element with locator '%s' never became visible", locator);
+        return waitOnExpectedCondition(ExpectedConditions.visibilityOfElementLocated(locator), errorMessage, timeout);
     }
 
     @Override
-    public void verifyElementInvisible(String css, TimeoutType timeout) {
-        waitOnExpectedCondition(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(css)),
-                format("Failure in verifyElementInvisible waiting for element with css '%s' to be invisible", css), timeout);
+    public void verifyElementInvisible(By locator, TimeoutType timeout) {
+        waitOnExpectedCondition(ExpectedConditions.invisibilityOfElementLocated(locator),
+                format("Failure in verifyElementInvisible waiting for element with locator '%s' to be invisible", locator), timeout);
     }
 
     @Override
-    public void verifyElementWithTextIsInvisible(String css, String text, TimeoutType timeout) {
+    public void verifyElementWithTextIsInvisible(By locator, String text, TimeoutType timeout) {
         try {
-            WebElement visibleEl = findVisibleElementContainingTextWithWait(css, text, timeout);
+            WebElement visibleEl = findVisibleElementContainingTextWithWait(locator, text, timeout);
             throw new RuntimeException(
-                    format("Error in verifyElementWithTextIsInvisible: found element by css '%s' containing text '%s'", css, text));
+                    format("Error in verifyElementWithTextIsInvisible: found element by locator '%s' containing text '%s'", locator, text));
         } catch (Exception e) {
             return; // OK - we didn't find a visible element containing the given text
         }
     }
 
     @Override
-    public WebElement verifyPageRefreshed(WebElement elementFromBeforeRefresh, String cssAfterRefresh, TimeoutType timeout) {
+    public WebElement verifyPageRefreshed(WebElement elementFromBeforeRefresh, By locatorAfterRefresh, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPageRefreshTimeoutSeconds(), timeout);
-        logger.info("Waiting for CSS '{}' to be present after page refreshes, using timeout of {} seconds", cssAfterRefresh, waitSeconds);
+        logger.info("Waiting for locator '{}' to be present after page refreshes, using timeout of {} seconds", locatorAfterRefresh, waitSeconds);
         waitOnExpectedConditionForSeconds(ExpectedConditions.stalenessOf(elementFromBeforeRefresh),
                 "Timeout waiting for web element to become stale (waiting for page to reload).",
                 waitSeconds);
         logger.info("Verified web element became stale (page is reloading).");
-        WebElement el = verifyElementPresented(cssAfterRefresh, TimeoutType.DEFAULT);
-        logger.info("Successfully verified page refreshed by finding web element with CSS '{}'.", cssAfterRefresh);
+        WebElement el = verifyElementPresented(locatorAfterRefresh, TimeoutType.DEFAULT);
+        logger.info("Successfully verified page refreshed by finding web element with locator '{}'.", locatorAfterRefresh);
 
         return el;
     }
@@ -986,14 +938,14 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     }
 
     @Override
-    public WebElement waitUntilClickable(String css, TimeoutType timeout) {
+    public WebElement waitUntilClickable(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
-        final String errorMessage = format("Element '%s' never became clickable after '%d' seconds", css, waitSeconds);
+        final String errorMessage = format("Element '%s' never became clickable after '%d' seconds", locator, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
-        logger.info("Waiting for CSS element '{}' to be clickable, using timeout of {} seconds", css, waitSeconds);
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(css)));
+        logger.info("Waiting for locator element '{}' to be clickable, using timeout of {} seconds", locator, waitSeconds);
+        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(locator));
         return el;
     }
 
@@ -1031,34 +983,34 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
     /**
      * Convenient helper to Find Elements from either top page element or from parent element.
      *
-     * @param css      - CSS defining the input element
+     * @param locator      - Locator defining the input element
      * @param parentEl - Parent web element. If this is provided the search will be from the parent element. If null, search will be from top element
      * @return - List of elements
      */
-    protected List<WebElement> findElements(String css, WebElement parentEl) {
+    protected List<WebElement> findElements(By locator, WebElement parentEl) {
         if (parentEl == null) {
-            return webDriver().findElements(By.cssSelector(css));
+            return webDriver().findElements(locator);
         } else {
-            return parentEl.findElements(By.cssSelector(css));
+            return parentEl.findElements(locator);
         }
     }
 
-    protected WebElement findElement(String css, WebElement parentEl) {
+    protected WebElement findElement(By locator, WebElement parentEl) {
         if (parentEl == null) {
-            return webDriver().findElement(By.cssSelector(css));
+            return webDriver().findElement(locator);
         } else {
-            return parentEl.findElement(By.cssSelector(css));
+            return parentEl.findElement(locator);
         }
     }
 
-    protected WebElement enterTextAndSelectFromList(WebElement inputField, String value, String popoverCSS,
+    protected WebElement enterTextAndSelectFromList(WebElement inputField, String value, By popoverLocator,
                                                     int withRetryCount, boolean slowly) throws SeleniumActionsException {
         boolean done = false;
         int initialCount = withRetryCount;
 
         do {
             try {
-                enterTextAndSelectFromList(inputField, value, popoverCSS, slowly);
+                enterTextAndSelectFromList(inputField, value, popoverLocator, slowly);
                 done = true;
             } catch (Exception ex) {
                 logger.error("Caught an exception " + ex.getMessage());
@@ -1070,8 +1022,8 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
         int numberOfUsedRetries = initialCount - withRetryCount - 1;
         if (numberOfUsedRetries > 0) {
             logger.warn(done ?
-                    format("Entered text successfully and selected CSS '%s' from list after %d retries", popoverCSS, numberOfUsedRetries) :
-                    format("Failed to enter text and select CSS '%s' from list.", popoverCSS));
+                    format("Entered text successfully and selected locator '%s' from list after %d retries", popoverLocator, numberOfUsedRetries) :
+                    format("Failed to enter text and select locator '%s' from list.", popoverLocator));
         }
         if (!done) {
             throw new SeleniumActionsException(format("Failed to inputTextAndSelectFromList after %d retries", numberOfUsedRetries));
@@ -1079,24 +1031,62 @@ public abstract class BaseSeleniumActions implements SeleniumActions {
         return inputField;
     }
 
-    protected void enterTextAndSelectFromList(WebElement inputField, String value, String popoverCSS, boolean slowly) {
+    protected void enterTextAndSelectFromList(WebElement inputField, String value, By popoverLocator, boolean slowly) {
         clearText(inputField);
         if (slowly) {
             inputTextSlowly(inputField, value);
         } else {
             inputText(inputField, value);
         }
-        verifyElementPresented(popoverCSS, TimeoutType.DEFAULT);
-        click(popoverCSS, TimeoutType.DEFAULT);
+        verifyElementPresented(popoverLocator, TimeoutType.DEFAULT);
+        click(popoverLocator, TimeoutType.DEFAULT);
     }
 
-    protected void invokeMenuItemAndSelect(WebElement clickable, String popoverCSS) {
+    protected void invokeMenuItemAndSelect(WebElement clickable, By popoverLocator) {
         Preconditions.checkNotNull(clickable, "Input WebElement cannot be null");
         waitUntilClickable(clickable, TimeoutType.DEFAULT);
         click(clickable, TimeoutType.DEFAULT);
-        verifyElementPresented(popoverCSS, TimeoutType.DEFAULT);
-        waitUntilClickable(popoverCSS, TimeoutType.DEFAULT);
-        click(popoverCSS, TimeoutType.DEFAULT);
+        verifyElementPresented(popoverLocator, TimeoutType.DEFAULT);
+        waitUntilClickable(popoverLocator, TimeoutType.DEFAULT);
+        click(popoverLocator, TimeoutType.DEFAULT);
+    }
+
+    //**********~~~~~~~~~~~~~ Verify Class Actions ~~~~~~~~~~~~~~~*************
+    public boolean doesElementHaveClass(By locator, String locatorClass) {
+        WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
+        return WebElementHelpers.webElementHasClass(el, locatorClass);
+    }
+
+    public WebElement verifyElementHasClass(final By locator, final String locatorClass, TimeoutType timeout) {
+        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
+                                  @Nullable
+                                  @Override
+                                  public WebElement apply(SeleniumActions input) {
+                                      WebElement el = input.verifyElementPresented(locator, TimeoutType.DEFAULT);
+                                      if (WebElementHelpers.webElementHasClass(el, locatorClass)) {
+                                          return el;
+                                      }
+                                      return null;
+                                  }
+                              }, this,
+                format("Waiting for element that matches locator '%s' to have class '%s'", locator, locatorClass),
+                timeout);
+    }
+
+    public WebElement verifyElementDoesNotHaveClass(final By locator, final String locatorClass, TimeoutType timeout) {
+        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
+                                  @Nullable
+                                  @Override
+                                  public WebElement apply(SeleniumActions input) {
+                                      WebElement el = input.verifyElementPresented(locator, TimeoutType.DEFAULT);
+                                      if (!WebElementHelpers.webElementHasClass(el, locatorClass)) {
+                                          return el;
+                                      }
+                                      return null;
+                                  }
+                              }, this,
+                format("Waiting for element that matches locator '%s' to NOT have class '%s'", locator, locatorClass),
+                timeout);
     }
 
 }

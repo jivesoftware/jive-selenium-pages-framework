@@ -1,10 +1,12 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
+import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import org.openqa.selenium.By;
 
 import javax.annotation.Nullable;
 
-public interface Page {
+public interface Page{
 
     /**
      * Get the SeleniumActions for the current page and browser, for how to interact with the page using Selenium.
@@ -23,11 +25,11 @@ public interface Page {
     void pageLoadHook();
 
     /**
-     * A CSS selector that uniquely identifies a page as being successfully loaded.
+     * A Selenium Locator that uniquely identifies a page as being successfully loaded.
      * Return null to not verify any element is present on page load.
      */
     @Nullable
-    String getPageIdentifierCSS();
+    By getPageIdentifier();
 
     /**
      * How to initialize sub-page fields defined with the @SubPage annotation

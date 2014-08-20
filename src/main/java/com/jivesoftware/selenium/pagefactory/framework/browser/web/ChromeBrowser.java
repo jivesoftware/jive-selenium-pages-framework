@@ -1,9 +1,8 @@
-package com.jivesoftware.selenium.pagefactory.framework.browser;
+package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.jivesoftware.selenium.pagefactory.framework.actions.ChromeSeleniumActions;
-import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.web.ChromeSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.openqa.selenium.WebDriver;
@@ -25,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-public class ChromeBrowser extends Browser {
+public class ChromeBrowser extends WebBrowser {
     public ChromeBrowser(String baseTestUrl,
                          TimeoutsConfig timeouts,
                          Optional<String> driverPath,
@@ -45,8 +44,8 @@ public class ChromeBrowser extends Browser {
 
 
     @Override
-    public BrowserType getBrowserType() {
-        return BrowserType.CHROME;
+    public WebBrowserType getBrowserType() {
+        return WebBrowserType.CHROME;
     }
 
     @Override
@@ -99,12 +98,7 @@ public class ChromeBrowser extends Browser {
     }
 
     @Override
-    public boolean isRemote() {
-        return false;
-    }
-
-    @Override
-    public SeleniumActions getActions() {
+    public ChromeSeleniumActions getActions() {
         return new ChromeSeleniumActions(this);
     }
 

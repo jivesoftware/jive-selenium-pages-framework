@@ -1,5 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
+import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
+
 import javax.annotation.Nonnull;
 
 /**

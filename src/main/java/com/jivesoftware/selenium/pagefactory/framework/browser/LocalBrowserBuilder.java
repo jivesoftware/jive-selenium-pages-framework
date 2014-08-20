@@ -3,6 +3,10 @@ package com.jivesoftware.selenium.pagefactory.framework.browser;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.slf4j.Logger;
@@ -14,11 +18,11 @@ import java.util.logging.Level;
  * Created by charles.capps on 8/18/14.
  *
  * <p>Builder class for creating a Browser that is running on the same host as the test code.
- *    Creates either a {@link com.jivesoftware.selenium.pagefactory.framework.browser.ChromeBrowser},
- *    {@link com.jivesoftware.selenium.pagefactory.framework.browser.FirefoxBrowser}, or
- *    {@link com.jivesoftware.selenium.pagefactory.framework.browser.InternetExplorerBrowser}.</p>
+ *    Creates either a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser},
+ *    {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser}, or
+ *    {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser}.</p>
  *
- *  <p>You can call the more general {@link #getBuilder(BrowserType, String)}, or the more specific methods
+ *  <p>You can call the more general {@link #getBuilder(WebBrowserType, String)}, or the more specific methods
  *  {@link #getChromeBuilder(String)}, {@link #getFirefoxBuilder(String)}, and {@link #getInternetExplorerBuilder(String)}.
  *
  *  Then call the methods to add parameters, such as {@link #withBrowserBinaryPath(String)}, and finally call
@@ -35,7 +39,7 @@ import java.util.logging.Level;
 public class LocalBrowserBuilder {
     private static final Logger logger = LoggerFactory.getLogger(LocalBrowserBuilder.class);
 
-    private final BrowserType browserType;
+    private final WebBrowserType browserType;
     private final String baseTestUrl;
 
     private TimeoutsConfig timeoutsConfig;
@@ -48,14 +52,14 @@ public class LocalBrowserBuilder {
     private Optional<Level> browserLogLevel = Optional.absent();
     private Optional<String> browserLogFile = Optional.absent();
 
-    private LocalBrowserBuilder(BrowserType browserType, String baseTestUrl) {
+    private LocalBrowserBuilder(WebBrowserType browserType, String baseTestUrl) {
         this.browserType = Preconditions.checkNotNull(browserType, "You must provide a non-null browserType!");
         this.baseTestUrl = Preconditions.checkNotNull(baseTestUrl, "You must provide a non-null baseTestUrl!");
         this.timeoutsConfig = TimeoutsConfig.defaultTimeoutsConfig();
     }
 
     //------------Getters in case the client wants to inspect the config they have so far-----------
-    public BrowserType getBrowserType() {
+    public WebBrowserType getBrowserType() {
         return browserType;
     }
 
@@ -100,7 +104,7 @@ public class LocalBrowserBuilder {
      * @param browserType - type of Browser, either CHROME, FIREFOX, or IE
      * @param baseTestUrl - base URL for your webapp, e.g. http://my.site.com/base
      */
-    public static LocalBrowserBuilder getBuilder(BrowserType browserType, String baseTestUrl) {
+    public static LocalBrowserBuilder getBuilder(WebBrowserType browserType, String baseTestUrl) {
         return new LocalBrowserBuilder(browserType, baseTestUrl);
     }
 
@@ -109,7 +113,7 @@ public class LocalBrowserBuilder {
      * @param baseTestUrl - base URL for your webapp, e.g. http://my.site.com/base
      */
     public static LocalBrowserBuilder getChromeBuilder(String baseTestUrl) {
-        return new LocalBrowserBuilder(BrowserType.CHROME, baseTestUrl);
+        return new LocalBrowserBuilder(WebBrowserType.CHROME, baseTestUrl);
     }
 
     /**
@@ -117,7 +121,7 @@ public class LocalBrowserBuilder {
      * @param baseTestUrl - base URL for your webapp, e.g. http://my.site.com/base
      */
     public static LocalBrowserBuilder getFirefoxBuilder(String baseTestUrl) {
-        return new LocalBrowserBuilder(BrowserType.FIREFOX, baseTestUrl);
+        return new LocalBrowserBuilder(WebBrowserType.FIREFOX, baseTestUrl);
     }
 
     /**
@@ -125,14 +129,14 @@ public class LocalBrowserBuilder {
      * @param baseTestUrl - base URL for your webapp, e.g. http://my.site.com/base
      */
     public static LocalBrowserBuilder getInternetExplorerBuilder(String baseTestUrl) {
-        return new LocalBrowserBuilder(BrowserType.IE, baseTestUrl);
+        return new LocalBrowserBuilder(WebBrowserType.IE, baseTestUrl);
     }
 
     /**
      * Creates the Browser instance, which includes creating the actual Browser process via the underlying WebDriver.
-     * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.FirefoxBrowser},
-     * {@link com.jivesoftware.selenium.pagefactory.framework.browser.ChromeBrowser},
-     * or {@link com.jivesoftware.selenium.pagefactory.framework.browser.InternetExplorerBrowser}
+     * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser},
+     * {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser},
+     * or {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser}
      * @throws JiveWebDriverException
      */
     public Browser build() throws JiveWebDriverException {

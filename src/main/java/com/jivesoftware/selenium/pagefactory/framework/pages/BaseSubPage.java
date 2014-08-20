@@ -1,6 +1,8 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
+import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.PageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,20 +41,18 @@ public class BaseSubPage implements SubPage {
         this.a = actions;
     }
 
-    @Override
     public void pageLoadHook() {
         PAGE_UTILS.defaultPageLoadHook(this, a);
     }
 
     @Nullable
-    @Override
-    public String getPageIdentifierCSS() {
+    public By getPageIdentifier() {
         return null;
     }
 
-    @Override
-    public String getPageContainerCSS() {
-        return "body";
+    @Nullable
+    public By getPageContainer() {
+        return null;
     }
 
     public final void initSubPages() {

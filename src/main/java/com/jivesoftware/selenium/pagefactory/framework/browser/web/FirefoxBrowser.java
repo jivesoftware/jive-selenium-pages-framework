@@ -1,8 +1,7 @@
-package com.jivesoftware.selenium.pagefactory.framework.browser;
+package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.google.common.base.Optional;
-import com.jivesoftware.selenium.pagefactory.framework.actions.FirefoxSeleniumActions;
-import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.web.FirefoxSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -20,7 +19,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Set;
 
-public class FirefoxBrowser extends Browser {
+public class FirefoxBrowser extends WebBrowser {
 
     public FirefoxBrowser(String baseTestUrl,
                           TimeoutsConfig timeoutsConfig,
@@ -38,8 +37,8 @@ public class FirefoxBrowser extends Browser {
 
 
     @Override
-    public BrowserType getBrowserType() {
-        return BrowserType.FIREFOX;
+    public WebBrowserType getBrowserType() {
+        return WebBrowserType.FIREFOX;
     }
 
     @Override
@@ -81,12 +80,7 @@ public class FirefoxBrowser extends Browser {
     }
 
     @Override
-    public boolean isRemote() {
-        return false;
-    }
-
-    @Override
-    public SeleniumActions getActions() {
+    public FirefoxSeleniumActions getActions() {
         return new FirefoxSeleniumActions(this);
     }
 

@@ -1,8 +1,7 @@
-package com.jivesoftware.selenium.pagefactory.framework.browser;
+package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.google.common.base.Optional;
-import com.jivesoftware.selenium.pagefactory.framework.actions.InternetExplorerActions;
-import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.web.InternetExplorerActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.openqa.selenium.WebDriver;
@@ -16,7 +15,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import javax.annotation.Nullable;
 import java.util.logging.Level;
 
-public class InternetExplorerBrowser extends Browser {
+public class InternetExplorerBrowser extends WebBrowser {
     public InternetExplorerBrowser(String baseTestUrl,
                                    TimeoutsConfig timeouts,
                                    Optional<String> driverPath,
@@ -31,8 +30,8 @@ public class InternetExplorerBrowser extends Browser {
     }
 
     @Override
-    public BrowserType getBrowserType() {
-        return BrowserType.IE;
+    public WebBrowserType getBrowserType() {
+        return WebBrowserType.IE;
     }
 
     @Override
@@ -89,12 +88,7 @@ public class InternetExplorerBrowser extends Browser {
     }
 
     @Override
-    public boolean isRemote() {
-        return false;
-    }
-
-    @Override
-    public SeleniumActions getActions() {
+    public InternetExplorerActions getActions() {
         return new InternetExplorerActions(this);
     }
 

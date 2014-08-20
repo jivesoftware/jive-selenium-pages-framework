@@ -3,6 +3,11 @@ package com.jivesoftware.selenium.pagefactory.framework.browser;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.*;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.slf4j.Logger;
@@ -13,14 +18,14 @@ import java.util.logging.Level;
 /**
  * Created by charles.capps on 8/18/14.
  *
- * <p>Builder class for creating a {@link com.jivesoftware.selenium.pagefactory.framework.browser.RemoteBrowser}.
+ * <p>Builder class for creating a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser}.
  * A RemoteBrowser is a browser running in a Selenium Grid, that works
  * by connecting to a Selenium Hub. See https://code.google.com/p/selenium/wiki/Grid2</p>
  *
  * <p>In other words, a RemoteBrowser is a wrapper around a {@link org.openqa.selenium.remote.RemoteWebDriver}
  * that simplifies configuration and unifies options across all Browsers.</p>
  *
- * <p>You can call {@link #getBuilder(BrowserType, String, String)} to get a builder, or you can equivalently call
+ * <p>You can call {@link #getBuilder(WebBrowserType, String, String)} to get a builder, or you can equivalently call
  * {@link #getChromeBuilder(String, String)}, {@link #getFirefoxBuilder(String, String)}, or {@link #getInternetExplorerBuilder(String, String)}.
  *
  * Calling RemoteBrowserBuilder.getBuilder(BrowserType.CHROME, ...)
@@ -29,7 +34,7 @@ import java.util.logging.Level;
 public class RemoteBrowserBuilder {
     private static final Logger logger = LoggerFactory.getLogger(RemoteBrowserBuilder.class);
 
-    private final BrowserType browserType;
+    private final WebBrowserType browserType;
     private final String baseTestUrl;
     private final String seleniumHubURL;
 
@@ -42,7 +47,7 @@ public class RemoteBrowserBuilder {
     private Optional<Level> browserLogLevel = Optional.absent();
     private Optional<String> browserLogFile = Optional.absent();
 
-    private RemoteBrowserBuilder(BrowserType browserType,
+    private RemoteBrowserBuilder(WebBrowserType browserType,
                                  String baseTestUrl,
                                  String seleniumHubURL) {
         this.browserType = Preconditions.checkNotNull(browserType, "You must provide a non-null BrowserType!");
@@ -52,7 +57,7 @@ public class RemoteBrowserBuilder {
     }
 
     //------------Getters in case the client wants to inspect the config they have so far-----------
-    public BrowserType getBrowserType() {
+    public WebBrowserType getBrowserType() {
         return browserType;
     }
 
@@ -100,7 +105,7 @@ public class RemoteBrowserBuilder {
      * @param baseTestUrl - base URL of the webapp you are testing, e.g. http://my.site.com/base
      * @param seleniumHubURL - URL with port to the Selenium HUB, e.g. http://selenium.my.company.com:4444/wd/hub
      */
-    public static RemoteBrowserBuilder getBuilder(BrowserType browserType,
+    public static RemoteBrowserBuilder getBuilder(WebBrowserType browserType,
                                               String baseTestUrl,
                                               String seleniumHubURL) {
         return new RemoteBrowserBuilder(browserType, baseTestUrl, seleniumHubURL);
@@ -114,7 +119,7 @@ public class RemoteBrowserBuilder {
      * @param seleniumHubURL - URL with port to the Selenium HUB, e.g. http://selenium.my.company.com:4444/wd/hub
      */
     public static RemoteBrowserBuilder getChromeBuilder(String baseTestUrl, String seleniumHubURL) {
-        return new RemoteBrowserBuilder(BrowserType.CHROME, baseTestUrl, seleniumHubURL);
+        return new RemoteBrowserBuilder(WebBrowserType.CHROME, baseTestUrl, seleniumHubURL);
     }
 
     /**
@@ -125,7 +130,7 @@ public class RemoteBrowserBuilder {
      * @param seleniumHubURL - URL with port to the Selenium HUB, e.g. http://selenium.my.company.com:4444/wd/hub
      */
     public static RemoteBrowserBuilder getFirefoxBuilder(String baseTestUrl, String seleniumHubURL) {
-        return new RemoteBrowserBuilder(BrowserType.FIREFOX, baseTestUrl, seleniumHubURL);
+        return new RemoteBrowserBuilder(WebBrowserType.FIREFOX, baseTestUrl, seleniumHubURL);
     }
 
     /**
@@ -136,18 +141,18 @@ public class RemoteBrowserBuilder {
      * @param seleniumHubURL - URL with port to the Selenium HUB, e.g. http://selenium.my.company.com:4444/wd/hub
      */
     public static RemoteBrowserBuilder getInternetExplorerBuilder(String baseTestUrl, String seleniumHubURL) {
-        return new RemoteBrowserBuilder(BrowserType.IE, baseTestUrl, seleniumHubURL);
+        return new RemoteBrowserBuilder(WebBrowserType.IE, baseTestUrl, seleniumHubURL);
     }
 
     /**
      * Creates the RemoteBrowser instance, which includes creating the actual Browser process via the underlying WebDriver.
      *
-     * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.RemoteBrowser},
+     * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser},
      * @throws JiveWebDriverException
      */
     public RemoteBrowser build() throws JiveWebDriverException {
         logger.info("Building Remote Browser with the following config: \n{}", toString());
-        Browser browser;
+        WebBrowser browser;
         switch (browserType) {
             case FIREFOX:
                 browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight);

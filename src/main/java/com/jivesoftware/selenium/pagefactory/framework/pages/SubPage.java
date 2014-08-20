@@ -1,5 +1,8 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
+import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
+import org.openqa.selenium.By;
+
 /**
  * Created by charles.capps on 7/29/14.
  */
@@ -17,8 +20,8 @@ public interface SubPage extends Page {
     boolean hasParent();
 
     /**
-     * A CSS selector that returns page container locator; useful for nav bars, side bars,
+     * A Selenium locator that returns page container locator; useful for nav bars, side bars,
      * inbox message items.
      */
-    String getPageContainerCSS();
+    By getPageContainer();
 }
