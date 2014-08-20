@@ -1,4 +1,4 @@
-package com.jivesoftware.selenium.pagefactory.framework.actions.web;
+package com.jivesoftware.selenium.pagefactory.framework.actions;
 
 import com.google.common.collect.Lists;
 import org.openqa.selenium.WebElement;

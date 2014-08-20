@@ -196,32 +196,12 @@ public abstract class Browser<D extends WebDriver> {
     /**
      * Refresh the current page, without giving back a newly initialized Page object.
      */
-    public void refreshPage() {
-        runLeavePageHook();
-        Page currentPage = PAGE_UTILS.loadCurrentPage(Page.class, webDriver, this.getActions());
-        currentPage.refreshPage();
-        if (optionalCachedPage.isPresent()) {
-            TopLevelPage cachedPage = optionalCachedPage.get().getCachedPage();
-            cachedPage.refreshElements();
-        }
-    }
+    public abstract void refreshPage();
 
     /**
      * @param pageClass - the class of the expected Page after refreshing.
      */
-    public <T extends TopLevelPage> T refreshPage(Class<T> pageClass) {
-        runLeavePageHook();
-        invalidateCachedPage();
-        T page = loadTopLevelPage(pageClass);
-        page.refreshPage();
-        page = loadTopLevelPage(pageClass);
-        setCachedPage(page);
-        return page;
-    }
-
-    public void cleanSession() {
-        webDriver.manage().deleteAllCookies();
-    }
+    public abstract <T extends TopLevelPage> T refreshPage(Class<T> pageClass);
 
     public void quit() {
         webDriver.quit();

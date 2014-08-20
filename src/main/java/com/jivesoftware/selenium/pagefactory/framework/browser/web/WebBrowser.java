@@ -5,6 +5,7 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
+import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.webservice.EndpointBuilder;
 import org.openqa.selenium.Dimension;
@@ -196,6 +197,22 @@ public abstract class WebBrowser extends Browser<WebDriver> {
             TopLevelPage cachedPage = optionalCachedPage.get().getCachedPage();
             cachedPage.refreshElements();
         }
+    }
+
+    /**
+     * @param pageClass - the class of the expected Page after refreshing.
+     */
+    public <T extends TopLevelPage> T refreshPage(Class<T> pageClass) {
+        runLeavePageHook();
+        invalidateCachedPage();
+        webDriver.navigate().refresh();
+        T page = loadTopLevelPage(pageClass);
+        setCachedPage(page);
+        return page;
+    }
+
+    public void cleanSession() {
+        webDriver.manage().deleteAllCookies();
     }
 
     @Nullable

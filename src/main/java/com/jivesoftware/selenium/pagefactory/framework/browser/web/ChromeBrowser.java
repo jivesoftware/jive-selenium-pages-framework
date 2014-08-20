@@ -2,7 +2,7 @@ package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.jivesoftware.selenium.pagefactory.framework.actions.web.ChromeSeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.ChromeSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.openqa.selenium.WebDriver;

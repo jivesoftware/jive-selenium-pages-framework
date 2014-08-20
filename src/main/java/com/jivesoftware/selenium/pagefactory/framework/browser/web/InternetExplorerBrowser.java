@@ -1,7 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.google.common.base.Optional;
-import com.jivesoftware.selenium.pagefactory.framework.actions.web.InternetExplorerActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.InternetExplorerActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.openqa.selenium.WebDriver;

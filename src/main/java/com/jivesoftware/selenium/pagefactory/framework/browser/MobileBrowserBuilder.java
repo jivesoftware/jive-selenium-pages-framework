@@ -14,16 +14,25 @@ import org.slf4j.LoggerFactory;
 import java.util.logging.Level;
 
 /**
- * Created By Amir Simhi
+ * Created By amir.simhi on 8/20/14.
+ *
+ * <p>Builder class for creating an App that is running on an emulator or a connected device that connected
+ *    to the same host as the test code.
+ *    Creates either a {@link com.jivesoftware.selenium.pagefactory.framework.browser.mobile.AndroidMobileBrowser},
+ *    {@link com.jivesoftware.selenium.pagefactory.framework.browser.mobile.IOSMobileBrowser}..</p>
+ *
+ *  <p>A Browser is basically a wrapper for a WebDriver that greatly simplifies configuration,
+ *  adds useful utilities, and has methods
+ *  for loading {@link com.jivesoftware.selenium.pagefactory.framework.pages.Page}'s.
+ *
+ *  Pages provide an object-oriented solution to Selenium testing. You can write Page classes that model a web page
+ *  in the web app you are testing.</p>
  */
 public class MobileBrowserBuilder {
     private static final Logger logger = LoggerFactory.getLogger(MobileBrowserBuilder.class);
-    private final String DEFAULT_DEVICE_NAME = "Device";
-    private final String DEFAULT_APPIUM_VERSION = "1.0";
 
     private String baseTestUrl;
     private TimeoutsConfig timeoutsConfig;
-    private String appiumVersion;
     private MobilePlatformName platformName;
     private String platformVersion;
     private String deviceName;
@@ -37,8 +46,6 @@ public class MobileBrowserBuilder {
         this.baseTestUrl = Preconditions.checkNotNull(baseTestUrl, "You must provide a non-null baseTestUrl!");
         this.timeoutsConfig = TimeoutsConfig.defaultTimeoutsConfig();
         this.platformName = Preconditions.checkNotNull(platformName, "You must provide a non-null platformName!");
-        this.appiumVersion = DEFAULT_APPIUM_VERSION;
-        this.deviceName = DEFAULT_DEVICE_NAME;
 
     }
 
@@ -49,10 +56,6 @@ public class MobileBrowserBuilder {
 
     public TimeoutsConfig getTimeoutsConfig() {
         return timeoutsConfig;
-    }
-
-    public String getAppiumVersion() {
-        return appiumVersion;
     }
 
     public MobilePlatformName getPlatformName() {
@@ -109,11 +112,11 @@ public class MobileBrowserBuilder {
         MobileBrowser browser;
         switch (platformName) {
             case ANDROID:
-                browser = new AndroidMobileBrowser(baseTestUrl, appiumVersion, platformName.getPlatformName(), platformVersion,
+                browser = new AndroidMobileBrowser(baseTestUrl, platformName.getPlatformName(), platformVersion,
                         deviceName, app, appPackage, appActivity, timeoutsConfig);
                 break;
             case IOS:
-                browser = new IOSMobileBrowser(baseTestUrl, appiumVersion, platformName.getPlatformName(), platformVersion,
+                browser = new IOSMobileBrowser(baseTestUrl, platformName.getPlatformName(), platformVersion,
                         deviceName, app, timeoutsConfig);
                 break;
             default:
@@ -125,11 +128,6 @@ public class MobileBrowserBuilder {
 
     public MobileBrowserBuilder withTimeoutsConfig(TimeoutsConfig timeoutsConfig) {
         this.timeoutsConfig = timeoutsConfig == null ? TimeoutsConfig.defaultTimeoutsConfig() : timeoutsConfig;
-        return this;
-    }
-
-    public MobileBrowserBuilder withAppiumVersion(String appiumVersion) {
-        this.appiumVersion = appiumVersion;
         return this;
     }
 
@@ -168,7 +166,6 @@ public class MobileBrowserBuilder {
     public String toString() {
         return Objects.toStringHelper(this)
                 .add("baseTestUrl", baseTestUrl)
-                .add("appiumVersion", appiumVersion)
                 .add("platformName", platformName.getPlatformName())
                 .add("platformVersion", platformVersion)
                 .add("deviceName", deviceName)

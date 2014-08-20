@@ -1,7 +1,6 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
-import com.jivesoftware.selenium.pagefactory.framework.actions.web.BaseWebSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;

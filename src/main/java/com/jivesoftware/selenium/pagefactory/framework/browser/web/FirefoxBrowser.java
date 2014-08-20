@@ -1,7 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
 import com.google.common.base.Optional;
-import com.jivesoftware.selenium.pagefactory.framework.actions.web.FirefoxSeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.actions.FirefoxSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;

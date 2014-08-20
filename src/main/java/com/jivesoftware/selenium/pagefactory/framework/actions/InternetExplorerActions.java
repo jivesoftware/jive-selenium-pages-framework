@@ -1,5 +1,6 @@
-package com.jivesoftware.selenium.pagefactory.framework.actions.web;
+package com.jivesoftware.selenium.pagefactory.framework.actions;
 
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import org.openqa.selenium.By;
@@ -11,10 +12,10 @@ import org.slf4j.LoggerFactory;
  * SeleniumActions class for InternetExplorer.
  * There is only one workaround, due to a bug in Selenium 2.42.
  */
-public class InternetExplorerActions extends BaseWebSeleniumActions {
+public class InternetExplorerActions extends BaseSeleniumActions<InternetExplorerBrowser> {
     private final static Logger logger = LoggerFactory.getLogger(InternetExplorerActions.class);
 
-    public InternetExplorerActions(WebBrowser browser) {
+    public InternetExplorerActions(InternetExplorerBrowser browser) {
         super(browser);
     }
 

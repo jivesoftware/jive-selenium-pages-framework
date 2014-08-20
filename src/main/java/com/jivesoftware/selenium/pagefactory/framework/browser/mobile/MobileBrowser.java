@@ -1,21 +1,11 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.mobile;
 
-import com.google.common.base.Optional;
-//import com.jivesoftware.jenesis.test.shared.actions.AndroidSeleniumActions;
-//import com.jivesoftware.jenesis.test.shared.actions.BaseMobileSeleniumActions;
-//import com.jivesoftware.jenesis.test.shared.actions.IOSSeleniumActions;
-//import com.jivesoftware.jenesis.test.shared.pages.PageUtils;
-//import com.jivesoftware.jenesis.test.shared.pages.SubPage;
-//import com.jivesoftware.jenesis.test.shared.pages.TopLevelPage;
-import com.jivesoftware.selenium.pagefactory.framework.actions.mobile.AndroidSeleniumActions;
-import com.jivesoftware.selenium.pagefactory.framework.actions.mobile.BaseMobileSeleniumActions;
-import com.jivesoftware.selenium.pagefactory.framework.actions.mobile.IOSSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
-import com.jivesoftware.selenium.pagefactory.framework.browser.CachedPage;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
-import com.jivesoftware.selenium.pagefactory.framework.pages.PageUtils;
+import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
+import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import io.appium.java_client.AppiumDriver;
 
 import java.io.IOException;
@@ -39,22 +29,17 @@ import org.slf4j.LoggerFactory;
 public abstract class MobileBrowser extends Browser<AppiumDriver> {
     private static Logger logger = LoggerFactory.getLogger(MobileBrowser.class);
 
-    protected String appiumVersion;
     protected String platformName;
     protected String platformVersion;
     protected String deviceName;
     protected String app;
 
-    protected BaseMobileSeleniumActions actions;
-
     protected MobileBrowser(String baseTestUrl,
                             TimeoutsConfig timeoutsConfig,
-                            String appiumVersion,
                             String platformName, String platformVersion,
                             String deviceName,
                             String app) throws JiveWebDriverException {
         super(baseTestUrl, timeoutsConfig);
-        this.appiumVersion = appiumVersion;
         this.platformName = platformName;
         this.platformVersion = platformVersion;
         this.deviceName = deviceName;
@@ -66,9 +51,9 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         this.webDriver.manage().timeouts().implicitlyWait(getImplicitWaitTimeoutMillis(), TimeUnit.MILLISECONDS);
     }
 
-    public Dimension getSize() {
-        return this.webDriver.manage().window().getSize();
-    }
+    public int getScreenWidth() { return this.webDriver.manage().window().getSize().getWidth();}
+
+    public int getScreenHeight() { return this.webDriver.manage().window().getSize().getHeight();}
 
     protected AppiumDriver createWebDriver() throws JiveWebDriverException {
         try {
@@ -86,19 +71,41 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         }
     }
 
+    /**
+     * Refresh the current page, without giving back a newly initialized Page object.
+     */
+    @Override
+    public void refreshPage() {
+        runLeavePageHook();
+        Page currentPage = PAGE_UTILS.loadCurrentPage(Page.class, webDriver, this.getActions());
+        currentPage.refreshPage();
+        if (optionalCachedPage.isPresent()) {
+            TopLevelPage cachedPage = optionalCachedPage.get().getCachedPage();
+            cachedPage.refreshElements();
+        }
+    }
+
+    /**
+     * @param pageClass - the class of the expected Page after refreshing.
+     */
+    @Override
+    public <T extends TopLevelPage> T refreshPage(Class<T> pageClass) {
+        runLeavePageHook();
+        invalidateCachedPage();
+        T page = loadTopLevelPage(pageClass);
+        page.refreshPage();
+        page = loadTopLevelPage(pageClass);
+        setCachedPage(page);
+        return page;
+    }
+
     @Override
     public WebBrowserType getBrowserType() {
         return WebBrowserType.MOBILE;
     }
 
-    public abstract BaseMobileSeleniumActions getActions();
-
     public String getPlatformName() {
         return platformName;
-    }
-
-    public String getAppiumVersion() {
-        return appiumVersion;
     }
 
     public String getPlatformVersion() {
@@ -114,35 +121,38 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     }
 
     //**********~~~~~~~~~~~~~ Mobile Actions ~~~~~~~~~~~~~~~*************
-    public void Shake() {
+    public void shake() {
         webDriver.shake();
     }
 
-    public void rotateToLandscape() {
+    public void rotateLandscape() {
         webDriver.rotate(ScreenOrientation.LANDSCAPE);
     }
 
-    public void rotateToPortrait() {
+    public void rotatePortrait() {
         webDriver.rotate(ScreenOrientation.PORTRAIT);
     }
 
+    /**
+     * Swipe from the right to left for a second
+     */
     public void swipeLeft() {
-        webDriver.swipe(getSize().getWidth(), 50, 10, 50, 1000);
+        webDriver.swipe(getScreenWidth(), 50, 10, 50, 1000);
     }
 
     /**
      * Swipe from the left to right for a second
      */
     public void swipeRight() {
-        webDriver.swipe(0, 50, getSize().getWidth(), 50, 1000);
+        webDriver.swipe(0, 50, getScreenWidth(), 50, 1000);
     }
 
     /**
      * Swipe from the top to buttom for a second
      */
     public void dragDown() {
-        int midScreen = webDriver.manage().window().getSize().getWidth() / 2;
-        webDriver.swipe(midScreen, 50, midScreen, getSize().getHeight() - 20, 1000);
+        int midScreen = getScreenWidth() / 2;
+        webDriver.swipe(midScreen, 50, midScreen, getScreenHeight() - 20, 1000);
     }
 
     /**
@@ -150,7 +160,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
      */
     public void dragUp() {
         int midScreen = webDriver.manage().window().getSize().getWidth() / 2;
-        webDriver.swipe(midScreen, getSize().getHeight(), midScreen, 50, 1000);
+        webDriver.swipe(midScreen, getScreenHeight(), midScreen, 50, 1000);
     }
 
     /**
