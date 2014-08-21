@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jivesoftware</groupId>
     <artifactId>jive-selenium-pages-framework</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>jar</packaging>
     <name>jive-selenium-pages-framework</name>
     <description>Framework for automated testing using Selenium. Provides easy configuration of WebDrivers with BrowserFactory. Provides a Page abstraction.</description>
@@ -127,31 +127,9 @@
         </dependency>
     </dependencies>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-    <build>
-    <plugins>
-        <!--For uploading to the Maven Central Repository-->
-        <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.2</version>
-            <extensions>true</extensions>
-            <configuration>
-                <serverId>ossrh</serverId>
-                <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
-        </plugin>
-
-    </plugins>
-    </build>
-
     <profiles>
+        <!-- Profile shared for releasing to any target server -->
+        <!-- To release to central, run: "mvn -Prelease,central-release clean deploy" -->
         <profile>
             <id>release</id>
             <build>
@@ -204,6 +182,33 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>central-release</id>
+            <build>
+                <plugins>
+                    <!--For uploading to the Maven Central Repository-->
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.2</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
