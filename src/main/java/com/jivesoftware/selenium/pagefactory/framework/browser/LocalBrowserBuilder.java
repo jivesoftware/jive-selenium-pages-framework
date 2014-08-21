@@ -3,10 +3,7 @@ package com.jivesoftware.selenium.pagefactory.framework.browser;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.*;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.slf4j.Logger;
@@ -139,9 +136,9 @@ public class LocalBrowserBuilder {
      * or {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser}
      * @throws JiveWebDriverException
      */
-    public Browser build() throws JiveWebDriverException {
+    public WebBrowser build() throws JiveWebDriverException {
         logger.info("Building Local Browser with the following config: \n{}", toString());
-        Browser browser;
+        WebBrowser browser;
         switch (browserType) {
             case FIREFOX:
                 browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight);
