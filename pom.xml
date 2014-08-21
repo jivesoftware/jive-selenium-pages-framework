@@ -104,12 +104,18 @@
             <artifactId>selenium-remote-driver</artifactId>
             <version>${seleniumVersion}</version>
         </dependency>
+
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
             <version>1.6.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.8.8</version>
+        </dependency>
     </dependencies>
 
     <profiles>
