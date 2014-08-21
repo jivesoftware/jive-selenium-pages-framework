@@ -31,6 +31,10 @@
 
     <properties>
         <seleniumVersion>2.42.2</seleniumVersion>
+        <snapshotRepoId>ossrh</snapshotRepoId>
+        <snapshotRepoUrl>https://oss.sonatype.org/content/repositories/snapshots</snapshotRepoUrl>
+        <releaseRepoId>ossrh</releaseRepoId>
+        <releaseRepoUrl>https://oss.sonatype.org/content/repositories/releases</releaseRepoUrl>
     </properties>
 
     <dependencies>
@@ -105,26 +109,7 @@
             <artifactId>java-client</artifactId>
             <version>1.6.1</version>
         </dependency>
-        <!-- Need this dependency for the KillInternetExplorerProxy class that implements a server-side hook for the Selenium Grid HUB-->
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server</artifactId>
-            <version>${seleniumVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-java</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
     </dependencies>
 
     <profiles>
@@ -214,9 +199,13 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>${snapshotRepoId}</id>
+            <url>${snapshotRepoUrl}</url>
         </snapshotRepository>
+        <repository>
+            <id>${releaseRepoId}</id>
+            <url>${releaseRepoUrl}</url>
+        </repository>
     </distributionManagement>
 
 </project>
