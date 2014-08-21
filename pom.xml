@@ -129,7 +129,7 @@
 
     <profiles>
         <!-- Profile shared for releasing to any target server -->
-        <!-- To release to central, run: "mvn -Prelease,central-release clean deploy" -->
+        <!-- To release to central, run: "mvn -Prelease,sign,central-release clean deploy" -->
         <profile>
             <id>release</id>
             <build>
@@ -163,7 +163,15 @@
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
 
+        <!-- Profile shared for signing artifacts -->
+        <profile>
+            <id>sign</id>
+            <build>
+                <plugins>
                     <!--Required to upload to central repository-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
