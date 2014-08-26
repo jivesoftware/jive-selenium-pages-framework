@@ -64,7 +64,7 @@ public class BaseTopLevelPage implements TopLevelPage {
 
 
     @Override
-    public final void refreshPage() {
+    public void refreshPage() {
         getActions().getBrowser().refreshPage();
         refreshElements();
     }
