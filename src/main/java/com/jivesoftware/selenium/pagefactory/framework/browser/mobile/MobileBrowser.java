@@ -148,7 +148,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     }
 
     /**
-     * Swipe from the top to buttom for a second
+     * Swipe from the top to bottom for a second
      */
     public void dragDown() {
         int midScreen = getScreenWidth() / 2;
@@ -188,5 +188,10 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     }
     public void tap(int fingersNum, int xLocation, int yLocation, int duration) {
         webDriver.tap(fingersNum, xLocation, yLocation, duration);
+    }
+
+    public void initApp() {
+        webDriver.closeApp();
+        webDriver.launchApp();
     }
 }
