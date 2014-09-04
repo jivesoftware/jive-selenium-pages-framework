@@ -160,7 +160,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
      */
     public void dragUp() {
         int midScreen = webDriver.manage().window().getSize().getWidth() / 2;
-        webDriver.swipe(midScreen, getScreenHeight(), midScreen, 50, 1000);
+        webDriver.swipe(midScreen, getScreenHeight() - 20, midScreen, 50, 1000);
     }
 
     /**

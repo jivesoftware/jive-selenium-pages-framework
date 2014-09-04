@@ -14,7 +14,8 @@ import java.util.HashMap;
 /**
  * Added by Shiran.Dadon
  * Known bug of Apple from Xcode 5 and iOS 7.1 Simulator - swipe is not working on simulator.
- * As a workaround, using a python script
+ * As a workaround, using scrollTo in JavaScript.
+ * As in real devices regular swipe works but not scrollTo, using the regular command as well
  */
 
 public class IOSMobileBrowser extends MobileBrowser {
@@ -48,6 +49,7 @@ public class IOSMobileBrowser extends MobileBrowser {
      * Swipe from the right to left for a second
      */
     public void swipeLeft() {
+        super.swipeLeft();
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         scrollObject.put("direction", "left");
         webDriver.executeScript("mobile: scroll", scrollObject);
@@ -57,6 +59,7 @@ public class IOSMobileBrowser extends MobileBrowser {
      * Swipe from the left to right for a second
      */
     public void swipeRight() {
+        super.swipeRight();
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         scrollObject.put("direction", "right");
         webDriver.executeScript("mobile: scroll", scrollObject);
@@ -66,6 +69,7 @@ public class IOSMobileBrowser extends MobileBrowser {
      * Swipe from the top to buttom for a second
      */
     public void dragDown() {
+        super.dragDown();
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         scrollObject.put("direction", "down");
         webDriver.executeScript("mobile: scroll", scrollObject);
@@ -75,6 +79,7 @@ public class IOSMobileBrowser extends MobileBrowser {
      * Swipe from the down to up for a second
      */
     public void dragUp() {
+        super.dragUp();
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         scrollObject.put("direction", "up");
         webDriver.executeScript("mobile: scroll", scrollObject);
