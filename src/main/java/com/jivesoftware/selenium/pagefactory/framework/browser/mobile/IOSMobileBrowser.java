@@ -71,7 +71,7 @@ public class IOSMobileBrowser extends MobileBrowser {
     public void dragDown() {
         super.dragDown();
         HashMap<String, String> scrollObject = new HashMap<String, String>();
-        scrollObject.put("direction", "down");
+        scrollObject.put("direction", "up");
         webDriver.executeScript("mobile: scroll", scrollObject);
     }
 
@@ -81,7 +81,7 @@ public class IOSMobileBrowser extends MobileBrowser {
     public void dragUp() {
         super.dragUp();
         HashMap<String, String> scrollObject = new HashMap<String, String>();
-        scrollObject.put("direction", "up");
+        scrollObject.put("direction", "down");
         webDriver.executeScript("mobile: scroll", scrollObject);
     }
 
@@ -96,5 +96,9 @@ public class IOSMobileBrowser extends MobileBrowser {
      */
     public void swipe(int startX, int endX, int startY, int endY, int duration) {
         webDriver.swipe(startX, startY, endX, endY, duration);
+    }
+
+    public void scrollToTop() {
+        getWebDriver().findElementByClassName("UIAStatusBar").click();
     }
 }

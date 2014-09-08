@@ -194,4 +194,13 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         webDriver.closeApp();
         webDriver.launchApp();
     }
+
+    public void scrollToTop() {
+        int currentHeight = webDriver.manage().window().getPosition().getY();
+        while (currentHeight > 20) {
+            dragDown();
+            currentHeight = webDriver.manage().window().getPosition().getY();
+        }
+
+    }
 }
