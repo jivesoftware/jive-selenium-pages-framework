@@ -33,6 +33,7 @@ public class MobileBrowserBuilder {
 
     private String baseTestUrl;
     private TimeoutsConfig timeoutsConfig;
+    private String browserName;
     private MobilePlatformName platformName;
     private String platformVersion;
     private String deviceName;
@@ -56,6 +57,10 @@ public class MobileBrowserBuilder {
 
     public TimeoutsConfig getTimeoutsConfig() {
         return timeoutsConfig;
+    }
+
+    public String getBrowserName() {
+        return browserName;
     }
 
     public MobilePlatformName getPlatformName() {
@@ -101,10 +106,10 @@ public class MobileBrowserBuilder {
 
 
     /**
-     * Creates the Browser instance, which includes creating the actual Browser process via the underlying WebDriver.
-     * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser},
-     * {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser},
-     * or {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser}
+     * Creates the MobileBrowser instance, which includes creating the actual Browser process via the underlying Appium
+     * Server
+     * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.mobile.AndroidMobileBrowser},
+     * {@link com.jivesoftware.selenium.pagefactory.framework.browser.mobile.IOSMobileBrowser}
      * @throws com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException
      */
     public MobileBrowser build() throws JiveWebDriverException {
@@ -112,11 +117,11 @@ public class MobileBrowserBuilder {
         MobileBrowser browser;
         switch (platformName) {
             case ANDROID:
-                browser = new AndroidMobileBrowser(baseTestUrl, platformName.getPlatformName(), platformVersion,
+                browser = new AndroidMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(), platformVersion,
                         deviceName, app, appPackage, appActivity, timeoutsConfig);
                 break;
             case IOS:
-                browser = new IOSMobileBrowser(baseTestUrl, platformName.getPlatformName(), platformVersion,
+                browser = new IOSMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(), platformVersion,
                         deviceName, app, timeoutsConfig);
                 break;
             default:
@@ -128,6 +133,11 @@ public class MobileBrowserBuilder {
 
     public MobileBrowserBuilder withTimeoutsConfig(TimeoutsConfig timeoutsConfig) {
         this.timeoutsConfig = timeoutsConfig == null ? TimeoutsConfig.defaultTimeoutsConfig() : timeoutsConfig;
+        return this;
+    }
+
+    public MobileBrowserBuilder withBrowserName(String browserName) {
+        this.browserName = browserName;
         return this;
     }
 
@@ -166,6 +176,7 @@ public class MobileBrowserBuilder {
     public String toString() {
         return Objects.toStringHelper(this)
                 .add("baseTestUrl", baseTestUrl)
+                .add("browserName", browserName)
                 .add("platformName", platformName.getPlatformName())
                 .add("platformVersion", platformVersion)
                 .add("deviceName", deviceName)

@@ -12,6 +12,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
     private String appActivity;
 
     public AndroidMobileBrowser(String baseTestUrl,
+                                String browserName,
                                 String platformName,
                                 String platformVersion,
                                 String deviceName,
@@ -19,7 +20,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
                                 String appPackage,
                                 String appActivity,
                                 TimeoutsConfig timeouts) throws JiveWebDriverException {
-        super(baseTestUrl, timeouts, platformName, platformVersion, deviceName, app);
+        super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName, app);
         this.appPackage = appPackage;
         this.appActivity = appActivity;
     }
@@ -27,6 +28,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
     @Override
     public DesiredCapabilities getDesiredCapabilities() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        desiredCapabilities.setCapability(CapabilityType.BROWSER_NAME, browserName);
         desiredCapabilities.setCapability("platformName", platformName);
         desiredCapabilities.setCapability("platformVersion", platformVersion);
         desiredCapabilities.setCapability("deviceName", deviceName);

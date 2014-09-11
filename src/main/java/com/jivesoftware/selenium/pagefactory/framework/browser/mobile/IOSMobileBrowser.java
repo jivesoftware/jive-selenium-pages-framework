@@ -4,6 +4,7 @@ import com.jivesoftware.selenium.pagefactory.framework.actions.IOSSeleniumAction
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,17 +23,19 @@ public class IOSMobileBrowser extends MobileBrowser {
 
 
     public IOSMobileBrowser(String baseTestUrl,
+                            String browserName,
                             String platformName,
                             String platformVersion,
                             String deviceName,
                             String app,
                             TimeoutsConfig timeouts) throws JiveWebDriverException {
-        super(baseTestUrl, timeouts, platformName, platformVersion, deviceName, app);
+        super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName, app);
     }
 
     @Override
     public DesiredCapabilities getDesiredCapabilities() {
-        DesiredCapabilities desiredCapabilities = DesiredCapabilities.iphone();
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        desiredCapabilities.setCapability(CapabilityType.BROWSER_NAME, browserName);
         desiredCapabilities.setCapability("platformName", platformName);
         desiredCapabilities.setCapability("platformVersion", platformVersion);
         desiredCapabilities.setCapability("deviceName", deviceName);

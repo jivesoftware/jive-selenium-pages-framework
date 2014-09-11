@@ -29,17 +29,19 @@ import org.slf4j.LoggerFactory;
 public abstract class MobileBrowser extends Browser<AppiumDriver> {
     private static Logger logger = LoggerFactory.getLogger(MobileBrowser.class);
 
+    protected String browserName;
     protected String platformName;
     protected String platformVersion;
     protected String deviceName;
     protected String app;
 
     protected MobileBrowser(String baseTestUrl,
-                            TimeoutsConfig timeoutsConfig,
+                            TimeoutsConfig timeoutsConfig, String browserName,
                             String platformName, String platformVersion,
                             String deviceName,
                             String app) throws JiveWebDriverException {
         super(baseTestUrl, timeoutsConfig);
+        this.browserName = browserName;
         this.platformName = platformName;
         this.platformVersion = platformVersion;
         this.deviceName = deviceName;
