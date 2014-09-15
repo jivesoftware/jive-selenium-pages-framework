@@ -1,20 +1,30 @@
 package com.jivesoftware.selenium.pagefactory.framework.actions;
 
-import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.mobile.IOSMobileBrowser;
-import com.jivesoftware.selenium.pagefactory.framework.browser.mobile.MobileBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebElement;
+
+import java.util.HashMap;
 
 /**
  * Created by Shiran Dadon on 8/11/14.
  *
- * Selenium Actions for Android Applications
+ * Selenium Actions for iOS Applications
  *
- * Currently, this is the same as BaseSeleniumActions, as we don't have any need to implement anything differently
- * for IOS.
+ * Currently, only scrollTo option is implemented differently for iOS
  */
 public class IOSSeleniumActions extends BaseSeleniumActions<IOSMobileBrowser> {
 
     public IOSSeleniumActions(IOSMobileBrowser browser) {
         super(browser);
+    }
+
+    public void scrollIntoView(WebElement el) {
+        HashMap<String, String> scrollObject = new HashMap<String, String>();
+        String widId = ((RemoteWebElement) el).getId();
+        scrollObject.put("element", widId);
+        getBrowser().getWebDriver().executeScript("mobile: scrollTo", scrollObject);
     }
 }

@@ -4,6 +4,7 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import io.appium.java_client.AppiumDriver;
@@ -79,7 +80,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     @Override
     public void refreshPage() {
         runLeavePageHook();
-        Page currentPage = PAGE_UTILS.loadCurrentPage(Page.class, webDriver, this.getActions());
+        BaseTopLevelPage currentPage = PAGE_UTILS.loadCurrentPage(BaseTopLevelPage.class, webDriver, this.getActions());
         currentPage.refreshPage();
         if (optionalCachedPage.isPresent()) {
             TopLevelPage cachedPage = optionalCachedPage.get().getCachedPage();
