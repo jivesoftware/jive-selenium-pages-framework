@@ -34,18 +34,30 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     protected String platformName;
     protected String platformVersion;
     protected String deviceName;
+    protected String newCommandTimeout;
+    protected String automationName;
+    protected String version;
+    protected String autoLaunch;
     protected String app;
 
     protected MobileBrowser(String baseTestUrl,
                             TimeoutsConfig timeoutsConfig, String browserName,
                             String platformName, String platformVersion,
                             String deviceName,
+                            String newCommandTimeout,
+                            String automationName,
+                            String version,
+                            String autoLaunch,
                             String app) throws JiveWebDriverException {
         super(baseTestUrl, timeoutsConfig);
         this.browserName = browserName;
         this.platformName = platformName;
         this.platformVersion = platformVersion;
         this.deviceName = deviceName;
+        this.newCommandTimeout = newCommandTimeout;
+        this.automationName = automationName;
+        this.version = version;
+        this.autoLaunch = autoLaunch;
         this.app = app;
     }
 
@@ -155,7 +167,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
      */
     public void dragDown() {
         int midScreen = getScreenWidth() / 2;
-        webDriver.swipe(midScreen, 50, midScreen, getScreenHeight() - 20, 1000);
+        webDriver.swipe(midScreen, 160, midScreen, getScreenHeight() - 160, 1000);
     }
 
     /**
@@ -163,7 +175,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
      */
     public void dragUp() {
         int midScreen = webDriver.manage().window().getSize().getWidth() / 2;
-        webDriver.swipe(midScreen, getScreenHeight() - 20, midScreen, 50, 1000);
+        webDriver.swipe(midScreen, getScreenHeight() - 160, midScreen, 160, 1000);
     }
 
     /**
@@ -198,12 +210,5 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         webDriver.launchApp();
     }
 
-    public void scrollToTop() {
-        int currentHeight = webDriver.manage().window().getPosition().getY();
-        while (currentHeight > 20) {
-            dragDown();
-            currentHeight = webDriver.manage().window().getPosition().getY();
-        }
-
-    }
+    public abstract void scrollToTop();
 }

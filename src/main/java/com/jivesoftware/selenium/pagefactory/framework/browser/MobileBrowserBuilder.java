@@ -40,6 +40,11 @@ public class MobileBrowserBuilder {
     private String app;
     private String appPackage;
     private String appActivity;
+    private String newCommandTimeout;
+    private String automationName;
+    private String version;
+    private String autoLaunch;
+
 
 
     private MobileBrowserBuilder(String baseTestUrl,
@@ -117,12 +122,14 @@ public class MobileBrowserBuilder {
         MobileBrowser browser;
         switch (platformName) {
             case ANDROID:
-                browser = new AndroidMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(), platformVersion,
-                        deviceName, app, appPackage, appActivity, timeoutsConfig);
+                browser = new AndroidMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(),
+                        platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
+                        app, appPackage, appActivity, timeoutsConfig);
                 break;
             case IOS:
-                browser = new IOSMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(), platformVersion,
-                        deviceName, app, timeoutsConfig);
+                browser = new IOSMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(),
+                        platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
+                        app, timeoutsConfig);
                 break;
             default:
                 throw new IllegalArgumentException("Only IOS and Android are currently supported!");
@@ -171,6 +178,26 @@ public class MobileBrowserBuilder {
         return this;
     }
 
+    public MobileBrowserBuilder withNewCommandTimeout(String newCommandTimeout) {
+        this.newCommandTimeout = newCommandTimeout;
+        return this;
+    }
+
+    public MobileBrowserBuilder withAutomationName(String automationName) {
+        this.automationName = automationName;
+        return this;
+    }
+
+    public MobileBrowserBuilder withVersion(String version) {
+        this.version = version;
+        return this;
+    }
+
+    public MobileBrowserBuilder withAutoLaunch(String autoLaunch) {
+        this.autoLaunch = autoLaunch;
+        return this;
+    }
+
 
     @Override
     public String toString() {
@@ -183,6 +210,10 @@ public class MobileBrowserBuilder {
                 .add("app", app)
                 .add("appPackage", appPackage)
                 .add("appActivity", appActivity)
+                .add("newCommandTimeout", newCommandTimeout)
+                .add("automationName", automationName)
+                .add("version", version)
+                .add("autoLaunch", autoLaunch)
                 .toString();
     }
 }

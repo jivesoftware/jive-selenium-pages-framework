@@ -3,6 +3,7 @@ package com.jivesoftware.selenium.pagefactory.framework.browser.mobile;
 import com.jivesoftware.selenium.pagefactory.framework.actions.IOSSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -27,9 +28,14 @@ public class IOSMobileBrowser extends MobileBrowser {
                             String platformName,
                             String platformVersion,
                             String deviceName,
+                            String newCommandTimeout,
+                            String automationName,
+                            String version,
+                            String autoLaunch,
                             String app,
                             TimeoutsConfig timeouts) throws JiveWebDriverException {
-        super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName, app);
+        super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName,
+                newCommandTimeout, automationName, version, autoLaunch, app);
     }
 
     @Override
@@ -37,8 +43,12 @@ public class IOSMobileBrowser extends MobileBrowser {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         desiredCapabilities.setCapability(CapabilityType.BROWSER_NAME, browserName);
         desiredCapabilities.setCapability("platformName", platformName);
-        desiredCapabilities.setCapability(CapabilityType.VERSION, platformVersion);
+        desiredCapabilities.setCapability("platformVersion", platformVersion);
         desiredCapabilities.setCapability("deviceName", deviceName);
+        desiredCapabilities.setCapability("newCommandTimeout", newCommandTimeout);
+        desiredCapabilities.setCapability("automationName", automationName);
+        desiredCapabilities.setCapability("version", version);
+        desiredCapabilities.setCapability("autoLaunch", autoLaunch);
         desiredCapabilities.setCapability("app", app);
         desiredCapabilities.setCapability("rotatable", true);
         return desiredCapabilities;
