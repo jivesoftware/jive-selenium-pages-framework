@@ -205,5 +205,10 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         webDriver.tap(fingersNum, xLocation, yLocation, duration);
     }
 
+    public void initApp() {
+        webDriver.closeApp();
+        webDriver.launchApp();
+    }
+
     public abstract void scrollToTop();
 }
