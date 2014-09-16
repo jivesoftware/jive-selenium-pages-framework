@@ -5,7 +5,6 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
-import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.webservice.EndpointBuilder;
 import org.openqa.selenium.Dimension;
@@ -167,17 +166,16 @@ public abstract class WebBrowser extends Browser<WebDriver> {
      *
      * Invalidates the cached page and loads a fresh new page.
      *
-     * @param href - the href from a link, which may be a relative path from baseTestUrl or may be absolute
+     * @param uri - the href from a link, which may be a relative path from baseTestUrl or may be absolute
      * @param pageClass - the {@link com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage} class to load.
      */
-    public <T extends TopLevelPage> T openPageByURL(String href, Class<T> pageClass) throws URISyntaxException {
-        URI uri = new URI(href);
+    public <T extends TopLevelPage> T openPageByURL(URI uri, Class<T> pageClass) {
         URI absoluteURI;
         if (uri.isAbsolute()) {
             absoluteURI = uri;
         } else {
-            String fullURIStr = EndpointBuilder.uri(baseTestUrl, "/", href);
-            absoluteURI = new URI(fullURIStr);
+            String fullURIStr = EndpointBuilder.uri(baseTestUrl, "/", uri.toString());
+            absoluteURI = URI.create(fullURIStr);
         }
         logger.info("Opening web page by URL {}", absoluteURI);
         runLeavePageHook();
@@ -185,6 +183,19 @@ public abstract class WebBrowser extends Browser<WebDriver> {
         T page = PAGE_UTILS.loadPageFromURL(absoluteURI, pageClass, getWebDriver(), getActions());
         setCachedPage(page);
         return page;
+    }
+
+    /**
+     * Opens a new page in the Browser by URL. An absolute URL or the path can be provided.
+     *
+     * Invalidates the cached page and loads a fresh new page.
+     *
+     * @param href - the href from a link, which may be a relative path from baseTestUrl or may be absolute
+     * @param pageClass - the {@link com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage} class to load.
+     */
+    public <T extends TopLevelPage> T openPageByURL(String href, Class<T> pageClass) {
+        URI uri = URI.create(href);
+        return openPageByURL(uri, pageClass);
     }
 
     /**

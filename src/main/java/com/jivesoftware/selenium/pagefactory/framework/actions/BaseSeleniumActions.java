@@ -357,8 +357,11 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
     public WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String message = String.format("Timeout waiting %d seconds to find element containing text '%s' with locator '%s'",
+                waitSeconds, text, locator.toString());
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.ignoring(StaleElementReferenceException.class);
+        wait.ignoring(StaleElementReferenceException.class)
+                .withMessage(message);
 
         return wait.until(new ExpectedCondition<WebElement>() {
             @Override
