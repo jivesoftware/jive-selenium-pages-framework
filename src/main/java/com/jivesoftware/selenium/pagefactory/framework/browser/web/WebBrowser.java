@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -157,7 +156,7 @@ public abstract class WebBrowser extends Browser<WebDriver> {
      * {@link com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage} and then
      * call {@link #openPageByURL(String, Class)}.
      */
-    public TopLevelPage openPageByURL(String href) throws URISyntaxException {
+    public TopLevelPage openPageByURL(String href) {
         return openPageByURL(href, BaseTopLevelPage.class);
     }
 
