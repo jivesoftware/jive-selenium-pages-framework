@@ -179,6 +179,21 @@ public interface SeleniumActions {
 
     public WebElement findVisibleElementWithRefresh(By locator, TimeoutType timeout);
 
+    /**
+     * Search for a WebElement located by 'locator' that has a child element located in its sub-tree
+     * located by 'childLocator'.
+     *
+     * Poll repeatedly until a timeout occurs, but do not refresh the page.
+     *
+     * @param parentLocator - parent locator
+     * @param childLocator - a locator relative to the parent to find the child element
+     *
+     * @return - the parent element located by the 'locator' param
+     */
+    public WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout);
+
+    public List<WebElement> findElementsContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout);
+
     public WebElement findElementContainingText(By locator, String text);
 
     public WebElement findVisibleElementContainingText(By locator, String text);
@@ -353,6 +368,13 @@ public interface SeleniumActions {
     public void waitOnPredicateWithRefresh(Predicate<Object> predicate, String message, TimeoutType timeout);
 
     public <T> T waitOnExpectedCondition(ExpectedCondition<T> expectedCondition, String message, TimeoutType timeout);
+
+    /**
+     * Verify the given WebElement becomes stale (removed from the DOM).
+     * @param element - element we expect to be removed from the DOM
+     * @param timeout - timeout type, defaults to the webElementPresenceTimeout (typically 5 seconds).
+     */
+    public void verifyElementRemoved(WebElement element, TimeoutType timeout);
 
     public WebElement verifyPageRefreshed(WebElement elementFromBeforeRefresh, By locatorAfterRefresh, TimeoutType timeout);
 

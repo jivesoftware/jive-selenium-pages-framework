@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 import com.jivesoftware.selenium.pagefactory.framework.actions.WebElementHelpers;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
@@ -471,6 +472,64 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    public WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
+        final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
+                "with locator '%s' having child with locator '%s' with timeout of %d seconds", parentLocator, childLocator, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.ignoring(StaleElementReferenceException.class)
+                .withMessage(msg);
+
+        return wait.until(new ExpectedCondition<WebElement>() {
+            @Override
+            public WebElement apply(@Nullable WebDriver input) {
+                if (input == null) {
+                    return null;
+                }
+                List<WebElement> els = input.findElements(parentLocator);
+                for (WebElement el: els) {
+                    List<WebElement> subChildren = el.findElements(childLocator);
+                    if (subChildren.size() > 0) {
+                        return el;
+                    }
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public List<WebElement> findElementsContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
+        final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
+                "with locator '%s' having child with locator '%s' with timeout of %d seconds", parentLocator, childLocator, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.ignoring(StaleElementReferenceException.class)
+                .withMessage(msg);
+
+        return wait.until(new ExpectedCondition<List<WebElement>>() {
+            @Override
+            public List<WebElement> apply(@Nullable WebDriver input) {
+                if (input == null) {
+                    return null;
+                }
+                List<WebElement> results = Lists.newArrayList();
+                List<WebElement> els = input.findElements(parentLocator);
+                for (WebElement el: els) {
+                    List<WebElement> subChildren = el.findElements(childLocator);
+                    if (subChildren.size() > 0) {
+                        results.add(el);
+                    }
+                }
+                if (results.size() > 0) {
+                    return results;
+                }
+                return null;
+            }
+        });
+    }
+
+    @Override
     @Nullable
     public WebElement getChildElement(By locator, WebElement parentEl) {
         List<WebElement> elements = findElements(locator, parentEl);
@@ -852,6 +911,16 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         } catch (Exception e) {
             return; // OK - we didn't find a visible element containing the given text
         }
+    }
+
+    @Override
+    public void verifyElementRemoved(WebElement element, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        logger.info("Waiting for element to become stale (removed from the DOM) using timeout of {} seconds", waitSeconds);
+        waitOnExpectedConditionForSeconds(ExpectedConditions.stalenessOf(element),
+                "Timeout waiting for web element to become stale (removed from the DOM).",
+                waitSeconds);
+        logger.info("Verified web element became stale (removed from the DOM).");
     }
 
     @Override
