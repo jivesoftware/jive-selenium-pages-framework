@@ -46,6 +46,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("app", app);
         desiredCapabilities.setCapability("appPackage", appPackage);
         desiredCapabilities.setCapability("appWaitActivity", appActivity);
+        desiredCapabilities.setCapability("fullReset", "true");
         desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
         return desiredCapabilities;
     }
