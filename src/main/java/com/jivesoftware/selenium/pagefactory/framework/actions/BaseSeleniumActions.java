@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
-import com.jivesoftware.selenium.pagefactory.framework.actions.WebElementHelpers;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
@@ -472,6 +471,39 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    public WebElement findElementContainingChild(final By parentLocator, final By childLocator) {
+        List<WebElement> parents = webDriver().findElements(parentLocator);
+        for (WebElement el: parents) {
+            try {
+                List<WebElement> subChildren = el.findElements(childLocator);
+                if (subChildren.size() > 0) {
+                    return el;
+                }
+            } catch (WebDriverException e) {
+                logger.debug("Exception occurred finding sub-children in findElementContainingChild:", e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<WebElement> findElementsContainingChild(final By parentLocator, final By childLocator) {
+        List<WebElement> parents = webDriver().findElements(parentLocator);
+        List<WebElement> parentsWithChild = Lists.newArrayList();
+        for (WebElement el: parents) {
+            try {
+                List<WebElement> subChildren = el.findElements(childLocator);
+                if (subChildren.size() > 0) {
+                    parentsWithChild.add(el);
+                }
+            } catch (WebDriverException e) {
+                logger.debug("Exception occurred finding sub-children in findElementsContainingChild:", e);
+            }
+        }
+        return parentsWithChild;
+    }
+
+    @Override
     public WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
         final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
@@ -483,17 +515,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         return wait.until(new ExpectedCondition<WebElement>() {
             @Override
             public WebElement apply(@Nullable WebDriver input) {
-                if (input == null) {
-                    return null;
-                }
-                List<WebElement> els = input.findElements(parentLocator);
-                for (WebElement el: els) {
-                    List<WebElement> subChildren = el.findElements(childLocator);
-                    if (subChildren.size() > 0) {
-                        return el;
-                    }
-                }
-                return null;
+                return findElementContainingChild(parentLocator, childLocator);
             }
         });
     }
@@ -510,21 +532,11 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         return wait.until(new ExpectedCondition<List<WebElement>>() {
             @Override
             public List<WebElement> apply(@Nullable WebDriver input) {
-                if (input == null) {
-                    return null;
-                }
-                List<WebElement> results = Lists.newArrayList();
-                List<WebElement> els = input.findElements(parentLocator);
-                for (WebElement el: els) {
-                    List<WebElement> subChildren = el.findElements(childLocator);
-                    if (subChildren.size() > 0) {
-                        results.add(el);
-                    }
-                }
-                if (results.size() > 0) {
-                    return results;
-                }
-                return null;
+               List<WebElement> parents = findElementsContainingChild(parentLocator, childLocator);
+               if (parents.size() > 0) {
+                   return parents;
+               }
+               return null;
             }
         });
     }

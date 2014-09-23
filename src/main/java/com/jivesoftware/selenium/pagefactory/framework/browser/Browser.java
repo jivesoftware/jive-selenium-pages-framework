@@ -6,7 +6,6 @@ import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
-import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
 import com.jivesoftware.selenium.pagefactory.framework.pages.PageUtils;
 import com.jivesoftware.selenium.pagefactory.framework.pages.SubPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;

@@ -1,7 +1,6 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
 import com.google.common.base.Optional;
-import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.PageFactory;

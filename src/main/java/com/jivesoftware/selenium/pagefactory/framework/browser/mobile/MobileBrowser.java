@@ -5,21 +5,18 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserTyp
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
-import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import io.appium.java_client.AppiumDriver;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**

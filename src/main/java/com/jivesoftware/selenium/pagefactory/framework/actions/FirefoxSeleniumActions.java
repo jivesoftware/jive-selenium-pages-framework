@@ -1,7 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.actions;
 
-import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
-import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
 
 /**

@@ -16,7 +16,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -178,6 +177,22 @@ public interface SeleniumActions {
     public WebElement findElementWithRefresh(By locator, TimeoutType timeout);
 
     public WebElement findVisibleElementWithRefresh(By locator, TimeoutType timeout);
+
+    /**
+     * Find the first element located by 'parentLocator' that has at least 1 child element located by the relative locator 'childLocator'
+     * @param parentLocator - locator to find parent elements
+     * @param childLocator - relative locator to find child elements inside a parent element
+     * @return - parent element that have at least 1 child element located by 'childLocator', or null if there are none.
+     */
+    public WebElement findElementContainingChild(final By parentLocator, final By childLocator);
+
+    /**
+     * Find elements located by 'parentLocator' that have child elements located by the relative locator 'childLocator'
+     * @param parentLocator - locator to find parent elements
+     * @param childLocator - relative locator to find child elements inside a parent element
+     * @return - parent elements that have at least 1 child element located by 'childLocator'
+     */
+    public List<WebElement> findElementsContainingChild(final By parentLocator, final By childLocator);
 
     /**
      * Search for a WebElement located by 'locator' that has a child element located in its sub-tree

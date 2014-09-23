@@ -3,7 +3,6 @@ package com.jivesoftware.selenium.pagefactory.framework.pages;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.jivesoftware.selenium.pagefactory.framework.actions.BaseSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import org.openqa.selenium.By;

@@ -1,8 +1,6 @@
 package com.jivesoftware.selenium.pagefactory.framework.actions;
 
 import com.jivesoftware.selenium.pagefactory.framework.browser.mobile.IOSMobileBrowser;
-import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 

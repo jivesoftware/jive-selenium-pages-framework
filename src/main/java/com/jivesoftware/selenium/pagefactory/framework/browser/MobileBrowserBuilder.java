@@ -11,8 +11,6 @@ import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverEx
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.logging.Level;
-
 /**
  * Created By amir.simhi on 8/20/14.
  *

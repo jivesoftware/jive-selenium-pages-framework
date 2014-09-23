@@ -1,7 +1,6 @@
 package com.jivesoftware.selenium.pagefactory.framework.actions;
 
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
