@@ -765,7 +765,12 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         if (el == null) {
             return false;
         }
-        return el.isDisplayed() && el.getSize().getHeight() > 0 && el.getSize().getWidth() > 0;
+        try {
+            return el.isDisplayed() && el.getSize().getHeight() > 0 && el.getSize().getWidth() > 0;
+        } catch (StaleElementReferenceException e) {
+            // If the element becomes stale during the check, after we got it, then return false. 
+            return false;
+        }
     }
 
     @Override
