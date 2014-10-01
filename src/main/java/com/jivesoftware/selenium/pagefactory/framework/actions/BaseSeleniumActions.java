@@ -121,7 +121,13 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
     public WebElement click(By locator, TimeoutType timeout) {
         WebElement el = waitUntilClickable(locator, timeout);
-        el.click();
+        try {
+            el.click();
+        } catch (StaleElementReferenceException e) {
+            logger.warn("Element was stale immediately after waiting to be clickable in BaseSeleniumActions#click. Waiting for element to be clickable again.");
+            el = waitUntilClickable(locator, timeout);
+            el.click();
+        }
         logger.info("Clicked element with locator '{}'", locator);
         return el;
     }
@@ -1059,8 +1065,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
         logger.info("Waiting for locator element '{}' to be clickable, using timeout of {} seconds", locator, waitSeconds);
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(locator));
-        return el;
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
     @Override
