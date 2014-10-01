@@ -26,6 +26,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.String.format;
@@ -302,6 +303,30 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
                     format("Timeout waiting for javascript symbol '%s' to have value '%s' with %d seconds timeout used", symbol, value, waitSeconds), e);
         }
         logger.info("Success verifying javascript symbol '{}' has value '{}'!", symbol, value);
+    }
+
+    @Override
+    public String getWebPageReadyState() throws Exception {
+        return (String) executeJavascript("return document.readyState;");
+    }
+
+    @Override
+    public void waitForWebPageReadyStateToBeComplete() {
+        final int waitSeconds = timeoutsConfig.getPageLoadTimeoutSeconds();
+        waitOnPredicate(new Predicate() {
+            @Override
+            public boolean apply(@Nullable Object o) {
+                try {
+                    String readyState = getWebPageReadyState();
+                    return Objects.equals(readyState, "complete");
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        },
+        String.format("Error - web page never reached document.readyState='complete' after %d seconds", waitSeconds),
+        TimeoutType.PAGE_LOAD_TIMEOUT);
+        logger.info("Success - Waited for document.readyState to be 'complete' on page: " + webDriver().getCurrentUrl());
     }
 
 
@@ -768,7 +793,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         try {
             return el.isDisplayed() && el.getSize().getHeight() > 0 && el.getSize().getWidth() > 0;
         } catch (StaleElementReferenceException e) {
-            // If the element becomes stale during the check, after we got it, then return false. 
+            // If the element becomes stale during the check, after we got it, then return false.
             return false;
         }
     }

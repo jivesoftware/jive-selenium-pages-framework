@@ -167,6 +167,10 @@ public interface SeleniumActions {
 
     public void waitForJavascriptSymbolToHaveValue(String symbol, String value, TimeoutType timeout);
 
+    public String getWebPageReadyState() throws Exception;
+
+    public void waitForWebPageReadyStateToBeComplete();
+
     /**
      * Immediately return true or false as to whether a web element exists on the page.
      */
