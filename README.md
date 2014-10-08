@@ -5,7 +5,9 @@ jive-selenium-pages-framework
 
 <h4>Author: Charles Capps</h4>
 <h4>Email: charles.capps@jivesoftware.com</h4>
-<h4>Javadoc can be found [here](http://charlescapps.github.io/jive-selenium-pages-framework/javadoc/)</h4>
+<h4>Javadoc can be found 
+    <a href="http://charlescapps.github.io/jive-selenium-pages-framework/javadoc/" title="Jive Selenium Pages Framework Javadoc">here</a>
+</h4>
 
 <p>
 This framework provides many valuable features for simplifying Selenium Browser testing.
