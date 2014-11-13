@@ -46,7 +46,7 @@ public class IOSMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("version", version);
         desiredCapabilities.setCapability("autoLaunch", autoLaunch);
         desiredCapabilities.setCapability("app", app);
-        desiredCapabilities.setCapability("fullReset", "true");
+        desiredCapabilities.setCapability("fullReset", "false");
         desiredCapabilities.setCapability("rotatable", "true");
         return desiredCapabilities;
     }
@@ -79,7 +79,8 @@ public class IOSMobileBrowser extends MobileBrowser {
      * Swipe from the top to buttom for a second
      */
     public void dragDown() {
-        super.dragDown();
+        int midScreen = getScreenWidth() / 2;
+        webDriver.swipe(midScreen, 140, midScreen, getScreenHeight() - 140, 1500);
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         scrollObject.put("direction", "up");
         webDriver.executeScript("mobile: scroll", scrollObject);
@@ -89,7 +90,8 @@ public class IOSMobileBrowser extends MobileBrowser {
      * Swipe from the down to up for a second
      */
     public void dragUp() {
-        super.dragUp();
+        int midScreen = getScreenWidth() / 2;
+        webDriver.swipe(midScreen, getScreenHeight() - 140, midScreen, 140, 1500);
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         scrollObject.put("direction", "down");
         webDriver.executeScript("mobile: scroll", scrollObject);
@@ -110,5 +112,11 @@ public class IOSMobileBrowser extends MobileBrowser {
 
     public void scrollToTop() {
         getWebDriver().findElementByClassName("UIAStatusBar").click();
+    }
+
+    public void openNotifications() {
+        int midScreenWidth = getScreenWidth() / 2 ;
+        webDriver.swipe(midScreenWidth, 0, midScreenWidth, getScreenHeight(), 1000);
+        webDriver.quit();
     }
 }
