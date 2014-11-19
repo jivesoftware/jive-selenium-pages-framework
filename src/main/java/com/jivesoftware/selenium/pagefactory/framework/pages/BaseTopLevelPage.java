@@ -14,19 +14,19 @@ import javax.annotation.Nonnull;
  * <p/>
  * Subclasses should call super.pageLoadHook() if they want to wait on the page identifier.
  */
-public class BaseTopLevelPage implements TopLevelPage {
+public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage {
     @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.getLogger(BaseTopLevelPage.class);
 
     private static final PageUtils PAGE_UTILS = new PageUtils();
-    protected SeleniumActions a;
+    protected S a;
 
-    public final SeleniumActions getActions() {
+    public final S getActions() {
         return a;
     }
 
     public final void setActions(SeleniumActions actions) {
-        this.a = actions;
+        this.a = (S) actions;
     }
 
     @Nonnull

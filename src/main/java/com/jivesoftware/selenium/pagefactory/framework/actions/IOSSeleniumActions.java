@@ -13,12 +13,13 @@ import java.util.HashMap;
  *
  * Currently, only scrollTo option is implemented differently for iOS
  */
-public class IOSSeleniumActions extends BaseSeleniumActions<IOSMobileBrowser> {
+public class IOSSeleniumActions extends MobileSeleniumActions<IOSMobileBrowser> {
 
     public IOSSeleniumActions(IOSMobileBrowser browser) {
         super(browser);
     }
 
+    @Override
     public void scrollIntoView(WebElement el) {
         HashMap<String, String> scrollObject = new HashMap<String, String>();
         String widId = ((RemoteWebElement) el).getId();
