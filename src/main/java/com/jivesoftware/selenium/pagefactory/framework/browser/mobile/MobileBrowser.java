@@ -70,7 +70,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     protected AppiumDriver createWebDriver() throws JiveWebDriverException {
         try {
             printCapabilities(getDesiredCapabilities());
-            return new AppiumDriver(new URL(getBaseTestUrl()), getDesiredCapabilities());
+            return new SwipeableWebDriver(new URL(getBaseTestUrl()), getDesiredCapabilities());
         } catch (IOException e) {
             throw new JiveWebDriverException("Error starting appium driver service", e);
         }
@@ -173,6 +173,14 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     public void dragUp() {
         int midScreen = webDriver.manage().window().getSize().getWidth() / 2;
         webDriver.swipe(midScreen, getScreenHeight() - 250, midScreen, 250, 2500);
+    }
+
+    /**
+     * Swipe from the top to bottom for a second
+     */
+    public void drag(int yStart, int yEnd) {
+        int midScreen = getScreenWidth() / 2;
+        webDriver.swipe(midScreen, yStart, midScreen, yEnd, 2500);
     }
 
     /**
