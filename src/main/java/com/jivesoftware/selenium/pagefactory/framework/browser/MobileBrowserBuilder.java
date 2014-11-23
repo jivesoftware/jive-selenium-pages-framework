@@ -42,7 +42,7 @@ public class MobileBrowserBuilder {
     private String automationName;
     private String version;
     private String autoLaunch;
-
+    private boolean touchMode;
 
 
     private MobileBrowserBuilder(String baseTestUrl,
@@ -90,6 +90,9 @@ public class MobileBrowserBuilder {
         return appActivity;
     }
 
+    public boolean isTouchMode() {
+        return touchMode;
+    }
 
     /**
      * Get a MobileBrowserBuilder for Android and base URL for the webapp you are testing against.
@@ -122,7 +125,7 @@ public class MobileBrowserBuilder {
             case ANDROID:
                 browser = new AndroidMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(),
                         platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
-                        app, appPackage, appActivity, timeoutsConfig);
+                        app, appPackage, appActivity, timeoutsConfig, touchMode);
                 break;
             case IOS:
                 browser = new IOSMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(),
@@ -134,6 +137,11 @@ public class MobileBrowserBuilder {
         }
         browser.initializeBrowser();
         return browser;
+    }
+
+    public MobileBrowserBuilder withTouchMode(boolean touchMode) {
+        this.touchMode = touchMode;
+        return this;
     }
 
     public MobileBrowserBuilder withTimeoutsConfig(TimeoutsConfig timeoutsConfig) {

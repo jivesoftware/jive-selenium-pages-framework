@@ -3,6 +3,8 @@ package com.jivesoftware.selenium.pagefactory.framework.browser.mobile;
 import com.jivesoftware.selenium.pagefactory.framework.actions.AndroidSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
@@ -10,9 +12,11 @@ import org.slf4j.LoggerFactory;
 
 public class AndroidMobileBrowser extends MobileBrowser {
 
+    protected boolean touchMode;
     private String appPackage;
     private String appActivity;
     private static final Logger logger = LoggerFactory.getLogger(AndroidMobileBrowser.class);
+
     public AndroidMobileBrowser(String baseTestUrl,
                                 String browserName,
                                 String platformName,
@@ -25,9 +29,11 @@ public class AndroidMobileBrowser extends MobileBrowser {
                                 String app,
                                 String appPackage,
                                 String appActivity,
-                                TimeoutsConfig timeouts) throws JiveWebDriverException {
+                                TimeoutsConfig timeouts,
+                                boolean touchMode) throws JiveWebDriverException {
         super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName,
                 newCommandTimeout, automationName, version, autoLaunch, app);
+        this.touchMode = touchMode;
         this.appPackage = appPackage;
         this.appActivity = appActivity;
     }
@@ -46,7 +52,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("app", app);
         desiredCapabilities.setCapability("appPackage", appPackage);
         desiredCapabilities.setCapability("appWaitActivity", appActivity);
-        desiredCapabilities.setCapability("fullReset", "true");
+        desiredCapabilities.setCapability("fullReset", true);
         desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
         return desiredCapabilities;
     }
@@ -62,6 +68,90 @@ public class AndroidMobileBrowser extends MobileBrowser {
 
     public String getAppActivity() {
         return appActivity;
+    }
+
+
+    public boolean isTouchMode() {
+        return touchMode;
+    }
+
+    public void setTouchMode(boolean touchMode) {
+        this.touchMode = touchMode;
+    }
+
+    /**
+     * Swipe from the top to bottom for a second
+     */
+    @Override
+    public void dragDown() {
+        int midScreen = getScreenWidth() / 2;
+        if (touchMode) {
+            TouchActions action = new TouchActions(webDriver);
+            action.down(midScreen, 250).move(midScreen, 300).up(midScreen, 300).perform();
+        }
+        else {
+            webDriver.swipe(midScreen, 250, midScreen, getScreenHeight() - 250, 1500);
+        }
+    }
+
+    /**
+     * Swipe from the down to up for a second
+     */
+    @Override
+    public void dragUp() {
+        int midScreen = webDriver.manage().window().getSize().getWidth() / 2;
+        if (touchMode) {
+            TouchActions action = new TouchActions(webDriver);
+            action.down(midScreen, 300).move(midScreen, 250).up(midScreen, 250).perform();
+        }
+        else {
+            webDriver.swipe(midScreen, getScreenHeight() - 250, midScreen, 250, 2500);
+        }
+    }
+
+    /**
+     * Swipe from the top to bottom for a second
+     */
+    @Override
+    public void drag(int yStart, int yEnd) {
+        int midScreen = getScreenWidth() / 2;
+        if (touchMode) {
+            TouchActions action = new TouchActions(webDriver);
+            action.down(midScreen, yStart).move(midScreen, yEnd).up(midScreen, yEnd).perform();
+        }
+        else {
+            webDriver.swipe(midScreen, yStart, midScreen, yEnd, 2500);
+        }
+    }
+
+    @Override
+    public void tap(int fingersNum, WebElement webElement, int duration) {
+        if (touchMode) {
+            TouchActions action = new TouchActions(webDriver);
+            try {
+                action.down(webElement.getLocation().getX(), webElement.getLocation().getY()).clickAndHold().release(webElement).perform();
+            } catch (NullPointerException e) {
+
+            }
+        }
+        else {
+            webDriver.tap(fingersNum, webElement, duration);
+        }
+    }
+
+    @Override
+    public void tap(int fingersNum, int xLocation, int yLocation, int duration) {
+        if (touchMode) {
+            TouchActions action = new TouchActions(webDriver);
+            try {
+                action.down(xLocation, yLocation).clickAndHold().perform();
+            } catch (NullPointerException e) {
+
+            }
+        }
+        else {
+            webDriver.tap(fingersNum, xLocation, yLocation, duration);
+        }
     }
 
     @Override

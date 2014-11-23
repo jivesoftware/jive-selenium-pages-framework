@@ -18,7 +18,6 @@ import java.util.HashMap;
 
 public class IOSMobileBrowser extends MobileBrowser {
 
-
     public IOSMobileBrowser(String baseTestUrl,
                             String browserName,
                             String platformName,
