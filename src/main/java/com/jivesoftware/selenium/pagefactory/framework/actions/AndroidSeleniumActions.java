@@ -11,7 +11,7 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.mobile.AndroidMob
  * Currently, this is the same as BaseSeleniumActions, as we don't have any need to implement anything differently
  * for Android.
  */
-public class AndroidSeleniumActions extends MobileSeleniumActions<AndroidMobileBrowser> {
+public class AndroidSeleniumActions extends BaseSeleniumActions<AndroidMobileBrowser> {
 
     public AndroidSeleniumActions(AndroidMobileBrowser browser) {
         super(browser);
