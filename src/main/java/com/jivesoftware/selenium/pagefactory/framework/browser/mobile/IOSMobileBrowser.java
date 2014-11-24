@@ -45,7 +45,7 @@ public class IOSMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("version", version);
         desiredCapabilities.setCapability("autoLaunch", autoLaunch);
         desiredCapabilities.setCapability("app", app);
-        desiredCapabilities.setCapability("fullReset", "false");
+        desiredCapabilities.setCapability("fullReset", "true");
         desiredCapabilities.setCapability("rotatable", "true");
         return desiredCapabilities;
     }
