@@ -20,6 +20,7 @@ public class IOSMobileBrowser extends MobileBrowser {
 
     public IOSMobileBrowser(String baseTestUrl,
                             String browserName,
+                            String platform,
                             String platformName,
                             String platformVersion,
                             String deviceName,
@@ -29,7 +30,7 @@ public class IOSMobileBrowser extends MobileBrowser {
                             String autoLaunch,
                             String app,
                             TimeoutsConfig timeouts) throws JiveWebDriverException {
-        super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName,
+        super(baseTestUrl, timeouts, browserName, platform, platformName, platformVersion, deviceName,
                 newCommandTimeout, automationName, version, autoLaunch, app);
     }
 
@@ -37,6 +38,7 @@ public class IOSMobileBrowser extends MobileBrowser {
     public DesiredCapabilities getDesiredCapabilities() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         desiredCapabilities.setCapability(CapabilityType.BROWSER_NAME, browserName);
+        desiredCapabilities.setCapability("platform", platform);
         desiredCapabilities.setCapability("platformName", platformName);
         desiredCapabilities.setCapability("platformVersion", platformVersion);
         desiredCapabilities.setCapability("deviceName", deviceName);

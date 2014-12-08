@@ -34,6 +34,7 @@ public class MobileBrowserBuilder {
     private String browserName;
     private MobilePlatformName platformName;
     private String platformVersion;
+    private String platform;
     private String deviceName;
     private String app;
     private String appPackage;
@@ -72,6 +73,26 @@ public class MobileBrowserBuilder {
 
     public String getPlatformVersion() {
         return platformVersion;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public String getNewCommandTimeout() {
+        return newCommandTimeout;
+    }
+
+    public String getAutomationName() {
+        return automationName;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getAutoLaunch() {
+        return autoLaunch;
     }
 
     public String getDeviceName() {
@@ -123,12 +144,12 @@ public class MobileBrowserBuilder {
         MobileBrowser browser;
         switch (platformName) {
             case ANDROID:
-                browser = new AndroidMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(),
+                browser = new AndroidMobileBrowser(baseTestUrl, browserName, platform, platformName.getPlatformName(),
                         platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
                         app, appPackage, appActivity, timeoutsConfig, touchMode);
                 break;
             case IOS:
-                browser = new IOSMobileBrowser(baseTestUrl, browserName, platformName.getPlatformName(),
+                browser = new IOSMobileBrowser(baseTestUrl, browserName, platform, platformName.getPlatformName(),
                         platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
                         app, timeoutsConfig);
                 break;
@@ -204,6 +225,10 @@ public class MobileBrowserBuilder {
         return this;
     }
 
+    public MobileBrowserBuilder withPlatform(String platform) {
+        this.platform = platform;
+        return this;
+    }
 
     @Override
     public String toString() {
@@ -211,6 +236,7 @@ public class MobileBrowserBuilder {
                 .add("baseTestUrl", baseTestUrl)
                 .add("browserName", browserName)
                 .add("platformName", platformName.getPlatformName())
+                .add("platform", platform)
                 .add("platformVersion", platformVersion)
                 .add("deviceName", deviceName)
                 .add("app", app)

@@ -19,6 +19,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
 
     public AndroidMobileBrowser(String baseTestUrl,
                                 String browserName,
+                                String platform,
                                 String platformName,
                                 String platformVersion,
                                 String deviceName,
@@ -31,7 +32,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
                                 String appActivity,
                                 TimeoutsConfig timeouts,
                                 boolean touchMode) throws JiveWebDriverException {
-        super(baseTestUrl, timeouts, browserName, platformName, platformVersion, deviceName,
+        super(baseTestUrl, timeouts, browserName, platform, platformName, platformVersion, deviceName,
                 newCommandTimeout, automationName, version, autoLaunch, app);
         this.touchMode = touchMode;
         this.appPackage = appPackage;
@@ -42,6 +43,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
     public DesiredCapabilities getDesiredCapabilities() {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         desiredCapabilities.setCapability(CapabilityType.BROWSER_NAME, browserName);
+        desiredCapabilities.setCapability("platform", platform);
         desiredCapabilities.setCapability("platformName", platformName);
         desiredCapabilities.setCapability("platformVersion", platformVersion);
         desiredCapabilities.setCapability("deviceName", deviceName);

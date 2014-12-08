@@ -28,6 +28,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     private static Logger logger = LoggerFactory.getLogger(MobileBrowser.class);
 
     protected String browserName;
+    protected String platform;
     protected String platformName;
     protected String platformVersion;
     protected String deviceName;
@@ -39,7 +40,9 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
 
     protected MobileBrowser(String baseTestUrl,
                             TimeoutsConfig timeoutsConfig, String browserName,
-                            String platformName, String platformVersion,
+                            String platform,
+                            String platformName,
+                            String platformVersion,
                             String deviceName,
                             String newCommandTimeout,
                             String automationName,
@@ -48,6 +51,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
                             String app) throws JiveWebDriverException {
         super(baseTestUrl, timeoutsConfig);
         this.browserName = browserName;
+        this.platform = platform;
         this.platformName = platformName;
         this.platformVersion = platformVersion;
         this.deviceName = deviceName;
@@ -118,6 +122,10 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
 
     public String getPlatformName() {
         return platformName;
+    }
+
+    public String getPlatform() {
+        return platform;
     }
 
     public String getPlatformVersion() {
