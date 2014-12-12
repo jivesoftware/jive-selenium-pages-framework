@@ -30,7 +30,7 @@
     </developers>
 
     <properties>
-        <seleniumVersion>2.42.2</seleniumVersion>
+        <seleniumVersion>2.43.1</seleniumVersion>
         <snapshotRepoId>ossrh</snapshotRepoId>
         <snapshotRepoUrl>https://oss.sonatype.org/content/repositories/snapshots</snapshotRepoUrl>
         <releaseRepoId>ossrh</releaseRepoId>
