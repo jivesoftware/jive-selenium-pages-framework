@@ -3,9 +3,12 @@ package com.jivesoftware.selenium.pagefactory.framework.browser.mobile;
 import com.jivesoftware.selenium.pagefactory.framework.actions.IOSSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 
 
@@ -50,6 +53,15 @@ public class IOSMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("fullReset", "true");
         desiredCapabilities.setCapability("rotatable", "true");
         return desiredCapabilities;
+    }
+
+    protected IOSDriver createWebDriver() throws JiveWebDriverException {
+        try {
+            printCapabilities(getDesiredCapabilities());
+            return new IOSDriver(new URL(getBaseTestUrl()), getDesiredCapabilities());
+        } catch (IOException e) {
+            throw new JiveWebDriverException("Error starting appium driver service", e);
+        }
     }
 
     @Override
@@ -99,24 +111,26 @@ public class IOSMobileBrowser extends MobileBrowser {
     }
 
     /**
-     *
-     * @param startX - 0 is the left side of the smart-phone
-     * @param endX
-     * @param startY - 0 is the upper side of the smart-phone
-     * @param endY
-     * @param duration - in milliseconds
      * Will function only with real device
+     * @param startX - 0 is the left side of the smart-phone
+     * @param endX - coordinate to stop swipe
+     * @param startY - 0 is the upper side of the smart-phone
+     * @param endY - coordinate to stop swipe
+     * @param duration - in milliseconds
      */
     public void swipe(int startX, int endX, int startY, int endY, int duration) {
         webDriver.swipe(startX, startY, endX, endY, duration);
     }
 
+    /**
+     *  Uses iOS functionality of automatic scroll to top when clicking status bar
+     */
     public void scrollToTop() {
         getWebDriver().findElementByClassName("UIAStatusBar").click();
     }
 
     public void openNotifications() {
-        int midScreenWidth = getScreenWidth() / 2 ;
+        int midScreenWidth = getScreenWidth() / 2;
         webDriver.swipe(midScreenWidth, 0, midScreenWidth, getScreenHeight(), 1000);
         webDriver.quit();
     }

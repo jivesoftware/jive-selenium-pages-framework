@@ -3,12 +3,16 @@ package com.jivesoftware.selenium.pagefactory.framework.browser.mobile;
 import com.jivesoftware.selenium.pagefactory.framework.actions.AndroidSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URL;
 
 public class AndroidMobileBrowser extends MobileBrowser {
 
@@ -59,6 +63,15 @@ public class AndroidMobileBrowser extends MobileBrowser {
         return desiredCapabilities;
     }
 
+    protected AndroidDriver createWebDriver() throws JiveWebDriverException {
+        try {
+            printCapabilities(getDesiredCapabilities());
+            return new SwipeableWebDriver(new URL(getBaseTestUrl()), getDesiredCapabilities());
+        } catch (IOException e) {
+            throw new JiveWebDriverException("Error starting appium driver service", e);
+        }
+    }
+
     @Override
     public AndroidSeleniumActions getActions() {
         return new AndroidSeleniumActions(this);
@@ -72,11 +85,18 @@ public class AndroidMobileBrowser extends MobileBrowser {
         return appActivity;
     }
 
-
+    /**
+     *
+     * @return true if Android is API 17 or down, and as a result uses touch mode
+     */
     public boolean isTouchMode() {
         return touchMode;
     }
 
+    /**
+     *
+     * @param touchMode - true if Android is API 17 or lower
+     */
     public void setTouchMode(boolean touchMode) {
         this.touchMode = touchMode;
     }
@@ -90,8 +110,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
         if (touchMode) {
             TouchActions action = new TouchActions(webDriver);
             action.down(midScreen, 360).move(midScreen, 300).up(midScreen, 300).perform();
-        }
-        else {
+        } else {
             webDriver.swipe(midScreen, 360, midScreen, getScreenHeight() - 250, 1500);
         }
     }
@@ -105,14 +124,16 @@ public class AndroidMobileBrowser extends MobileBrowser {
         if (touchMode) {
             TouchActions action = new TouchActions(webDriver);
             action.down(midScreen, 300).move(midScreen, 250).up(midScreen, 250).perform();
-        }
-        else {
+        } else {
             webDriver.swipe(midScreen, getScreenHeight() - 250, midScreen, 250, 2500);
         }
     }
 
     /**
      * Swipe from the top to bottom for a second
+     *
+     * @param yStart - coordinate to start swiping
+     * @param yEnd - coordinate to stop swiping
      */
     @Override
     public void drag(int yStart, int yEnd) {
@@ -120,8 +141,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
         if (touchMode) {
             TouchActions action = new TouchActions(webDriver);
             action.down(midScreen, yStart).move(midScreen, yEnd).up(midScreen, yEnd).perform();
-        }
-        else {
+        } else {
             webDriver.swipe(midScreen, yStart, midScreen, yEnd, 2500);
         }
     }
@@ -131,12 +151,12 @@ public class AndroidMobileBrowser extends MobileBrowser {
         if (touchMode) {
             TouchActions action = new TouchActions(webDriver);
             try {
-                action.down(webElement.getLocation().getX(), webElement.getLocation().getY()).clickAndHold().release(webElement).perform();
+                action.down(webElement.getLocation().getX(), webElement.getLocation().getY()).clickAndHold()
+                        .release(webElement).perform();
             } catch (NullPointerException e) {
 
             }
-        }
-        else {
+        } else {
             webDriver.tap(fingersNum, webElement, duration);
         }
     }
@@ -148,10 +168,9 @@ public class AndroidMobileBrowser extends MobileBrowser {
             try {
                 action.down(xLocation, yLocation).clickAndHold().perform();
             } catch (NullPointerException e) {
-
+                logger.error("Failed To Tap due to NullPointerException", e.getStackTrace());
             }
-        }
-        else {
+        } else {
             webDriver.tap(fingersNum, xLocation, yLocation, duration);
         }
     }

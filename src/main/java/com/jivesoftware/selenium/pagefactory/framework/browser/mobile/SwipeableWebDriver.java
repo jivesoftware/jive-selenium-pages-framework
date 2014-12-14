@@ -1,6 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.mobile;
 
-import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.interactions.HasTouchScreen;
 import org.openqa.selenium.interactions.TouchScreen;
@@ -11,7 +12,7 @@ import java.net.URL;
 /**
  * Created by amir on 11/18/14.
  */
-public class SwipeableWebDriver extends AppiumDriver implements HasTouchScreen {
+public class SwipeableWebDriver extends AndroidDriver implements HasTouchScreen {
     private RemoteTouchScreen touch;
 
     public SwipeableWebDriver(URL remoteAddress, Capabilities desiredCapabilities) {
@@ -22,5 +23,15 @@ public class SwipeableWebDriver extends AppiumDriver implements HasTouchScreen {
     @Override
     public TouchScreen getTouch() {
         return touch;
+    }
+
+    @Override
+    public MobileElement scrollTo(String s) {
+        return null;
+    }
+
+    @Override
+    public MobileElement scrollToExact(String s) {
+        return null;
     }
 }

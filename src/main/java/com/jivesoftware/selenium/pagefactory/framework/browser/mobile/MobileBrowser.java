@@ -13,8 +13,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -67,20 +65,17 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         this.webDriver.manage().timeouts().implicitlyWait(getImplicitWaitTimeoutMillis(), TimeUnit.MILLISECONDS);
     }
 
-    public int getScreenWidth() { return this.webDriver.manage().window().getSize().getWidth();}
-
-    public int getScreenHeight() { return this.webDriver.manage().window().getSize().getHeight();}
-
-    protected AppiumDriver createWebDriver() throws JiveWebDriverException {
-        try {
-            printCapabilities(getDesiredCapabilities());
-            return new SwipeableWebDriver(new URL(getBaseTestUrl()), getDesiredCapabilities());
-        } catch (IOException e) {
-            throw new JiveWebDriverException("Error starting appium driver service", e);
-        }
+    public int getScreenWidth() {
+        return this.webDriver.manage().window().getSize().getWidth();
     }
 
-    private void printCapabilities(DesiredCapabilities desiredCapabilities) {
+    public int getScreenHeight() {
+        return this.webDriver.manage().window().getSize().getHeight();
+    }
+
+    protected abstract AppiumDriver createWebDriver() throws JiveWebDriverException;
+
+    protected void printCapabilities(DesiredCapabilities desiredCapabilities) {
         logger.info("Loading capabilities..");
         for (Map.Entry<String, ?> desiredCapability : desiredCapabilities.asMap().entrySet()) {
             logger.info(desiredCapability.getKey() + "  -  " + desiredCapability.getValue());
@@ -102,7 +97,10 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     }
 
     /**
+     *
      * @param pageClass - the class of the expected Page after refreshing.
+     * @param <T> - class that extends TopLevelPage class
+     * @return - a page of the requested class
      */
     @Override
     public <T extends TopLevelPage> T refreshPage(Class<T> pageClass) {
@@ -141,9 +139,6 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     }
 
     //**********~~~~~~~~~~~~~ Mobile Actions ~~~~~~~~~~~~~~~*************
-    public void shake() {
-        webDriver.shake();
-    }
 
     public void rotateLandscape() {
         webDriver.rotate(ScreenOrientation.LANDSCAPE);
@@ -184,7 +179,9 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     }
 
     /**
-     * Swipe from the top to bottom for a second
+     * Swipe from the top to bottom for 2.5 seconds
+     * @param yStart - 0 is the upper side of the smart-phone
+     * @param yEnd - the end coordinate of the drag function
      */
     public void drag(int yStart, int yEnd) {
         int midScreen = getScreenWidth() / 2;
@@ -194,9 +191,9 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     /**
      *
      * @param startX - 0 is the left side of the smart-phone
-     * @param endX
+     * @param endX - end coordinate of the right/left movement
      * @param startY - 0 is the upper side of the smart-phone
-     * @param endY
+     * @param endY - end coordinate of the up/down movement
      * @param duration - in milliseconds
      */
     public void swipe(int startX, int endX, int startY, int endY, int duration) {
