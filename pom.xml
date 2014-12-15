@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jivesoftware</groupId>
     <artifactId>jive-selenium-pages-framework</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>jive-selenium-pages-framework</name>
     <description>Framework for automated testing using Selenium. Provides easy configuration of WebDrivers with BrowserFactory. Provides a Page abstraction.</description>
