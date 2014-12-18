@@ -188,6 +188,11 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         webDriver.swipe(midScreen, yStart, midScreen, yEnd, 2500);
     }
 
+    public void drag(int yStart, int yEnd, int duration) {
+        int midScreen = getScreenWidth() / 2;
+        webDriver.swipe(midScreen, yStart, midScreen, yEnd, duration);
+    }
+
     /**
      *
      * @param startX - 0 is the left side of the smart-phone

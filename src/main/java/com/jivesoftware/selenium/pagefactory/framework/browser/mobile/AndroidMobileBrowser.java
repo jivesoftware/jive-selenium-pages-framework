@@ -111,7 +111,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
             TouchActions action = new TouchActions(webDriver);
             action.down(midScreen, 360).move(midScreen, 300).up(midScreen, 300).perform();
         } else {
-            webDriver.swipe(midScreen, 360, midScreen, getScreenHeight() - 250, 1500);
+            webDriver.swipe(midScreen, 450, midScreen, getScreenHeight() - 250, 1500);
         }
     }
 
@@ -143,6 +143,24 @@ public class AndroidMobileBrowser extends MobileBrowser {
             action.down(midScreen, yStart).move(midScreen, yEnd).up(midScreen, yEnd).perform();
         } else {
             webDriver.swipe(midScreen, yStart, midScreen, yEnd, 2500);
+        }
+    }
+
+    /**
+     * Swipe from the top to bottom for a second
+     *
+     * @param yStart - coordinate to start swiping
+     * @param yEnd - coordinate to stop swiping
+     */
+
+    @Override
+    public void drag(int yStart, int yEnd, int duration) {
+        int midScreen = getScreenWidth() / 2;
+        if (touchMode) {
+            TouchActions action = new TouchActions(webDriver);
+            action.down(midScreen, yStart).move(midScreen, yEnd).up(midScreen, yEnd).perform();
+        } else {
+            webDriver.swipe(midScreen, yStart, midScreen, yEnd, duration);
         }
     }
 
