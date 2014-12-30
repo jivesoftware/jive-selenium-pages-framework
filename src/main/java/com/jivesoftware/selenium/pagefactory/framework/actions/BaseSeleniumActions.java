@@ -36,50 +36,22 @@ import static java.lang.String.format;
  */
 public abstract class BaseSeleniumActions <B extends Browser> implements SeleniumActions {
     private static final long DEFAULT_POLL_MILLIS = 100;
-
-    protected B browser;
-    protected final TimeoutsConfig timeoutsConfig;
     protected static Logger logger = LoggerFactory.getLogger(BaseSeleniumActions.class);
+    protected final TimeoutsConfig timeoutsConfig;
+    protected B browser;
 
     public BaseSeleniumActions(B browser) {
         this.browser = Preconditions.checkNotNull(browser, "Error: you must supply a non-null Browser to BaseSeleniumActions!");
         this.timeoutsConfig = Preconditions.checkNotNull(browser.getTimeouts(), "Error: you must supply a non-null Timeouts to BaseSeleniumActions!");
     }
 
-    //Convenience method to reduce typing
-    protected WebDriver webDriver() {
-        return browser.getWebDriver();
-    }
-
-/**
- * Return the {@link com.jivesoftware.selenium.pagefactory.framework.browser.Browser} object this actions class is tied to.
- */
-    @Override
-    public B getBrowser() {
-        return browser;
-    }
-
-    public void setBrowser(Browser browser) {
-        this.browser = (B)browser;
-    }
-
-    @Override
-    public Actions getActionsBuilder() {
-        return new Actions(webDriver());
-    }
+    // --------------- Methods implemented from the SeleniumActions interface -----------------
 
     @Override
     public void acceptAlert(TimeoutType timeout) {
         waitOnExpectedCondition(ExpectedConditions.alertIsPresent(),
                 "Waiting for javascript alert to be present before accepting alert.", timeout);
         webDriver().switchTo().alert().accept();
-    }
-
-    @Override
-    public void dismissAlert(TimeoutType timeout) {
-        waitOnExpectedCondition(ExpectedConditions.alertIsPresent(),
-                "Waiting for javascript alert to be present before dismissing alert.", timeout);
-        webDriver().switchTo().alert().dismiss();
     }
 
     @Override
@@ -108,17 +80,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public WebElement clickNoWait(By locator) throws JiveWebDriverException {
-        WebElement el = getElement(locator);
-        if (!isClickable(el)) {
-            throw new JiveWebDriverException("Element is not clickable: " + locator.toString());
-        }
-        el.click();
-        logger.info("Clicked element with locator '{}', no waiting.", locator);
-        return el;
-    }
-
-    @Override
     public WebElement click(By locator, TimeoutType timeout) {
         WebElement el = waitUntilClickable(locator, timeout);
         try {
@@ -142,45 +103,15 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public WebElement clickAndVerifyPresent(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout) {
-        click(locatorToClick, timeout);
-        logger.info("After click, waiting for '{}' to be present.", locatorToVerifyPresent);
-        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage =
-                format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
-                        locatorToVerifyPresent, waitSeconds);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.withMessage(errorMessage)
-            .ignoring(StaleElementReferenceException.class);
-        return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
+    public <T extends SubPage> T clickAndLoadSubPage(By locatorToClick, Class<T> pageClass, TimeoutType timeout) {
+        click(locatorToClick, TimeoutType.DEFAULT);
+        return loadSubPage(pageClass);
     }
 
     @Override
-    public WebElement clickAndVerifyPresent(WebElement el, By locatorToVerifyPresent, TimeoutType timeout) {
-        click(el, timeout);
-        logger.info("After click, waiting for '{}' to be present.", locatorToVerifyPresent);
-        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage =
-                format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
-                        locatorToVerifyPresent, waitSeconds);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.withMessage(errorMessage)
-            .ignoring(StaleElementReferenceException.class);
-        return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
-    }
-
-    @Override
-    public WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyVisible, TimeoutType timeout) {
-        click(locatorToClick, timeout);
-        logger.info("After click, waiting for '{}' to be visible.", locatorToVerifyVisible);
-        return verifyElementVisible(locatorToVerifyVisible, timeout);
-    }
-
-    @Override
-    public WebElement clickAndVerifyVisible(WebElement el, By locatorToVerifyVisible, TimeoutType timeout) {
-        click(el, timeout);
-        logger.info("After click, waiting for '{}' to be visible.", locatorToVerifyVisible);
-        return verifyElementVisible(locatorToVerifyVisible, timeout);
+    public <T extends SubPage> T clickAndLoadSubPage(WebElement el, Class<T> pageClass, TimeoutType timeout) {
+        click(el, TimeoutType.DEFAULT);
+        return loadSubPage(pageClass);
     }
 
     @Override
@@ -196,15 +127,13 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public <T extends SubPage> T clickAndLoadSubPage(By locatorToClick, Class<T> pageClass, TimeoutType timeout) {
-        click(locatorToClick, TimeoutType.DEFAULT);
-        return loadSubPage(pageClass);
+    public void clickAndSelectFromList(By locatorToClick, By popoverLocator) {
+        invokeMenuItemAndSelect(getElement(locatorToClick), popoverLocator);
     }
 
     @Override
-    public <T extends SubPage> T clickAndLoadSubPage(WebElement el, Class<T> pageClass, TimeoutType timeout) {
-        click(el, TimeoutType.DEFAULT);
-        return loadSubPage(pageClass);
+    public void clickAndSelectFromList(WebElement clickable, By popoverLocator) {
+        invokeMenuItemAndSelect(clickable, popoverLocator);
     }
 
     @Override
@@ -250,14 +179,114 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void clickAndSelectFromList(By locatorToClick, By popoverLocator) {
-        invokeMenuItemAndSelect(getElement(locatorToClick), popoverLocator);
+    public WebElement clickAndVerifyPresent(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout) {
+        click(locatorToClick, timeout);
+        logger.info("After click, waiting for '{}' to be present.", locatorToVerifyPresent);
+        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String errorMessage =
+                format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
+                        locatorToVerifyPresent, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.withMessage(errorMessage)
+            .ignoring(StaleElementReferenceException.class);
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
     }
 
     @Override
-    public void clickAndSelectFromList(WebElement clickable, By popoverLocator) {
-        invokeMenuItemAndSelect(clickable, popoverLocator);
+    public WebElement clickAndVerifyPresent(WebElement el, By locatorToVerifyPresent, TimeoutType timeout) {
+        click(el, timeout);
+        logger.info("After click, waiting for '{}' to be present.", locatorToVerifyPresent);
+        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String errorMessage =
+                format("Failure in clickAndVerifyPresent: element '%s' never became present after %d seconds!",
+                        locatorToVerifyPresent, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.withMessage(errorMessage)
+            .ignoring(StaleElementReferenceException.class);
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
     }
+
+    @Override
+    public WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyVisible, TimeoutType timeout) {
+        click(locatorToClick, timeout);
+        logger.info("After click, waiting for '{}' to be visible.", locatorToVerifyVisible);
+        return verifyElementVisible(locatorToVerifyVisible, timeout);
+    }
+
+    @Override
+    public WebElement clickAndVerifyVisible(WebElement el, By locatorToVerifyVisible, TimeoutType timeout) {
+        click(el, timeout);
+        logger.info("After click, waiting for '{}' to be visible.", locatorToVerifyVisible);
+        return verifyElementVisible(locatorToVerifyVisible, timeout);
+    }
+
+    @Override
+    public WebElement clickNoWait(By locator) throws JiveWebDriverException {
+        WebElement el = getElement(locator);
+        if (!isClickable(el)) {
+            throw new JiveWebDriverException("Element is not clickable: " + locator.toString());
+        }
+        el.click();
+        logger.info("Clicked element with locator '{}', no waiting.", locator);
+        return el;
+    }
+
+    @Override
+    public void dismissAlert(TimeoutType timeout) {
+        waitOnExpectedCondition(ExpectedConditions.alertIsPresent(),
+                "Waiting for javascript alert to be present before dismissing alert.", timeout);
+        webDriver().switchTo().alert().dismiss();
+    }
+
+    //**********~~~~~~~~~~~~~ Verify Class Actions ~~~~~~~~~~~~~~~*************
+    public boolean doesElementHaveClass(By locator, String locatorClass) {
+        WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
+        return WebElementHelpers.webElementHasClass(el, locatorClass);
+    }
+
+    @Override
+    public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, String text, By popoverLocator,
+                                                            String requiredPopupText) {
+        enterTextForAutoCompleteAndSelectFirstMatch(inputLocator, 0, text, popoverLocator, requiredPopupText);
+    }
+
+    @Override
+    public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, int minChars, String text, By popoverLocator,
+                                                            String requiredPopupText) {
+        if (minChars > text.length()) {
+            throw new RuntimeException(format("Minimum characters to enter (%d) is greater than the length of the input text '%s'!", minChars, text));
+        }
+        scrollIntoView(inputLocator);
+        if (minChars > 0) {
+            inputText(inputLocator, text.substring(0, minChars));
+        }
+        for (int i = minChars; i < text.length(); i++) {
+            String oneChar = String.valueOf(text.charAt(i));
+            inputText(inputLocator, oneChar);
+
+            // If the last char is being entered, wait 5 full seconds for the expected popup. Otherwise, wait 1 second.
+            TimeoutType timeout = (i == text.length() - 1) ? TimeoutType.FIVE_SECONDS : TimeoutType.ONE_SECOND;
+            try {
+                WebElement matchingPopup = findElementContainingTextWithWait(popoverLocator, requiredPopupText, timeout);
+                if (matchingPopup != null) {
+                    try {
+                        getActionsBuilder().moveToElement(matchingPopup)
+                                .pause(500) // Sometimes javascript needs a moment to register that it's being hovered.
+                                .click()
+                                .perform();
+                        logger.info("Success - clicked popup for autocomplete text \"{}\"", text);
+                        return;
+                    } catch (Exception e) {
+                        logger.debug("Exception clicking popup from autocomplete.", e);
+                    }
+                }
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        throw new RuntimeException(format("No popup defined by Locator  '%s' found with required text '%s'", popoverLocator, requiredPopupText));
+    }
+
     @Override
     public Object executeJavascript(String script) {
         logger.trace("Executing javascript: '{}'", script);
@@ -267,74 +296,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
             throw new RuntimeException(format("Exception executing Javascript '%s':", script), e);
         }
     }
-    @Override
-    public void waitForJavascriptSymbolToBeDefined(final String symbol, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS); //Check every 100ms
-        wait.ignoring(StaleElementReferenceException.class);
-        try {
-            wait.until(new ExpectedCondition<Object>() {
-                @Nullable
-                @Override
-                public Object apply(@Nullable WebDriver input) {
-                    Object jsResult = executeJavascript(format("return (typeof %s != 'undefined') && (%s != null)", symbol, symbol));
-                    logger.trace("javascript result: " + jsResult);
-                    return jsResult;
-                }
-            });
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                    format("Timeout waiting for javascript symbol '%s' to be defined with %d seconds timeout used", symbol, waitSeconds), e);
-        }
-        logger.info("Success verifying javascript symbol '{}' is defined!", symbol);
-    }
-
-    @Override
-    public void waitForJavascriptSymbolToHaveValue(final String symbol, final String value, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS); //Check every 100ms
-        wait.ignoring(StaleElementReferenceException.class);
-        try {
-            wait.until(new ExpectedCondition<Object>() {
-                @Nullable
-                @Override
-                public Object apply(@Nullable WebDriver input) {
-                    Object jsResult = executeJavascript(format("return (%s) === (%s)", symbol, value));
-                    logger.trace("javascript result: " + jsResult);
-                    return jsResult;
-                }
-            });
-        } catch (TimeoutException e) {
-            throw new RuntimeException(
-                    format("Timeout waiting for javascript symbol '%s' to have value '%s' with %d seconds timeout used", symbol, value, waitSeconds), e);
-        }
-        logger.info("Success verifying javascript symbol '{}' has value '{}'!", symbol, value);
-    }
-
-    @Override
-    public String getWebPageReadyState() throws Exception {
-        return (String) executeJavascript("return document.readyState;");
-    }
-
-    @Override
-    public void waitForWebPageReadyStateToBeComplete() {
-        final int waitSeconds = timeoutsConfig.getPageLoadTimeoutSeconds();
-        waitOnPredicate(new Predicate() {
-            @Override
-            public boolean apply(@Nullable Object o) {
-                try {
-                    String readyState = getWebPageReadyState();
-                    return Objects.equals(readyState, "complete");
-                } catch (Exception e) {
-                    return false;
-                }
-            }
-        },
-        String.format("Error - web page never reached document.readyState='complete' after %d seconds", waitSeconds),
-        TimeoutType.PAGE_LOAD_TIMEOUT);
-        logger.info("Success - Waited for document.readyState to be 'complete' on page: " + webDriver().getCurrentUrl());
-    }
-
 
     /**
      * According to Selenium Javadoc, this is the correct way to check for existence of an element.
@@ -349,6 +310,39 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     public boolean exists(By locator, WebElement parentEl) {
         List<WebElement> elements = findElements(locator, parentEl);
         return elements.size() > 0;
+    }
+
+    @Override
+    public WebElement findElementContainingChild(final By parentLocator, final By childLocator) {
+        List<WebElement> parents = webDriver().findElements(parentLocator);
+        for (WebElement el: parents) {
+            try {
+                List<WebElement> subChildren = el.findElements(childLocator);
+                if (subChildren.size() > 0) {
+                    return el;
+                }
+            } catch (WebDriverException e) {
+                logger.debug("Exception occurred finding sub-children in findElementContainingChild:", e);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
+        final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
+                "with locator '%s' having child with locator '%s' with timeout of %d seconds", parentLocator, childLocator, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.ignoring(StaleElementReferenceException.class)
+                .withMessage(msg);
+
+        return wait.until(new ExpectedCondition<WebElement>() {
+            @Override
+            public WebElement apply(@Nullable WebDriver input) {
+                return findElementContainingChild(parentLocator, childLocator);
+            }
+        });
     }
 
     @Override
@@ -369,49 +363,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public WebElement findVisibleElementContainingText(By locator, String text) {
-        List<WebElement> matches = findElements(locator, null);
-        for (WebElement el : matches) {
-            try {
-                if (el.getText().contains(text) && el.isDisplayed()) {
-                    logger.info("SUCCESS: Found visible web element containing text '{}' with locator '{}'", text, locator);
-                    return el;
-                }
-            } catch (Exception e) { //Don't fail just because one web element was stale. Continue searching for the text.
-                logger.debug("Exception while searching for web elements containing text '{}' with locator '{}'", text, locator);
-                logger.debug(Throwables.getStackTraceAsString(e));
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String message = String.format("Timeout waiting %d seconds to find element containing text '%s' with locator '%s'",
-                waitSeconds, text, locator.toString());
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.ignoring(StaleElementReferenceException.class)
-                .withMessage(message);
-
-        return wait.until(new ExpectedCondition<WebElement>() {
-            @Override
-            public WebElement apply(@Nullable WebDriver input) {
-                WebElement el = findVisibleElementContainingText(locator, text);
-                if (el == null) {
-                    GeneralUtils.waitOneSecond();
-                }
-                return el;
-            }
-        });
-    }
-
-    @Override
-    public WebElement findElementWithRefresh(final By locator, TimeoutType timeout) {
-        return findElementContainingTextWithRefresh(locator, "", timeout);
-    }
-
-    @Override
     public WebElement findElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
@@ -425,43 +376,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
                     long start = new Date().getTime();
                     while ((new Date().getTime() - start) / 1000 < timeoutsConfig.getPauseBetweenRefreshSeconds()) {
                         WebElement el = findElementContainingText(locator, text);
-                        if (el != null) {
-                            return el;
-                        }
-                        GeneralUtils.waitMillis(timeoutsConfig.getPauseBetweenTriesMillis());
-                    }
-                    getBrowser().refreshPage();
-                    return null;
-                }
-            });
-            logger.info("Success finding element containing text '{}' defined by locator '{}'!", text, locator);
-            return found;
-        } catch (TimeoutException e) {
-            logger.error("Timeout waiting to find text '{}' in an element matching locator '{}'", text, locator);
-            throw new TimeoutException(
-                    format("Timeout waiting to find text '%s' in an element matching locator '%s'", text, locator));
-        }
-    }
-
-    @Override
-    public WebElement findVisibleElementWithRefresh(final By locator, TimeoutType timeout) {
-        return findVisibleElementContainingTextWithRefresh(locator, "", timeout);
-    }
-
-    @Override
-    public WebElement findVisibleElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.ignoring(StaleElementReferenceException.class);
-
-        logger.info("Waiting for element containing text '{}' defined by locator '{}', timeout of {} seconds", new Object[]{text, locator, waitSeconds});
-        try {
-            WebElement found = wait.until(new ExpectedCondition<WebElement>() {
-                @Override
-                public WebElement apply(@Nullable WebDriver input) {
-                    long start = new Date().getTime();
-                    while ((new Date().getTime() - start) / 1000 < timeoutsConfig.getPauseBetweenRefreshSeconds()) {
-                        WebElement el = findVisibleElementContainingText(locator, text);
                         if (el != null) {
                             return el;
                         }
@@ -502,19 +416,8 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public WebElement findElementContainingChild(final By parentLocator, final By childLocator) {
-        List<WebElement> parents = webDriver().findElements(parentLocator);
-        for (WebElement el: parents) {
-            try {
-                List<WebElement> subChildren = el.findElements(childLocator);
-                if (subChildren.size() > 0) {
-                    return el;
-                }
-            } catch (WebDriverException e) {
-                logger.debug("Exception occurred finding sub-children in findElementContainingChild:", e);
-            }
-        }
-        return null;
+    public WebElement findElementWithRefresh(final By locator, TimeoutType timeout) {
+        return findElementContainingTextWithRefresh(locator, "", timeout);
     }
 
     @Override
@@ -532,23 +435,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
             }
         }
         return parentsWithChild;
-    }
-
-    @Override
-    public WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
-        final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
-                "with locator '%s' having child with locator '%s' with timeout of %d seconds", parentLocator, childLocator, waitSeconds);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.ignoring(StaleElementReferenceException.class)
-                .withMessage(msg);
-
-        return wait.until(new ExpectedCondition<WebElement>() {
-            @Override
-            public WebElement apply(@Nullable WebDriver input) {
-                return findElementContainingChild(parentLocator, childLocator);
-            }
-        });
     }
 
     @Override
@@ -573,6 +459,98 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    public WebElement findVisibleElementContainingText(By locator, String text) {
+        List<WebElement> matches = findElements(locator, null);
+        for (WebElement el : matches) {
+            try {
+                if (el.getText().contains(text) && el.isDisplayed()) {
+                    logger.info("SUCCESS: Found visible web element containing text '{}' with locator '{}'", text, locator);
+                    return el;
+                }
+            } catch (Exception e) { //Don't fail just because one web element was stale. Continue searching for the text.
+                logger.debug("Exception while searching for web elements containing text '{}' with locator '{}'", text, locator);
+                logger.debug(Throwables.getStackTraceAsString(e));
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public WebElement findVisibleElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.ignoring(StaleElementReferenceException.class);
+
+        logger.info("Waiting for element containing text '{}' defined by locator '{}', timeout of {} seconds", new Object[]{text, locator, waitSeconds});
+        try {
+            WebElement found = wait.until(new ExpectedCondition<WebElement>() {
+                @Override
+                public WebElement apply(@Nullable WebDriver input) {
+                    long start = new Date().getTime();
+                    while ((new Date().getTime() - start) / 1000 < timeoutsConfig.getPauseBetweenRefreshSeconds()) {
+                        WebElement el = findVisibleElementContainingText(locator, text);
+                        if (el != null) {
+                            return el;
+                        }
+                        GeneralUtils.waitMillis(timeoutsConfig.getPauseBetweenTriesMillis());
+                    }
+                    getBrowser().refreshPage();
+                    return null;
+                }
+            });
+            logger.info("Success finding element containing text '{}' defined by locator '{}'!", text, locator);
+            return found;
+        } catch (TimeoutException e) {
+            logger.error("Timeout waiting to find text '{}' in an element matching locator '{}'", text, locator);
+            throw new TimeoutException(
+                    format("Timeout waiting to find text '%s' in an element matching locator '%s'", text, locator));
+        }
+    }
+
+    @Override
+    public WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String message = String.format("Timeout waiting %d seconds to find element containing text '%s' with locator '%s'",
+                waitSeconds, text, locator.toString());
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.ignoring(StaleElementReferenceException.class)
+                .withMessage(message);
+
+        return wait.until(new ExpectedCondition<WebElement>() {
+            @Override
+            public WebElement apply(@Nullable WebDriver input) {
+                WebElement el = findVisibleElementContainingText(locator, text);
+                if (el == null) {
+                    GeneralUtils.waitOneSecond();
+                }
+                return el;
+            }
+        });
+    }
+
+    @Override
+    public WebElement findVisibleElementWithRefresh(final By locator, TimeoutType timeout) {
+        return findVisibleElementContainingTextWithRefresh(locator, "", timeout);
+    }
+
+    @Override
+    public Actions getActionsBuilder() {
+        return new Actions(webDriver());
+    }
+
+/**
+ * Return the {@link com.jivesoftware.selenium.pagefactory.framework.browser.Browser} object this actions class is tied to.
+ */
+    @Override
+    public B getBrowser() {
+        return browser;
+    }
+
+    public void setBrowser(Browser browser) {
+        this.browser = (B)browser;
+    }
+
+    @Override
     @Nullable
     public WebElement getChildElement(By locator, WebElement parentEl) {
         List<WebElement> elements = findElements(locator, parentEl);
@@ -581,35 +559,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         }
         return null;
     }
-
-    @Override
-    @Nullable
-    public WebElement getElement(By locator) {
-        List<WebElement> elements = findElements(locator, null);
-        if (elements.size() > 0) {
-            return elements.get(0);
-        }
-        return null;
-    }
-
-    @Override
-    @Nonnull
-    public List<WebElement> getChildElements(By locator, WebElement parentEl) {
-        return findElements(locator, parentEl);
-    }
-
-    @Override
-    @Nonnull
-    public List<WebElement> getElements(By locator) {
-        return findElements(locator, null);
-    }
-
-    @Override
-    @Nonnull
-    public WebElement getElementWithWait(By locator) {
-        return getChildElementWithWait(locator, null);
-    }
-
 
     @Override
     @Nonnull
@@ -627,8 +576,52 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     @Nonnull
+    public List<WebElement> getChildElements(By locator, WebElement parentEl) {
+        return findElements(locator, parentEl);
+    }
+
+    @Override
+    public String getCurrentURL() {
+        return webDriver().getCurrentUrl();
+    }
+
+    @Override
+    @Nullable
+    public WebElement getElement(By locator) {
+        List<WebElement> elements = findElements(locator, null);
+        if (elements.size() > 0) {
+            return elements.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    @Nonnull
+    public WebElement getElementWithWait(By locator) {
+        return getChildElementWithWait(locator, null);
+    }
+
+    @Override
+    @Nonnull
+    public List<WebElement> getElements(By locator) {
+        return findElements(locator, null);
+    }
+
+    @Override
+    @Nonnull
     public WebElement getParentElement(WebElement el) {
         return el.findElement(By.xpath(".."));
+    }
+
+    //////////////////////////////////////Timeouts//////////////////////////////////////////////
+    @Override
+    public TimeoutsConfig getTimeoutsConfig() {
+        return timeoutsConfig;
+    }
+
+    @Override
+    public String getWebPageReadyState() throws Exception {
+        return (String) executeJavascript("return document.readyState;");
     }
 
     @Override
@@ -700,59 +693,9 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, String text, By popoverLocator,
-                                                            String requiredPopupText) {
-        enterTextForAutoCompleteAndSelectFirstMatch(inputLocator, 0, text, popoverLocator, requiredPopupText);
-    }
-
-    @Override
-    public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, int minChars, String text, By popoverLocator,
-                                                            String requiredPopupText) {
-        if (minChars > text.length()) {
-            throw new RuntimeException(format("Minimum characters to enter (%d) is greater than the length of the input text '%s'!", minChars, text));
-        }
-        scrollIntoView(inputLocator);
-        if (minChars > 0) {
-            inputText(inputLocator, text.substring(0, minChars));
-        }
-        for (int i = minChars; i < text.length(); i++) {
-            String oneChar = String.valueOf(text.charAt(i));
-            inputText(inputLocator, oneChar);
-
-            // If the last char is being entered, wait 5 full seconds for the expected popup. Otherwise, wait 1 second.
-            TimeoutType timeout = (i == text.length() - 1) ? TimeoutType.FIVE_SECONDS : TimeoutType.ONE_SECOND;
-            try {
-                WebElement matchingPopup = findElementContainingTextWithWait(popoverLocator, requiredPopupText, timeout);
-                if (matchingPopup != null) {
-                    try {
-                        getActionsBuilder().moveToElement(matchingPopup)
-                                .pause(500) // Sometimes javascript needs a moment to register that it's being hovered.
-                                .click()
-                                .perform();
-                        logger.info("Success - clicked popup for autocomplete text \"{}\"", text);
-                        return;
-                    } catch (Exception e) {
-                        logger.debug("Exception clicking popup from autocomplete.", e);
-                    }
-                }
-            } catch (Exception e) {
-                continue;
-            }
-        }
-        throw new RuntimeException(format("No popup defined by Locator  '%s' found with required text '%s'", popoverLocator, requiredPopupText));
-    }
-
-    @Override
     public void inputTinyMceText(String text) {
         waitForTinyMceToBeReady();
         ((JavascriptExecutor) webDriver()).executeScript(format("tinyMCE.activeEditor.setContent(\"%s\")", text));
-    }
-
-    @Override
-    public void waitForTinyMceToBeReady() {
-        waitForJavascriptSymbolToBeDefined("tinyMCE", TimeoutType.DEFAULT);
-        waitForJavascriptSymbolToBeDefined("tinyMCE.activeEditor", TimeoutType.DEFAULT);
-        waitForJavascriptSymbolToHaveValue("tinyMCE.activeEditor.initialized", "true", TimeoutType.DEFAULT);
     }
 
     @Override
@@ -805,6 +748,16 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    public <T extends SubPage> T loadSubPage(Class<T> pageClass) {
+        return (T)browser.loadSubPage(pageClass);
+    }
+
+    @Override
+    public <T extends TopLevelPage> T loadTopLevelPage(Class<T> pageClass) {
+        return (T) browser.loadTopLevelPage(pageClass);
+    }
+
+    @Override
     public void scrollIntoView(By locator) {
         WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
         scrollIntoView(el);
@@ -839,16 +792,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public <T extends TopLevelPage> T loadTopLevelPage(Class<T> pageClass) {
-        return (T) browser.loadTopLevelPage(pageClass);
-    }
-
-    @Override
-    public <T extends SubPage> T loadSubPage(Class<T> pageClass) {
-        return (T)browser.loadSubPage(pageClass);
-    }
-
-    @Override
     public void verifyElementContainsText(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementContainsText: an element with Locator '%s' was never found containing text '%s'!",
@@ -858,6 +801,76 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
             .ignoring(StaleElementReferenceException.class);
         wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
         logger.info("SUCCESS: Verified element with Locator '{}' contains text '{}'", locator, text);
+    }
+
+    public WebElement verifyElementDoesNotHaveClass(final By locator, final String locatorClass, TimeoutType timeout) {
+        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
+                                  @Nullable
+                                  @Override
+                                  public WebElement apply(SeleniumActions input) {
+                                      WebElement el = input.verifyElementPresented(locator, TimeoutType.DEFAULT);
+                                      if (!WebElementHelpers.webElementHasClass(el, locatorClass)) {
+                                          return el;
+                                      }
+                                      return null;
+                                  }
+                              }, this,
+                format("Waiting for element that matches locator '%s' to NOT have class '%s'", locator, locatorClass),
+                timeout);
+    }
+
+    public WebElement verifyElementHasClass(final By locator, final String locatorClass, TimeoutType timeout) {
+        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
+                                  @Nullable
+                                  @Override
+                                  public WebElement apply(SeleniumActions input) {
+                                      WebElement el = input.verifyElementPresented(locator, TimeoutType.DEFAULT);
+                                      if (WebElementHelpers.webElementHasClass(el, locatorClass)) {
+                                          return el;
+                                      }
+                                      return null;
+                                  }
+                              }, this,
+                format("Waiting for element that matches locator '%s' to have class '%s'", locator, locatorClass),
+                timeout);
+    }
+
+    @Override
+    public void verifyElementInvisible(By locator, TimeoutType timeout) {
+        waitOnExpectedCondition(ExpectedConditions.invisibilityOfElementLocated(locator),
+                format("Failure in verifyElementInvisible waiting for element with locator '%s' to be invisible", locator), timeout);
+    }
+
+    @Override
+    public void verifyElementNotPresented(By locator, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
+        final String errorMessage = format("Failure in verifyElementNotPresented: element '%s' never became not presented after %d seconds!",
+                locator, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.withMessage(errorMessage)
+            .ignoring(StaleElementReferenceException.class);
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        logger.trace("SUCCESS: Verified element with locator '{}' is NOT present", locator);
+    }
+
+    @Override
+    public void verifyElementNotSelected(By locator, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
+        final String errorMessage = format("Failure in verifyElementNotSelected: Element '%s' never became deselected after %d seconds!",
+                locator, waitSeconds);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.withMessage(errorMessage)
+            .ignoring(StaleElementReferenceException.class);
+        wait.until(ExpectedConditions.elementSelectionStateToBe(locator, false));
+        logger.info("SUCCESS: Verified element with locator '{}' is NOT selected", locator);
+    }
+
+    @Override
+    public void verifyElementNotSelected(WebElement el, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
+        wait.until(ExpectedConditions.elementSelectionStateToBe(el, false));
+        logger.info("SUCCESS: Verified element <{}> is NOT selected", el.getTagName());
     }
 
     @Override
@@ -874,26 +887,13 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void verifyElementNotPresented(By locator, TimeoutType timeout) {
+    public void verifyElementRemoved(WebElement element, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String errorMessage = format("Failure in verifyElementNotPresented: element '%s' never became not presented after %d seconds!",
-                locator, waitSeconds);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.withMessage(errorMessage)
-            .ignoring(StaleElementReferenceException.class);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
-        logger.trace("SUCCESS: Verified element with locator '{}' is NOT present", locator);
-    }
-
-    @Override
-    public void verifyElementWithTextNotPresented(By locator, String text, TimeoutType timeout) {
-        try {
-            findElementContainingTextWithWait(locator, text, timeout);
-            throw new RuntimeException(
-                    format("Error in verifyElementWithTextNotPresented: found element with locator '%s' containing text '%s'!", locator, text));
-        } catch (Exception e) {
-            return;
-        }
+        logger.info("Waiting for element to become stale (removed from the DOM) using timeout of {} seconds", waitSeconds);
+        waitOnExpectedConditionForSeconds(ExpectedConditions.stalenessOf(element),
+                "Timeout waiting for web element to become stale (removed from the DOM).",
+                waitSeconds);
+        logger.info("Verified web element became stale (removed from the DOM).");
     }
 
     @Override
@@ -919,35 +919,9 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void verifyElementNotSelected(By locator, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
-        final String errorMessage = format("Failure in verifyElementNotSelected: Element '%s' never became deselected after %d seconds!",
-                locator, waitSeconds);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.withMessage(errorMessage)
-            .ignoring(StaleElementReferenceException.class);
-        wait.until(ExpectedConditions.elementSelectionStateToBe(locator, false));
-        logger.info("SUCCESS: Verified element with locator '{}' is NOT selected", locator);
-    }
-
-    @Override
-    public void verifyElementNotSelected(WebElement el, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
-        wait.until(ExpectedConditions.elementSelectionStateToBe(el, false));
-        logger.info("SUCCESS: Verified element <{}> is NOT selected", el.getTagName());
-    }
-
-    @Override
     public WebElement verifyElementVisible(final By locator, TimeoutType timeout) {
         final String errorMessage = format("Error in verifyElementVisible: element with locator '%s' never became visible", locator);
         return waitOnExpectedCondition(ExpectedConditions.visibilityOfElementLocated(locator), errorMessage, timeout);
-    }
-
-    @Override
-    public void verifyElementInvisible(By locator, TimeoutType timeout) {
-        waitOnExpectedCondition(ExpectedConditions.invisibilityOfElementLocated(locator),
-                format("Failure in verifyElementInvisible waiting for element with locator '%s' to be invisible", locator), timeout);
     }
 
     @Override
@@ -962,13 +936,14 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void verifyElementRemoved(WebElement element, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        logger.info("Waiting for element to become stale (removed from the DOM) using timeout of {} seconds", waitSeconds);
-        waitOnExpectedConditionForSeconds(ExpectedConditions.stalenessOf(element),
-                "Timeout waiting for web element to become stale (removed from the DOM).",
-                waitSeconds);
-        logger.info("Verified web element became stale (removed from the DOM).");
+    public void verifyElementWithTextNotPresented(By locator, String text, TimeoutType timeout) {
+        try {
+            findElementContainingTextWithWait(locator, text, timeout);
+            throw new RuntimeException(
+                    format("Error in verifyElementWithTextNotPresented: found element with locator '%s' containing text '%s'!", locator, text));
+        } catch (Exception e) {
+            return;
+        }
     }
 
     @Override
@@ -983,6 +958,86 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         logger.info("Successfully verified page refreshed by finding web element with locator '{}'.", locatorAfterRefresh);
 
         return el;
+    }
+
+    @Override
+    public void waitForJavascriptSymbolToBeDefined(final String symbol, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS); //Check every 100ms
+        wait.ignoring(StaleElementReferenceException.class);
+        try {
+            wait.until(new ExpectedCondition<Object>() {
+                @Nullable
+                @Override
+                public Object apply(@Nullable WebDriver input) {
+                    Object jsResult = executeJavascript(format("return (typeof %s != 'undefined') && (%s != null)", symbol, symbol));
+                    logger.trace("javascript result: " + jsResult);
+                    return jsResult;
+                }
+            });
+        } catch (TimeoutException e) {
+            throw new RuntimeException(
+                    format("Timeout waiting for javascript symbol '%s' to be defined with %d seconds timeout used", symbol, waitSeconds), e);
+        }
+        logger.info("Success verifying javascript symbol '{}' is defined!", symbol);
+    }
+
+    @Override
+    public void waitForJavascriptSymbolToHaveValue(final String symbol, final String value, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS); //Check every 100ms
+        wait.ignoring(StaleElementReferenceException.class);
+        try {
+            wait.until(new ExpectedCondition<Object>() {
+                @Nullable
+                @Override
+                public Object apply(@Nullable WebDriver input) {
+                    Object jsResult = executeJavascript(format("return (%s) === (%s)", symbol, value));
+                    logger.trace("javascript result: " + jsResult);
+                    return jsResult;
+                }
+            });
+        } catch (TimeoutException e) {
+            throw new RuntimeException(
+                    format("Timeout waiting for javascript symbol '%s' to have value '%s' with %d seconds timeout used", symbol, value, waitSeconds), e);
+        }
+        logger.info("Success verifying javascript symbol '{}' has value '{}'!", symbol, value);
+    }
+
+    @Override
+    public void waitForTinyMceToBeReady() {
+        waitForJavascriptSymbolToBeDefined("tinyMCE", TimeoutType.DEFAULT);
+        waitForJavascriptSymbolToBeDefined("tinyMCE.activeEditor", TimeoutType.DEFAULT);
+        waitForJavascriptSymbolToHaveValue("tinyMCE.activeEditor.initialized", "true", TimeoutType.DEFAULT);
+    }
+
+    @Override
+    public void waitForWebPageReadyStateToBeComplete() {
+        final int waitSeconds = timeoutsConfig.getPageLoadTimeoutSeconds();
+        waitOnPredicate(new Predicate() {
+            @Override
+            public boolean apply(@Nullable Object o) {
+                try {
+                    String readyState = getWebPageReadyState();
+                    return Objects.equals(readyState, "complete");
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        },
+        String.format("Error - web page never reached document.readyState='complete' after %d seconds", waitSeconds),
+        TimeoutType.PAGE_LOAD_TIMEOUT);
+        logger.info("Success - Waited for document.readyState to be 'complete' on page: " + webDriver().getCurrentUrl());
+    }
+
+    @Override
+    public <T> T waitOnExpectedCondition(ExpectedCondition<T> expectedCondition, String message, TimeoutType timeout) {
+        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout); //Default of web element presence timeout
+        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS);
+        wait.withMessage(message)
+            .ignoring(StaleElementReferenceException.class);
+        logger.info("Waiting on expected condition, using timeout of {} seconds", waitSeconds);
+        return wait.until(expectedCondition);
     }
 
     @Override
@@ -1040,24 +1095,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public <T> T waitOnExpectedCondition(ExpectedCondition<T> expectedCondition, String message, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout); //Default of web element presence timeout
-        WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS);
-        wait.withMessage(message)
-            .ignoring(StaleElementReferenceException.class);
-        logger.info("Waiting on expected condition, using timeout of {} seconds", waitSeconds);
-        return wait.until(expectedCondition);
-    }
-
-    private <T> T waitOnExpectedConditionForSeconds(ExpectedCondition<T> expectedCondition, String message, int timeout) {
-        WebDriverWait wait = new WebDriverWait(webDriver(), timeout, DEFAULT_POLL_MILLIS);
-        wait.withMessage(message)
-            .ignoring(StaleElementReferenceException.class);
-        logger.info("Waiting on expected condition, using timeout of {} seconds", timeout);
-        return wait.until(expectedCondition);
-    }
-
-    @Override
     public WebElement waitUntilClickable(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Element '%s' never became clickable after '%d' seconds", locator, waitSeconds);
@@ -1087,40 +1124,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         return el;
     }
 
-    //////////////////////////////////////Timeouts//////////////////////////////////////////////
-    @Override
-    public TimeoutsConfig getTimeoutsConfig() {
-        return timeoutsConfig;
-    }
-
-    protected int getTimeout(int defaultTimeout, TimeoutType timeout) {
-        return timeout == TimeoutType.DEFAULT ? defaultTimeout : timeoutsConfig.getTimeoutInSeconds(timeout);
-    }
-
     //////////////////////////////////// helpers ////////////////////////////////////////////////
-
-    /**
-     * Convenient helper to Find Elements from either top page element or from parent element.
-     *
-     * @param locator      - Locator defining the input element
-     * @param parentEl - Parent web element. If this is provided the search will be from the parent element. If null, search will be from top element
-     * @return - List of elements
-     */
-    protected List<WebElement> findElements(By locator, WebElement parentEl) {
-        if (parentEl == null) {
-            return webDriver().findElements(locator);
-        } else {
-            return parentEl.findElements(locator);
-        }
-    }
-
-    protected WebElement findElement(By locator, WebElement parentEl) {
-        if (parentEl == null) {
-            return webDriver().findElement(locator);
-        } else {
-            return parentEl.findElement(locator);
-        }
-    }
 
     protected WebElement enterTextAndSelectFromList(WebElement inputField, String value, By popoverLocator,
                                                     int withRetryCount, boolean slowly) throws SeleniumActionsException {
@@ -1161,6 +1165,33 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         click(popoverLocator, TimeoutType.DEFAULT);
     }
 
+    protected WebElement findElement(By locator, WebElement parentEl) {
+        if (parentEl == null) {
+            return webDriver().findElement(locator);
+        } else {
+            return parentEl.findElement(locator);
+        }
+    }
+
+    /**
+     * Convenient helper to Find Elements from either top page element or from parent element.
+     *
+     * @param locator      - Locator defining the input element
+     * @param parentEl - Parent web element. If this is provided the search will be from the parent element. If null, search will be from top element
+     * @return - List of elements
+     */
+    protected List<WebElement> findElements(By locator, WebElement parentEl) {
+        if (parentEl == null) {
+            return webDriver().findElements(locator);
+        } else {
+            return parentEl.findElements(locator);
+        }
+    }
+
+    protected int getTimeout(int defaultTimeout, TimeoutType timeout) {
+        return timeout == TimeoutType.DEFAULT ? defaultTimeout : timeoutsConfig.getTimeoutInSeconds(timeout);
+    }
+
     protected void invokeMenuItemAndSelect(WebElement clickable, By popoverLocator) {
         Preconditions.checkNotNull(clickable, "Input WebElement cannot be null");
         waitUntilClickable(clickable, TimeoutType.DEFAULT);
@@ -1170,42 +1201,17 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         click(popoverLocator, TimeoutType.DEFAULT);
     }
 
-    //**********~~~~~~~~~~~~~ Verify Class Actions ~~~~~~~~~~~~~~~*************
-    public boolean doesElementHaveClass(By locator, String locatorClass) {
-        WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
-        return WebElementHelpers.webElementHasClass(el, locatorClass);
+    //Convenience method to reduce typing
+    protected WebDriver webDriver() {
+        return browser.getWebDriver();
     }
 
-    public WebElement verifyElementHasClass(final By locator, final String locatorClass, TimeoutType timeout) {
-        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
-                                  @Nullable
-                                  @Override
-                                  public WebElement apply(SeleniumActions input) {
-                                      WebElement el = input.verifyElementPresented(locator, TimeoutType.DEFAULT);
-                                      if (WebElementHelpers.webElementHasClass(el, locatorClass)) {
-                                          return el;
-                                      }
-                                      return null;
-                                  }
-                              }, this,
-                format("Waiting for element that matches locator '%s' to have class '%s'", locator, locatorClass),
-                timeout);
-    }
-
-    public WebElement verifyElementDoesNotHaveClass(final By locator, final String locatorClass, TimeoutType timeout) {
-        return waitOnFunction(new Function<SeleniumActions, WebElement>() {
-                                  @Nullable
-                                  @Override
-                                  public WebElement apply(SeleniumActions input) {
-                                      WebElement el = input.verifyElementPresented(locator, TimeoutType.DEFAULT);
-                                      if (!WebElementHelpers.webElementHasClass(el, locatorClass)) {
-                                          return el;
-                                      }
-                                      return null;
-                                  }
-                              }, this,
-                format("Waiting for element that matches locator '%s' to NOT have class '%s'", locator, locatorClass),
-                timeout);
+    private <T> T waitOnExpectedConditionForSeconds(ExpectedCondition<T> expectedCondition, String message, int timeout) {
+        WebDriverWait wait = new WebDriverWait(webDriver(), timeout, DEFAULT_POLL_MILLIS);
+        wait.withMessage(message)
+            .ignoring(StaleElementReferenceException.class);
+        logger.info("Waiting on expected condition, using timeout of {} seconds", timeout);
+        return wait.until(expectedCondition);
     }
 
 }

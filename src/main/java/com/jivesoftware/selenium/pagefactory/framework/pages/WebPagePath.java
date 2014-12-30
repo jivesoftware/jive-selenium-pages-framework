@@ -20,4 +20,6 @@ public @interface WebPagePath {
 
     @Nonnull String path();
 
+    boolean isRegex() default false;
+
 }
