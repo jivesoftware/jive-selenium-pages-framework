@@ -93,7 +93,7 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
         if (regex) {
             Pattern pattern = Pattern.compile(expectedPath);
             Matcher m = pattern.matcher(currentPath);
-            if (!m.find() || !m.hitEnd()) {
+            if (!m.find() || m.regionEnd() != currentPath.length()) {
                 throw new InvalidPageUrlException(String.format("The current path of the web browser is %s, but expected the path to end with an expression " +
                                                                     "matching the regex '%s'",
                                                                 currentPath, expectedPath));
