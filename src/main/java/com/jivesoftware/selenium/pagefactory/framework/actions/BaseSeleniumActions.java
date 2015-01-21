@@ -6,6 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.BrowserUtil;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
@@ -1002,6 +1003,12 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
                     format("Timeout waiting for javascript symbol '%s' to have value '%s' with %d seconds timeout used", symbol, value, waitSeconds), e);
         }
         logger.info("Success verifying javascript symbol '{}' has value '{}'!", symbol, value);
+    }
+
+    @Override
+    public void waitForPageToBeStable(TimeoutType timeout) {
+        int waitSeconds = getTimeout(BrowserUtil.DEFAULT_TIMEOUT_SECONDS, timeout);
+        BrowserUtil.waitForPageHtmlToBeStable(getBrowser(), waitSeconds);
     }
 
     @Override

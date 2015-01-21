@@ -102,16 +102,16 @@ public interface SeleniumActions {
     /**
      * Click a web element, then verify another element is NOT present on the DOM (so also not visible).
      */
-    void clickAndVerifyNotPresent(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotPresent(By locatorToClick, By locatorToVerifyNotPresent, TimeoutType timeout);
 
-    void clickAndVerifyNotPresent(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotPresent(WebElement elToClick, By locatorToVerifyNotPresent, TimeoutType timeout);
 
     /**
      * Click a web element, then verify another element is NOT present on the DOM (so also not visible).
      */
-    void clickAndVerifyNotVisible(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotVisible(By locatorToClick, By locatorToVerifyNotVisible, TimeoutType timeout);
 
-    void clickAndVerifyNotVisible(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotVisible(WebElement elToClick, By locatorToVerifyNotVisible, TimeoutType timeout);
 
     /**
      * Click a web element, then verify another element is present on the DOM (not necessarily visible).
@@ -127,9 +127,9 @@ public interface SeleniumActions {
      *
      * @return - the WebElement we verified was present
      */
-    WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyVisible, TimeoutType timeout);
 
-    WebElement clickAndVerifyVisible(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    WebElement clickAndVerifyVisible(WebElement elToClick, By locatorToVerifyVisible, TimeoutType timeout);
 
     /**
      * Click without polling for the element to be clickable or waiting until it's ready.
@@ -387,6 +387,14 @@ public interface SeleniumActions {
     void waitForJavascriptSymbolToBeDefined(String symbol, TimeoutType timeout);
 
     void waitForJavascriptSymbolToHaveValue(String symbol, String value, TimeoutType timeout);
+
+    /**
+     * Wait for the HTML of a page to be stable, by verifying the length of the HTML doesn't change for a second.
+     * {@see com.thoughtworks.selenium.webdriven.commands.WaitForPageToLoad#getLengthCheckingWait(org.openqa.selenium.WebDriver)}
+     *
+     * This will probably will only be useful for ordinary WebBrowsers (not mobile) at the moment.
+     */
+    void waitForPageToBeStable(TimeoutType timeout);
 
     /**
      * Wait for tinyMCE.activeEditor.initialized to be true, see Tiny MCE documentation online for why.
