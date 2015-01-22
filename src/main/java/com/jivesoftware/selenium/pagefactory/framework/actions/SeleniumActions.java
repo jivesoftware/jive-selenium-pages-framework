@@ -7,6 +7,7 @@ import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import com.jivesoftware.selenium.pagefactory.framework.exception.SeleniumActionsException;
+import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.SubPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import org.openqa.selenium.By;
@@ -405,8 +406,18 @@ public interface SeleniumActions {
 
     <T> T waitOnExpectedCondition(ExpectedCondition<T> expectedCondition, String message, TimeoutType timeout);
 
-    /* Method to simplify general waiting code in Pages and Keywords. Takes a function and waits until the return value is non-null.*/
+    /**
+     * Method to simplify general waiting code in Pages and Keywords. Takes a function and waits until the return value is non-null.
+     **/
     <T, V> V waitOnFunction(Function<T, V> function, T input, String message, TimeoutType timeout);
+
+    /**
+     * Wait on a Predicate on a TopLevelPage class until it returns true.
+     * Each iteration, the page is refreshed, then the new TopLevelPage object is passed in to the Predicate.apply() method.
+     *
+     * @return - the last TopLevelPage object after the Predicate returned true.
+     */
+    <T extends TopLevelPage> T waitOnPagePredicateWithRefresh(Predicate<T> predicate, Class<T> pageClass, String message, TimeoutType timeout);
 
     /* Method to simplify general waiting code in Pages and Keywords. Takes a predicate and waits until it returns true.*/
     <T> void waitOnPredicate(Predicate<T> predicate, T input, String message, TimeoutType timeout);

@@ -1059,6 +1059,27 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         return fluentWait.until(function);
     }
 
+    public <T extends TopLevelPage> T waitOnPagePredicateWithRefresh(final Predicate<T> predicate, final Class<T> pageClass, String message, TimeoutType timeout) {
+        int timeoutSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
+        WebDriverWait wait = new WebDriverWait(webDriver(), timeoutSeconds, DEFAULT_POLL_MILLIS);
+        wait.withMessage(message)
+            .ignoring(StaleElementReferenceException.class);
+
+        logger.info("Waiting on Predicate for page {}, using timeout of {} seconds", pageClass.getSimpleName(), timeoutSeconds);
+        return wait.until(new Function<WebDriver, T>() {
+
+            @Override
+            public T apply(@Nullable WebDriver webDriver) {
+                T page = loadTopLevelPage(pageClass);
+                if (predicate.apply(page)) {
+                    return page;
+                }
+                getBrowser().refreshPage(pageClass);
+                return null;
+            }
+        });
+    }
+
     @Override
     public <T> void waitOnPredicate(Predicate<T> predicate, T input, String message, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getMediumTimeoutSeconds(), timeout);
