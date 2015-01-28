@@ -1276,9 +1276,9 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         }
         if (!(webDriver instanceof RemoteWebDriver)) {
             return false;
-        } else {
-            return false;
-        }
+        } 
+        RemoteWebDriver remoteWebDriver = (RemoteWebDriver)webDriver;
+        return "firefox".equalsIgnoreCase(remoteWebDriver.getCapabilities().getBrowserName());
     }
 
     private void waitForPageLoadIfFirefox() {
