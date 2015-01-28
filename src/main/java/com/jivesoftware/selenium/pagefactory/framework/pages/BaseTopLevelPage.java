@@ -47,10 +47,11 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
 
     @Override
     public void pageLoadHook() {
-        // First verify that the current URL matches the value annotated with @WebPagePath
-        verifyCurrentURL();
-
+        // First do the default load hook, which verifies an element is present
         PAGE_UTILS.defaultPageLoadHook(this, a);
+
+        // Next, verify that the current URL matches the value annotated with @WebPagePath
+        verifyCurrentURL();
     }
 
     /**

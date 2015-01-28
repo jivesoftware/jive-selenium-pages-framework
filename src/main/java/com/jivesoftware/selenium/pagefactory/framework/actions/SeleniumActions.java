@@ -7,6 +7,7 @@ import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import com.jivesoftware.selenium.pagefactory.framework.exception.SeleniumActionsException;
+import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.SubPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import org.openqa.selenium.By;
@@ -102,16 +103,16 @@ public interface SeleniumActions {
     /**
      * Click a web element, then verify another element is NOT present on the DOM (so also not visible).
      */
-    void clickAndVerifyNotPresent(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotPresent(By locatorToClick, By locatorToVerifyNotPresent, TimeoutType timeout);
 
-    void clickAndVerifyNotPresent(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotPresent(WebElement elToClick, By locatorToVerifyNotPresent, TimeoutType timeout);
 
     /**
      * Click a web element, then verify another element is NOT present on the DOM (so also not visible).
      */
-    void clickAndVerifyNotVisible(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotVisible(By locatorToClick, By locatorToVerifyNotVisible, TimeoutType timeout);
 
-    void clickAndVerifyNotVisible(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    void clickAndVerifyNotVisible(WebElement elToClick, By locatorToVerifyNotVisible, TimeoutType timeout);
 
     /**
      * Click a web element, then verify another element is present on the DOM (not necessarily visible).
@@ -127,9 +128,9 @@ public interface SeleniumActions {
      *
      * @return - the WebElement we verified was present
      */
-    WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyVisible, TimeoutType timeout);
 
-    WebElement clickAndVerifyVisible(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
+    WebElement clickAndVerifyVisible(WebElement elToClick, By locatorToVerifyVisible, TimeoutType timeout);
 
     /**
      * Click without polling for the element to be clickable or waiting until it's ready.
@@ -389,6 +390,14 @@ public interface SeleniumActions {
     void waitForJavascriptSymbolToHaveValue(String symbol, String value, TimeoutType timeout);
 
     /**
+     * Wait for the HTML of a page to be stable, by verifying the length of the HTML doesn't change for a second.
+     * {@see com.thoughtworks.selenium.webdriven.commands.WaitForPageToLoad#getLengthCheckingWait(org.openqa.selenium.WebDriver)}
+     *
+     * This will probably will only be useful for ordinary WebBrowsers (not mobile) at the moment.
+     */
+    void waitForPageToBeStable(TimeoutType timeout);
+
+    /**
      * Wait for tinyMCE.activeEditor.initialized to be true, see Tiny MCE documentation online for why.
      */
     void waitForTinyMceToBeReady();
@@ -397,8 +406,18 @@ public interface SeleniumActions {
 
     <T> T waitOnExpectedCondition(ExpectedCondition<T> expectedCondition, String message, TimeoutType timeout);
 
-    /* Method to simplify general waiting code in Pages and Keywords. Takes a function and waits until the return value is non-null.*/
+    /**
+     * Method to simplify general waiting code in Pages and Keywords. Takes a function and waits until the return value is non-null.
+     **/
     <T, V> V waitOnFunction(Function<T, V> function, T input, String message, TimeoutType timeout);
+
+    /**
+     * Wait on a Predicate on a TopLevelPage class until it returns true.
+     * Each iteration, the page is refreshed, then the new TopLevelPage object is passed in to the Predicate.apply() method.
+     *
+     * @return - the last TopLevelPage object after the Predicate returned true.
+     */
+    <T extends TopLevelPage> T waitOnPagePredicateWithRefresh(Predicate<T> predicate, Class<T> pageClass, String message, TimeoutType timeout);
 
     /* Method to simplify general waiting code in Pages and Keywords. Takes a predicate and waits until it returns true.*/
     <T> void waitOnPredicate(Predicate<T> predicate, T input, String message, TimeoutType timeout);

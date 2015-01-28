@@ -50,6 +50,10 @@ public abstract class Browser<D extends WebDriver> {
         return baseTestUrl;
     }
 
+    public void setBaseTestUrl(String baseTestUrl) {
+        this.baseTestUrl = baseTestUrl;
+    }
+
     public TimeoutsConfig getTimeouts() {
         return timeouts;
     }

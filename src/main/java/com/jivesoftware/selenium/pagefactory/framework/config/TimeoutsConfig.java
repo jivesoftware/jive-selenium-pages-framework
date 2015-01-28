@@ -2,6 +2,8 @@ package com.jivesoftware.selenium.pagefactory.framework.config;
 
 import com.google.common.base.Preconditions;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * <p>Represents the timeout configuration used by a {@link com.jivesoftware.selenium.pagefactory.framework.browser.Browser}.</p>
  *
@@ -109,6 +111,14 @@ public final class TimeoutsConfig {
                 return 20;
             case SIXTY_SECONDS:
                 return 60;
+            case THIRTY_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(30);
+            case SIXTY_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(60);
+            case NINETY_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(90);
+            case TWO_HOURS:
+                return (int)TimeUnit.HOURS.toSeconds(2);
             default:
                 return getWebElementPresenceTimeoutSeconds();
         }

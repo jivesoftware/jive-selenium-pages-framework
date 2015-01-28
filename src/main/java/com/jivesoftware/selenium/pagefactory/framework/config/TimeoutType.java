@@ -43,5 +43,5 @@ public enum TimeoutType {
     LONG,
     /** Fixed timeouts not affected by configuration.
      *  Usage is discouraged; but this is useful when you need an exact timeout that can't be changed by configuration. **/
-    ONE_SECOND, TWO_SECONDS, FIVE_SECONDS, TEN_SECONDS, TWENTY_SECONDS, SIXTY_SECONDS
+    ONE_SECOND, TWO_SECONDS, FIVE_SECONDS, TEN_SECONDS, TWENTY_SECONDS, SIXTY_SECONDS, THIRTY_MINUTES, SIXTY_MINUTES, NINETY_MINUTES, TWO_HOURS
 }

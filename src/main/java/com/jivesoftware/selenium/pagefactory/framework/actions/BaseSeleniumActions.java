@@ -6,6 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.BrowserUtil;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
@@ -1029,6 +1030,12 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    public void waitForPageToBeStable(TimeoutType timeout) {
+        int waitSeconds = getTimeout(BrowserUtil.DEFAULT_TIMEOUT_SECONDS, timeout);
+        BrowserUtil.waitForPageHtmlToBeStable(getBrowser(), waitSeconds);
+    }
+
+    @Override
     public void waitForTinyMceToBeReady() {
         waitForJavascriptSymbolToBeDefined("tinyMCE", TimeoutType.DEFAULT);
         waitForJavascriptSymbolToBeDefined("tinyMCE.activeEditor", TimeoutType.DEFAULT);
@@ -1074,6 +1081,27 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
                 .ignoring(NotFoundException.class)
                 .ignoring(StaleElementReferenceException.class);
         return fluentWait.until(function);
+    }
+
+    public <T extends TopLevelPage> T waitOnPagePredicateWithRefresh(final Predicate<T> predicate, final Class<T> pageClass, String message, TimeoutType timeout) {
+        int timeoutSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
+        WebDriverWait wait = new WebDriverWait(webDriver(), timeoutSeconds, DEFAULT_POLL_MILLIS);
+        wait.withMessage(message)
+            .ignoring(StaleElementReferenceException.class);
+
+        logger.info("Waiting on Predicate for page {}, using timeout of {} seconds", pageClass.getSimpleName(), timeoutSeconds);
+        return wait.until(new Function<WebDriver, T>() {
+
+            @Override
+            public T apply(@Nullable WebDriver webDriver) {
+                T page = loadTopLevelPage(pageClass);
+                if (predicate.apply(page)) {
+                    return page;
+                }
+                getBrowser().refreshPage(pageClass);
+                return null;
+            }
+        });
     }
 
     @Override
