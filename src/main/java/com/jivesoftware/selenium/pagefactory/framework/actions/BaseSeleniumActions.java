@@ -297,7 +297,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
     public Object executeJavascript(String script) {
         logger.trace("Executing javascript: '{}'", script);
-        waitForPageLoadIfFirefox();
         try {
             return ((JavascriptExecutor) webDriver()).executeScript(script);
         } catch (Exception e) {
@@ -1276,7 +1275,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         }
         if (!(webDriver instanceof RemoteWebDriver)) {
             return false;
-        } 
+        }
         RemoteWebDriver remoteWebDriver = (RemoteWebDriver)webDriver;
         return "firefox".equalsIgnoreCase(remoteWebDriver.getCapabilities().getBrowserName());
     }
