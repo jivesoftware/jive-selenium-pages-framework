@@ -4,6 +4,7 @@ import com.jivesoftware.selenium.pagefactory.framework.actions.AndroidSeleniumAc
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidKeyCode;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.CapabilityType;
@@ -191,6 +192,14 @@ public class AndroidMobileBrowser extends MobileBrowser {
         } else {
             webDriver.tap(fingersNum, xLocation, yLocation, duration);
         }
+    }
+
+    public void clickHomePage() {
+        webDriver.sendKeyEvent(AndroidKeyCode.HOME);
+    }
+
+    public void clickBack() {
+        webDriver.sendKeyEvent(AndroidKeyCode.BACK);
     }
 
     @Override
