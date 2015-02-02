@@ -152,14 +152,14 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
      * Swipe from the right to left for a second
      */
     public void swipeLeft() {
-        webDriver.swipe(getScreenWidth(), 50, 10, 50, 1000);
+        webDriver.swipe(getScreenWidth() - 5, getScreenHeight() / 2, 5, getScreenHeight() / 2, 1000);
     }
 
     /**
      * Swipe from the left to right for a second
      */
     public void swipeRight() {
-        webDriver.swipe(0, 50, getScreenWidth(), 50, 1000);
+        webDriver.swipe(5, getScreenHeight() / 2, getScreenWidth() - 5, getScreenHeight() / 2, 1000);
     }
 
     /**
