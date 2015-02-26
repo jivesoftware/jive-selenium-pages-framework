@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.jivesoftware.selenium.pagefactory.framework.actions.ChromeSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -34,10 +35,11 @@ public class ChromeBrowser extends WebBrowser {
                          Optional<Integer> startWindowWidth,
                          Optional<Integer> startWindowHeight,
                          Optional<Level> browserLogLevel,
-                         Optional<String> browserLogFile) {
+                         Optional<String> browserLogFile,
+                         Optional<Platform> platform) {
 
         super(baseTestUrl, timeouts, driverPath, browserBinaryPath, browserVersion, browserLocale,
-                startWindowWidth, startWindowHeight, browserLogLevel, browserLogFile);
+                startWindowWidth, startWindowHeight, browserLogLevel, browserLogFile, platform);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ChromeBrowser.class);
@@ -60,6 +62,9 @@ public class ChromeBrowser extends WebBrowser {
     @Override
     public DesiredCapabilities getDesiredCapabilities() {
         DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
+
+        setCommonWebBrowserCapabilities(desiredCapabilities);
+
         desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
 
         // If the locale option is present and is not empty, then set this option in Chromedriver
@@ -75,15 +80,6 @@ public class ChromeBrowser extends WebBrowser {
         if (browserBinaryPath.isPresent() && !browserBinaryPath.get().isEmpty()) {
             desiredCapabilities.setCapability("chrome.binary", browserBinaryPath.get());
         }
-
-        // If the version is present and not empty, then set it as the desired version
-        Optional<String> version = getBrowserVersion();
-        if (version.isPresent() && !version.get().isEmpty()) {
-            desiredCapabilities.setCapability(CapabilityType.VERSION, version.get());
-        }
-
-        LoggingPreferences loggingPreferences = getLoggingPreferences();
-        desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
 
         // ChromeOptions
         ChromeOptions options = new ChromeOptions();

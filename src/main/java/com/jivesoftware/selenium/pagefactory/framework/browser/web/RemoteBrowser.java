@@ -44,7 +44,7 @@ public class RemoteBrowser extends WebBrowser {
                 delegate.getBrowserVersion(),
                 delegate.getBrowserLocale(),
                 delegate.getStartWindowWidth(),
-                delegate.getStartWindowHeight(), delegate.getBrowserLogLevel(), delegate.getBrowserLogFile());
+                delegate.getStartWindowHeight(), delegate.getBrowserLogLevel(), delegate.getBrowserLogFile(), delegate.getPlatform());
         this.delegate = delegate;
         this.seleniumHubURL = seleniumHubURL;
     }

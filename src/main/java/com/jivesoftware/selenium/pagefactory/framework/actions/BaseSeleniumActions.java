@@ -110,24 +110,28 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
     public <T extends SubPage> T clickAndLoadSubPage(By locatorToClick, Class<T> pageClass, TimeoutType timeout) {
         click(locatorToClick, TimeoutType.DEFAULT);
+        browser.invalidateCachedPage(); // Invalidate the cache when a new TopLevelPage is expected to be loaded.
         return loadSubPage(pageClass);
     }
 
     @Override
     public <T extends SubPage> T clickAndLoadSubPage(WebElement el, Class<T> pageClass, TimeoutType timeout) {
         click(el, TimeoutType.DEFAULT);
+        browser.invalidateCachedPage(); // Invalidate the cache when a new TopLevelPage is expected to be loaded.
         return loadSubPage(pageClass);
     }
 
     @Override
     public <T extends TopLevelPage> T clickAndLoadTopLevelPage(By locatorToClick, Class<T> pageClass, TimeoutType timeout) {
         click(locatorToClick, TimeoutType.DEFAULT);
+        browser.invalidateCachedPage(); // Invalidate the cache when a new TopLevelPage is expected to be loaded.
         return loadTopLevelPage(pageClass);
     }
 
     @Override
     public <T extends TopLevelPage> T clickAndLoadTopLevelPage(WebElement el, Class<T> pageClass, TimeoutType timeout) {
         click(el, TimeoutType.DEFAULT);
+        browser.invalidateCachedPage(); // Invalidate the cache when a new TopLevelPage is expected to be loaded.
         return loadTopLevelPage(pageClass);
     }
 

@@ -3,9 +3,15 @@ package com.jivesoftware.selenium.pagefactory.framework.browser;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.*;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.openqa.selenium.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +48,7 @@ public class RemoteBrowserBuilder {
     private Optional<Integer> startWindowHeight = Optional.absent();
     private Optional<Level> browserLogLevel = Optional.absent();
     private Optional<String> browserLogFile = Optional.absent();
+    private Optional<Platform> platform = Optional.absent();
 
     private RemoteBrowserBuilder(WebBrowserType browserType,
                                  String baseTestUrl,
@@ -91,6 +98,10 @@ public class RemoteBrowserBuilder {
 
     public Optional<String> getBrowserLogFile() {
         return browserLogFile;
+    }
+
+    public Optional<Platform> getPlatform() {
+        return platform;
     }
 
     /**
@@ -151,15 +162,15 @@ public class RemoteBrowserBuilder {
         WebBrowser browser;
         switch (browserType) {
             case FIREFOX:
-                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight);
+                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight, platform);
                 break;
             case CHROME:
                 browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile);
+                        browserLogLevel, browserLogFile, platform);
                 break;
             case IE:
                 browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile);
+                        browserLogLevel, browserLogFile, platform);
                 break;
             default:
                 throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");
@@ -204,6 +215,11 @@ public class RemoteBrowserBuilder {
         return this;
     }
 
+    public RemoteBrowserBuilder withPlatform(Platform platform) {
+        this.platform = Optional.fromNullable(platform);
+        return this;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -216,6 +232,7 @@ public class RemoteBrowserBuilder {
                 .add("startWindowHeight", startWindowHeight)
                 .add("browserLogLevel", browserLogLevel)
                 .add("browserLogFile", browserLogFile)
+                .add("platform", platform)
                 .toString();
     }
 

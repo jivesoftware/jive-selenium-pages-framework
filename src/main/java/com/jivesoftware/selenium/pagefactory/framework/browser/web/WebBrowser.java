@@ -8,10 +8,12 @@ import com.jivesoftware.selenium.pagefactory.framework.pages.BaseTopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import com.jivesoftware.selenium.pagefactory.framework.webservice.EndpointBuilder;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ public abstract class WebBrowser extends Browser<WebDriver> {
     private final Optional<Integer> startWindowHeight;
     private final Optional<Level> browserLogLevel;
     private final Optional<String> browserLogFile;
+    private final Optional<Platform> platform;
 
     public WebBrowser(String baseTestUrl,
                       TimeoutsConfig timeouts,
@@ -45,11 +48,12 @@ public abstract class WebBrowser extends Browser<WebDriver> {
                       Optional<String> browserVersion,
                       Optional<String> browserLocale,
                       Optional<Integer> startWindowWidth,
-                      Optional<Integer> startWindowHeight) {
+                      Optional<Integer> startWindowHeight,
+                      Optional<Platform> platform) {
 
         this(baseTestUrl, timeouts, webDriverPath, browserBinaryPath, browserVersion, browserLocale,
                 startWindowWidth, startWindowHeight,
-                Optional.<Level>absent(), Optional.<String>absent());
+                Optional.<Level>absent(), Optional.<String>absent(), platform);
 
     }
 
@@ -62,7 +66,8 @@ public abstract class WebBrowser extends Browser<WebDriver> {
                       Optional<Integer> startWindowWidth,
                       Optional<Integer> startWindowHeight,
                       Optional<Level> browserLogLevel,
-                      Optional<String> browserLogFile) {
+                      Optional<String> browserLogFile,
+                      Optional<Platform> platform) {
         super(baseTestUrl, timeouts);
         this.webDriverPath = webDriverPath;
         this.browserBinaryPath = browserBinaryPath;
@@ -72,6 +77,7 @@ public abstract class WebBrowser extends Browser<WebDriver> {
         this.startWindowHeight = startWindowHeight;
         this.browserLogLevel = browserLogLevel;
         this.browserLogFile = browserLogFile;
+        this.platform = platform;
     }
 
     /**
@@ -137,6 +143,10 @@ public abstract class WebBrowser extends Browser<WebDriver> {
 
     public Optional<String> getBrowserLogFile() {
         return browserLogFile;
+    }
+
+    public Optional<Platform> getPlatform() {
+        return platform;
     }
 
     public TimeoutsConfig getTimeouts() {
@@ -227,4 +237,22 @@ public abstract class WebBrowser extends Browser<WebDriver> {
 
     @Nullable
     public abstract LogEntries getBrowserLogEntries();
+
+    protected void setCommonWebBrowserCapabilities(DesiredCapabilities desiredCapabilities) {
+        // If a required version is present, then set this as a desired capability. Only affects Remote browsers.
+        Optional<String> browserVersion = getBrowserVersion();
+        if (browserVersion.isPresent() && !browserVersion.get().isEmpty()) {
+            desiredCapabilities.setCapability(CapabilityType.VERSION, browserVersion.get());
+        }
+
+        // Set logging preferences.
+        LoggingPreferences loggingPreferences = getLoggingPreferences();
+        desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
+
+        // If a platform is specified, set this desired capability. Only affects Remote browsers.
+        Optional<Platform> platform = getPlatform();
+        if (platform.isPresent()) {
+            desiredCapabilities.setPlatform(platform.get());
+        }
+    }
 }

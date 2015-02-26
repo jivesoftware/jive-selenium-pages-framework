@@ -3,9 +3,14 @@ package com.jivesoftware.selenium.pagefactory.framework.browser;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.jivesoftware.selenium.pagefactory.framework.browser.web.*;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.openqa.selenium.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,15 +146,15 @@ public class LocalBrowserBuilder {
         WebBrowser browser;
         switch (browserType) {
             case FIREFOX:
-                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight);
+                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight, Optional.<Platform>absent());
                 break;
             case CHROME:
                 browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile);
+                        browserLogLevel, browserLogFile, Optional.<Platform>absent());
                 break;
             case IE:
                 browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile);
+                        browserLogLevel, browserLogFile, Optional.<Platform>absent());
                 break;
             default:
                 throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");

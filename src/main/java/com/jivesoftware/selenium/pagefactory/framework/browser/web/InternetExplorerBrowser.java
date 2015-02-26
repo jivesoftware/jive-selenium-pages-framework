@@ -4,11 +4,11 @@ import com.google.common.base.Optional;
 import com.jivesoftware.selenium.pagefactory.framework.actions.InternetExplorerActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverLogLevel;
 import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -25,8 +25,9 @@ public class InternetExplorerBrowser extends WebBrowser {
                                    Optional<Integer> startWindowWidth,
                                    Optional<Integer> startWindowHeight,
                                    Optional<Level> browserLogLevel,
-                                   Optional<String> browserLogFile) {
-        super(baseTestUrl, timeouts, driverPath, browserBinaryPath, browserVersion, browserLocale, startWindowWidth, startWindowHeight, browserLogLevel, browserLogFile);
+                                   Optional<String> browserLogFile,
+                                   Optional<Platform> platform) {
+        super(baseTestUrl, timeouts, driverPath, browserBinaryPath, browserVersion, browserLocale, startWindowWidth, startWindowHeight, browserLogLevel, browserLogFile, platform);
     }
 
     @Override
@@ -37,14 +38,12 @@ public class InternetExplorerBrowser extends WebBrowser {
     @Override
     public DesiredCapabilities getDesiredCapabilities() {
         DesiredCapabilities desiredCapabilities = DesiredCapabilities.internetExplorer();
+
+        setCommonWebBrowserCapabilities(desiredCapabilities);
+
         desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
         desiredCapabilities.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
         desiredCapabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
-
-        Optional<String> version = getBrowserVersion();
-        if (version.isPresent() && !version.get().isEmpty()) {
-            desiredCapabilities.setCapability(CapabilityType.VERSION, version.get());
-        }
 
         Level logLevel = getLogLevel();
         desiredCapabilities.setCapability(InternetExplorerDriver.LOG_LEVEL, convertJavaLogLevelToIeLogLevel(logLevel.toString()));
@@ -53,9 +52,6 @@ public class InternetExplorerBrowser extends WebBrowser {
         if (browserLogFile.isPresent() && !browserLogFile.get().isEmpty()) {
             desiredCapabilities.setCapability(InternetExplorerDriver.LOG_FILE, browserLogFile.get());
         }
-
-        LoggingPreferences loggingPreferences = getLoggingPreferences();
-        desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
 
         return desiredCapabilities;
     }
