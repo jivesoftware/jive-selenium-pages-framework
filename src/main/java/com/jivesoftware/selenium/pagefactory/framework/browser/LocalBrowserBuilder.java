@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.SafariBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
@@ -155,6 +156,10 @@ public class LocalBrowserBuilder {
             case IE:
                 browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
                         browserLogLevel, browserLogFile, Optional.<Platform>absent());
+                break;
+            case SAFARI:
+                browser = new SafariBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
+                                            browserLogLevel, browserLogFile, Optional.<Platform>absent());
                 break;
             default:
                 throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");

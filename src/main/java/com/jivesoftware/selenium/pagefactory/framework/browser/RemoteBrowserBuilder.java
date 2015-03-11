@@ -7,6 +7,7 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.browser.web.SafariBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
@@ -171,6 +172,10 @@ public class RemoteBrowserBuilder {
             case IE:
                 browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
                         browserLogLevel, browserLogFile, platform);
+                break;
+            case SAFARI:
+                browser = new SafariBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
+                                            browserLogLevel, browserLogFile, Optional.<Platform>absent());
                 break;
             default:
                 throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");

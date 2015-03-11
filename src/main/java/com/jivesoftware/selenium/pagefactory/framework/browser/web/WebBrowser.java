@@ -91,8 +91,11 @@ public abstract class WebBrowser extends Browser<WebDriver> {
         if (startWindowWidth.isPresent() && startWindowHeight.isPresent()) {
             this.webDriver.manage().window().setSize(new Dimension(startWindowWidth.get(), startWindowHeight.get()));
         }
-        this.webDriver.manage().timeouts().pageLoadTimeout(getPageTimeoutSeconds(), TimeUnit.SECONDS);
-        this.webDriver.manage().timeouts().implicitlyWait(getImplicitWaitTimeoutMillis(), TimeUnit.MILLISECONDS);
+        // Safari web driver doesn't support setting timeouts.
+        if (getBrowserType() != WebBrowserType.SAFARI) {
+            this.webDriver.manage().timeouts().pageLoadTimeout(getPageTimeoutSeconds(), TimeUnit.SECONDS);
+            this.webDriver.manage().timeouts().implicitlyWait(getImplicitWaitTimeoutMillis(), TimeUnit.MILLISECONDS);
+        }
     }
 
     public abstract WebBrowserType getBrowserType();
@@ -238,6 +241,10 @@ public abstract class WebBrowser extends Browser<WebDriver> {
     @Nullable
     public abstract LogEntries getBrowserLogEntries();
 
+    /**
+     * Helper to set properties of the DesiredCapabilities that are common across all browsers.
+     * @param desiredCapabilities
+     */
     protected void setCommonWebBrowserCapabilities(DesiredCapabilities desiredCapabilities) {
         // If a required version is present, then set this as a desired capability. Only affects Remote browsers.
         Optional<String> browserVersion = getBrowserVersion();
