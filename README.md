@@ -40,7 +40,7 @@ so if your project uses maven you can just add this as a dependency with:
     &lt;dependency&gt;
         &lt;groupId&gt;com.jivesoftware&lt;/groupId&gt;
         &lt;artifactId&gt;jive-selenium-pages-framework&lt;/artifactId&gt;
-        &lt;version&gt;1.0.6&lt;/version&gt;
+        &lt;version&gt;1.0.10&lt;/version&gt;
     &lt;/dependency&gt;
 </pre>
 

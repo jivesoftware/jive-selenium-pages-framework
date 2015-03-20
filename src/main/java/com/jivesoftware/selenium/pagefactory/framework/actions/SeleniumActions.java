@@ -123,6 +123,24 @@ public interface SeleniumActions {
     WebElement clickAndVerifyPresent(WebElement elToClick, By locatorToVerifyPresent, TimeoutType timeout);
 
     /**
+     * Click a web element (if it's unselected), then verify it is selected (checked for a checkbox, etc.)
+     *
+     * @return - the WebElement we verified was selected
+     */
+    WebElement clickAndVerifySelected(By locatorToClick, TimeoutType timeout);
+
+    WebElement clickAndVerifySelected(WebElement elToClick, TimeoutType timeout);
+
+    /**
+     * Click a web element, then verify it is selected (checked for a checkbox, etc.)
+     *
+     * @return - the WebElement we verified was selected
+     */
+    WebElement clickAndVerifyNotSelected(By locatorToClick, TimeoutType timeout);
+
+    WebElement clickAndVerifyNotSelected(WebElement elToClick, TimeoutType timeout);
+
+    /**
      * Click a web element, then verify another element is present on the DOM (not necessarily visible).
      *
      * @return - the WebElement we verified was present
@@ -311,6 +329,10 @@ public interface SeleniumActions {
 
     boolean isClickable(WebElement el);
 
+    boolean isSelected(By locator);
+
+    boolean isSelected(WebElement css);
+
     /**
      * Return immediately with an answer as to whether an element is visible.
      *
@@ -355,9 +377,9 @@ public interface SeleniumActions {
 
     void verifyElementNotPresented(By locator, TimeoutType timeout);
 
-    void verifyElementNotSelected(By locator, TimeoutType timeout);
+    WebElement verifyElementNotSelected(By locator, TimeoutType timeout);
 
-    void verifyElementNotSelected(WebElement el, TimeoutType timeout);
+    WebElement verifyElementNotSelected(WebElement el, TimeoutType timeout);
 
     WebElement verifyElementPresented(By locator, TimeoutType timeout);
 
@@ -369,11 +391,32 @@ public interface SeleniumActions {
      */
     void verifyElementRemoved(WebElement element, TimeoutType timeout);
 
-    void verifyElementSelected(By locator, TimeoutType timeout);
+    WebElement verifyElementSelected(By locator, TimeoutType timeout);
 
-    void verifyElementSelected(WebElement el, TimeoutType timeout);
+    WebElement verifyElementSelected(WebElement el, TimeoutType timeout);
 
+    /**
+     * Verify that the element found with the given By is visible, then returns this element.
+     *
+     * This method assumes that the given By uniquely defines an element. It may act unexpectedly if
+     * there are multiple elements on the page matching the By, some visible and some invisible.
+     *
+     * @throws org.openqa.selenium.TimeoutException if the element is not found
+     * @return - the visible, matching web element
+     * @see #verifyAnyElementVisible
+     */
     WebElement verifyElementVisible(By locator, TimeoutType timeout);
+
+    /**
+     * Verifies that there exists any element on the page that matches the given By, and is visible.
+     * Returns the first such element found.
+     *
+     * This differs from "verifyElementVisible", because that method uses the Selenium "ExpectedConditions.visibilityOfElementLocatedBy()", which
+     * requires that the *first* element matching the given By is visible.
+     * @return - the found WebElement
+     * @see #verifyElementVisible
+     */
+    WebElement verifyAnyElementVisible(By locator, TimeoutType timeout);
 
     void verifyElementWithTextIsInvisible(By locator, String text, TimeoutType timeout);
 
