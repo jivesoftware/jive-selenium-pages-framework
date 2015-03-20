@@ -3,6 +3,7 @@ package com.jivesoftware.selenium.pagefactory.framework.actions;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
@@ -84,7 +85,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public WebElement click(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         WebElement el = waitUntilClickable(locator, timeout);
         try {
             el.click();
@@ -99,7 +99,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public WebElement click(WebElement el, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         waitUntilClickable(el, timeout);
         String tag = el.getTagName();
         el.click();
@@ -215,6 +214,50 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         return wait.until(ExpectedConditions.presenceOfElementLocated(locatorToVerifyPresent));
     }
 
+    /**
+     * Click a web element, then verify it is selected (checked for a checkbox, etc.)
+     *
+     * @return - the WebElement we verified was selected
+     */
+    @Override
+    public WebElement clickAndVerifySelected(By locatorToSelect, TimeoutType timeout) {
+        WebElement el = webDriver().findElement(locatorToSelect);
+        if (isSelected(el)) {
+            return el;
+        }
+        click(el, TimeoutType.DEFAULT);
+        return verifyElementSelected(el, TimeoutType.DEFAULT);
+    }
+
+    @Override
+    public WebElement clickAndVerifySelected(WebElement elToSelect, TimeoutType timeout) {
+        if (isSelected(elToSelect)) {
+            return elToSelect;
+        }
+        click(elToSelect, TimeoutType.DEFAULT);
+        return verifyElementSelected(elToSelect, TimeoutType.DEFAULT);
+    }
+
+    /**
+     * Click a web element, then verify it is selected (checked for a checkbox, etc.)
+     *
+     * @return - the WebElement we verified was selected
+     */
+    @Override
+    public WebElement clickAndVerifyNotSelected(By locatorToSelect, TimeoutType timeout) {
+        WebElement el = webDriver().findElement(locatorToSelect);
+        return clickAndVerifyNotSelected(el, timeout);
+    }
+
+    @Override
+    public WebElement clickAndVerifyNotSelected(WebElement elToSelect, TimeoutType timeout) {
+        if (!isSelected(elToSelect)) {
+            return elToSelect;
+        }
+        click(elToSelect, TimeoutType.DEFAULT);
+        return verifyElementNotSelected(elToSelect, TimeoutType.DEFAULT);
+    }
+
     @Override
     public WebElement clickAndVerifyVisible(By locatorToClick, By locatorToVerifyVisible, TimeoutType timeout) {
         click(locatorToClick, timeout);
@@ -242,7 +285,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public void dismissAlert(TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         waitOnExpectedCondition(ExpectedConditions.alertIsPresent(),
                 "Waiting for javascript alert to be present before dismissing alert.", timeout);
         webDriver().switchTo().alert().dismiss();
@@ -263,7 +305,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
     public void enterTextForAutoCompleteAndSelectFirstMatch(By inputLocator, int minChars, String text, By popoverLocator,
                                                             String requiredPopupText) {
-        waitForPageLoadIfFirefox();
         if (minChars > text.length()) {
             throw new RuntimeException(format("Minimum characters to enter (%d) is greater than the length of the input text '%s'!", minChars, text));
         }
@@ -325,7 +366,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public WebElement findElementContainingChild(final By parentLocator, final By childLocator) {
-        waitForPageLoadIfFirefox();
         List<WebElement> parents = webDriver().findElements(parentLocator);
         for (WebElement el: parents) {
             try {
@@ -434,7 +474,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public List<WebElement> findElementsContainingChild(final By parentLocator, final By childLocator) {
-        waitForPageLoadIfFirefox();
         List<WebElement> parents = webDriver().findElements(parentLocator);
         List<WebElement> parentsWithChild = Lists.newArrayList();
         for (WebElement el: parents) {
@@ -473,11 +512,10 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public WebElement findVisibleElementContainingText(By locator, String text) {
-        waitForPageLoadIfFirefox();
         List<WebElement> matches = findElements(locator, null);
         for (WebElement el : matches) {
             try {
-                if (el.getText().contains(text) && el.isDisplayed()) {
+                if ((Strings.isNullOrEmpty(text) || el.getText().contains(text)) && el.isDisplayed()) {
                     logger.info("SUCCESS: Found visible web element containing text '{}' with locator '{}'", text, locator);
                     return el;
                 }
@@ -602,7 +640,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
     @Nullable
     public WebElement getElement(By locator) {
-        waitForPageLoadIfFirefox();
         List<WebElement> elements = findElements(locator, null);
         if (elements.size() > 0) {
             return elements.get(0);
@@ -656,7 +693,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Nonnull
     public WebElement inputText(@Nonnull WebElement el, String text) {
         logger.info("Inputting text '{}' into web element <{}>", text, el.getTagName());
-        waitForPageLoadIfFirefox();
         try {
             el.sendKeys(text);
         } catch (Exception e) {
@@ -745,6 +781,17 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    public boolean isSelected(By locator) {
+        WebElement el = findElement(locator, null);
+        return el.isSelected();
+    }
+
+    @Override
+    public boolean isSelected(WebElement el) {
+        return el.isSelected();
+    }
+
+    @Override
     public boolean isVisible(By locator) {
         WebElement el = getElement(locator);
         return isVisible(el);
@@ -766,13 +813,11 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     @Override
 
     public <T extends SubPage> T loadSubPage(Class<T> pageClass) {
-        waitForPageLoadIfFirefox();
         return (T)browser.loadSubPage(pageClass);
     }
 
     @Override
     public <T extends TopLevelPage> T loadTopLevelPage(Class<T> pageClass) {
-        waitForPageLoadIfFirefox();
         return (T) browser.loadTopLevelPage(pageClass);
     }
 
@@ -856,14 +901,12 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public void verifyElementInvisible(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         waitOnExpectedCondition(ExpectedConditions.invisibilityOfElementLocated(locator),
                 format("Failure in verifyElementInvisible waiting for element with locator '%s' to be invisible", locator), timeout);
     }
 
     @Override
     public void verifyElementNotPresented(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementNotPresented: element '%s' never became not presented after %d seconds!",
                 locator, waitSeconds);
@@ -875,8 +918,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void verifyElementNotSelected(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
+    public WebElement verifyElementNotSelected(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementNotSelected: Element '%s' never became deselected after %d seconds!",
                 locator, waitSeconds);
@@ -885,20 +927,20 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
             .ignoring(StaleElementReferenceException.class);
         wait.until(ExpectedConditions.elementSelectionStateToBe(locator, false));
         logger.info("SUCCESS: Verified element with locator '{}' is NOT selected", locator);
+        return webDriver().findElement(locator);
     }
 
     @Override
-    public void verifyElementNotSelected(WebElement el, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
+    public WebElement verifyElementNotSelected(WebElement el, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.until(ExpectedConditions.elementSelectionStateToBe(el, false));
         logger.info("SUCCESS: Verified element <{}> is NOT selected", el.getTagName());
+        return el;
     }
 
     @Override
     public WebElement verifyElementPresented(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String errorMessage =
                 format("Failure in verifyElementPresented: element '%s' never became presented after %d seconds!",
@@ -912,7 +954,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public void verifyElementRemoved(WebElement element, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         logger.info("Waiting for element to become stale (removed from the DOM) using timeout of {} seconds", waitSeconds);
         waitOnExpectedConditionForSeconds(ExpectedConditions.stalenessOf(element),
@@ -922,8 +963,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
-    public void verifyElementSelected(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
+    public WebElement verifyElementSelected(By locator, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementSelected: Element '%s' never became selected after %d seconds!",
                 locator, waitSeconds);
@@ -931,11 +971,11 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         wait.withMessage(errorMessage)
             .ignoring(StaleElementReferenceException.class);
         wait.until(ExpectedConditions.elementToBeSelected(locator));
+        return webDriver().findElement(locator);
     }
 
     @Override
-    public void verifyElementSelected(WebElement el, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
+    public WebElement verifyElementSelected(WebElement el, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Failure in verifyElementSelected: Element '%s' never became selected after %d seconds!",
                 el.getTagName(), waitSeconds);
@@ -943,13 +983,18 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         wait.withMessage(errorMessage);
         wait.until(ExpectedConditions.elementToBeSelected(el));
         logger.info("SUCCESS: Verified element <{}> is selected", el.getTagName());
+        return el;
     }
 
     @Override
     public WebElement verifyElementVisible(final By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         final String errorMessage = format("Error in verifyElementVisible: element with locator '%s' never became visible", locator);
         return waitOnExpectedCondition(ExpectedConditions.visibilityOfElementLocated(locator), errorMessage, timeout);
+    }
+
+    @Override
+    public WebElement verifyAnyElementVisible(By locator, TimeoutType timeout) {
+        return findVisibleElementContainingTextWithWait(locator, "", timeout);
     }
 
     @Override
@@ -1151,7 +1196,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public WebElement waitUntilClickable(By locator, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String errorMessage = format("Element '%s' never became clickable after '%d' seconds", locator, waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
@@ -1163,7 +1207,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
 
     @Override
     public WebElement waitUntilClickable(final WebElement el, TimeoutType timeout) {
-        waitForPageLoadIfFirefox();
         int waitSeconds = getTimeout(timeoutsConfig.getClickTimeoutSeconds(), timeout);
         final String message = format("Element never became clickable after '%d' seconds", waitSeconds);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
@@ -1238,7 +1281,6 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
      * @return - List of elements
      */
     protected List<WebElement> findElements(By locator, WebElement parentEl) {
-        waitForPageLoadIfFirefox();
         if (parentEl == null) {
             return webDriver().findElements(locator);
         } else {
@@ -1272,22 +1314,5 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         return wait.until(expectedCondition);
     }
 
-
-    private boolean isFirefox(WebDriver webDriver) {
-        if (webDriver instanceof FirefoxDriver) {
-            return true;
-        }
-        if (!(webDriver instanceof RemoteWebDriver)) {
-            return false;
-        }
-        RemoteWebDriver remoteWebDriver = (RemoteWebDriver)webDriver;
-        return "firefox".equalsIgnoreCase(remoteWebDriver.getCapabilities().getBrowserName());
-    }
-
-    private void waitForPageLoadIfFirefox() {
-        if (isFirefox(webDriver())) {
-            waitForWebPageReadyStateToBeComplete();
-        }
-    }
 
 }
