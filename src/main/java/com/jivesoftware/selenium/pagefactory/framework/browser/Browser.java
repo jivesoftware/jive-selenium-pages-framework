@@ -207,6 +207,8 @@ public abstract class Browser<D extends WebDriver> {
     public abstract <T extends TopLevelPage> T refreshPage(Class<T> pageClass);
 
     public void quit() {
+        logger.info("Quitting WebDriver: {}", webDriver);
         webDriver.quit();
+        logger.info("SUCCESS - quit WebDriver: {}", webDriver);
     }
 }

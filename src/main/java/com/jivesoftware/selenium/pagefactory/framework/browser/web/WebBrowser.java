@@ -96,6 +96,7 @@ public abstract class WebBrowser extends Browser<WebDriver> {
             this.webDriver.manage().timeouts().pageLoadTimeout(getPageTimeoutSeconds(), TimeUnit.SECONDS);
             this.webDriver.manage().timeouts().implicitlyWait(getImplicitWaitTimeoutMillis(), TimeUnit.MILLISECONDS);
         }
+        logger.info("SUCCESS - Created WebBrowser of type {}: {}", getBrowserType(), webDriver);
     }
 
     public abstract WebBrowserType getBrowserType();
