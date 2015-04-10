@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser;
 import com.thoughtworks.selenium.Wait;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -65,7 +65,7 @@ public class BrowserUtil {
             URL remoteServer = httpCommandExecutor.getAddressOfRemoteServer();
             return getSeleniumNodeUrl(remoteServer, sessionId.toString());
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     // Helper for above method.
@@ -80,11 +80,11 @@ public class BrowserUtil {
             InputStream inputStream = response.getEntity().getContent();
             JsonNode obj = objectMapper.readTree(inputStream);
             String nodeHost = obj.get("proxyId").asText();
-            return Optional.fromNullable(nodeHost);
+            return Optional.ofNullable(nodeHost);
         } catch (Exception e) {
             logger.warn("Error determining Selenium Node URL: {}", e.getMessage());
             logger.debug(Throwables.getStackTraceAsString(e));
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

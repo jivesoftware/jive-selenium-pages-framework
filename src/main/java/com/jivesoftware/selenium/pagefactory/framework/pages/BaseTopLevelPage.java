@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
-import com.google.common.base.Optional;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.exception.InvalidPageUrlException;
@@ -11,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.net.URI;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

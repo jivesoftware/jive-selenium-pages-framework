@@ -1,7 +1,6 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
@@ -16,6 +15,7 @@ import org.openqa.selenium.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.logging.Level;
 
 /**
@@ -43,13 +43,13 @@ public class RemoteBrowserBuilder {
 
     private TimeoutsConfig timeoutsConfig;
 
-    private Optional<String> browserVersion = Optional.absent();
-    private Optional<String> browserLocale = Optional.absent();
-    private Optional<Integer> startWindowWidth = Optional.absent();
-    private Optional<Integer> startWindowHeight = Optional.absent();
-    private Optional<Level> browserLogLevel = Optional.absent();
-    private Optional<String> browserLogFile = Optional.absent();
-    private Optional<Platform> platform = Optional.absent();
+    private Optional<String> browserVersion = Optional.empty();
+    private Optional<String> browserLocale = Optional.empty();
+    private Optional<Integer> startWindowWidth = Optional.empty();
+    private Optional<Integer> startWindowHeight = Optional.empty();
+    private Optional<Level> browserLogLevel = Optional.empty();
+    private Optional<String> browserLogFile = Optional.empty();
+    private Optional<Platform> platform = Optional.empty();
 
     private RemoteBrowserBuilder(WebBrowserType browserType,
                                  String baseTestUrl,
@@ -163,19 +163,19 @@ public class RemoteBrowserBuilder {
         WebBrowser browser;
         switch (browserType) {
             case FIREFOX:
-                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight, platform);
+                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, Optional.empty(), Optional.empty(), browserVersion, browserLocale, startWindowWidth, startWindowHeight, platform);
                 break;
             case CHROME:
-                browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
+                browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, Optional.empty(), Optional.empty(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
                         browserLogLevel, browserLogFile, platform);
                 break;
             case IE:
-                browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
+                browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, Optional.empty(), Optional.empty(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
                         browserLogLevel, browserLogFile, platform);
                 break;
             case SAFARI:
-                browser = new SafariBrowser(baseTestUrl, timeoutsConfig, Optional.<String>absent(), Optional.<String>absent(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
-                                            browserLogLevel, browserLogFile, Optional.<Platform>absent());
+                browser = new SafariBrowser(baseTestUrl, timeoutsConfig, Optional.empty(), Optional.empty(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
+                                            browserLogLevel, browserLogFile, Optional.empty());
                 break;
             default:
                 throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");
@@ -191,37 +191,37 @@ public class RemoteBrowserBuilder {
     }
 
     public RemoteBrowserBuilder withBrowserVersion(String browserVersion) {
-        this.browserVersion = Optional.fromNullable(browserVersion);
+        this.browserVersion = Optional.ofNullable(browserVersion);
         return this;
     }
 
     public RemoteBrowserBuilder withBrowserLocale(String browserLocale) {
-        this.browserLocale = Optional.fromNullable(browserLocale);
+        this.browserLocale = Optional.ofNullable(browserLocale);
         return this;
     }
 
     public RemoteBrowserBuilder withStartWindowWidth(Integer startWindowWidth) {
-        this.startWindowWidth = Optional.fromNullable(startWindowWidth);
+        this.startWindowWidth = Optional.ofNullable(startWindowWidth);
         return this;
     }
 
     public RemoteBrowserBuilder withStartWindowHeight(Integer startWindowHeight) {
-        this.startWindowHeight = Optional.fromNullable(startWindowHeight);
+        this.startWindowHeight = Optional.ofNullable(startWindowHeight);
         return this;
     }
 
     public RemoteBrowserBuilder withBrowserLogLevel(Level browserLogLevel) {
-        this.browserLogLevel = Optional.fromNullable(browserLogLevel);
+        this.browserLogLevel = Optional.ofNullable(browserLogLevel);
         return this;
     }
 
     public RemoteBrowserBuilder withBrowserLogFile(String browserLogFile) {
-        this.browserLogFile = Optional.fromNullable(browserLogFile);
+        this.browserLogFile = Optional.ofNullable(browserLogFile);
         return this;
     }
 
     public RemoteBrowserBuilder withPlatform(Platform platform) {
-        this.platform = Optional.fromNullable(platform);
+        this.platform = Optional.ofNullable(platform);
         return this;
     }
 

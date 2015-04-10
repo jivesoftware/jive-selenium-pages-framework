@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
-import com.google.common.base.Optional;
 import com.jivesoftware.selenium.pagefactory.framework.browser.Browser;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -53,7 +53,7 @@ public abstract class WebBrowser extends Browser<WebDriver> {
 
         this(baseTestUrl, timeouts, webDriverPath, browserBinaryPath, browserVersion, browserLocale,
                 startWindowWidth, startWindowHeight,
-                Optional.<Level>absent(), Optional.<String>absent(), platform);
+                Optional.empty(), Optional.empty(), platform);
 
     }
 

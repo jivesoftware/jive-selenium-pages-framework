@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.jivesoftware.selenium.pagefactory.framework.actions.ChromeSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
@@ -9,7 +8,6 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
@@ -22,6 +20,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 

@@ -1,7 +1,6 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser;
@@ -11,10 +10,10 @@ import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
-import org.openqa.selenium.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.logging.Level;
 
 /**
@@ -47,13 +46,13 @@ public class LocalBrowserBuilder {
 
     private TimeoutsConfig timeoutsConfig;
 
-    private Optional<String> webDriverPath = Optional.absent();
-    private Optional<String> browserBinaryPath = Optional.absent();
-    private Optional<String> browserLocale = Optional.absent();
-    private Optional<Integer> startWindowWidth = Optional.absent();
-    private Optional<Integer> startWindowHeight = Optional.absent();
-    private Optional<Level> browserLogLevel = Optional.absent();
-    private Optional<String> browserLogFile = Optional.absent();
+    private Optional<String> webDriverPath = Optional.empty();
+    private Optional<String> browserBinaryPath = Optional.empty();
+    private Optional<String> browserLocale = Optional.empty();
+    private Optional<Integer> startWindowWidth = Optional.empty();
+    private Optional<Integer> startWindowHeight = Optional.empty();
+    private Optional<Level> browserLogLevel = Optional.empty();
+    private Optional<String> browserLogFile = Optional.empty();
 
     private LocalBrowserBuilder(WebBrowserType browserType, String baseTestUrl) {
         this.browserType = Preconditions.checkNotNull(browserType, "You must provide a non-null browserType!");
@@ -147,19 +146,19 @@ public class LocalBrowserBuilder {
         WebBrowser browser;
         switch (browserType) {
             case FIREFOX:
-                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight, Optional.<Platform>absent());
+                browser = new FirefoxBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.empty(), browserLocale, startWindowWidth, startWindowHeight, Optional.empty());
                 break;
             case CHROME:
-                browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile, Optional.<Platform>absent());
+                browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.empty(), browserLocale, startWindowWidth, startWindowHeight,
+                        browserLogLevel, browserLogFile, Optional.empty());
                 break;
             case IE:
-                browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile, Optional.<Platform>absent());
+                browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.empty(), browserLocale, startWindowWidth, startWindowHeight,
+                        browserLogLevel, browserLogFile, Optional.empty());
                 break;
             case SAFARI:
-                browser = new SafariBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.<String>absent(), browserLocale, startWindowWidth, startWindowHeight,
-                                            browserLogLevel, browserLogFile, Optional.<Platform>absent());
+                browser = new SafariBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.empty(), browserLocale, startWindowWidth, startWindowHeight,
+                                            browserLogLevel, browserLogFile, Optional.empty());
                 break;
             default:
                 throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");
@@ -174,37 +173,37 @@ public class LocalBrowserBuilder {
     }
 
     public LocalBrowserBuilder withWebDriverPath(String pathToWebDriver) {
-        this.webDriverPath = Optional.fromNullable(pathToWebDriver);
+        this.webDriverPath = Optional.ofNullable(pathToWebDriver);
         return this;
     }
 
     public LocalBrowserBuilder withBrowserBinaryPath(String pathToBrowserBinary) {
-        this.browserBinaryPath = Optional.fromNullable(pathToBrowserBinary);
+        this.browserBinaryPath = Optional.ofNullable(pathToBrowserBinary);
         return this;
     }
 
     public LocalBrowserBuilder withBrowserLocale(String browserLocale) {
-        this.browserLocale = Optional.fromNullable(browserLocale);
+        this.browserLocale = Optional.ofNullable(browserLocale);
         return this;
     }
 
     public LocalBrowserBuilder withStartWindowWidth(Integer startWindowWidth) {
-        this.startWindowWidth = Optional.fromNullable(startWindowWidth);
+        this.startWindowWidth = Optional.ofNullable(startWindowWidth);
         return this;
     }
 
     public LocalBrowserBuilder withStartWindowHeight(Integer startWindowHeight) {
-        this.startWindowHeight = Optional.fromNullable(startWindowHeight);
+        this.startWindowHeight = Optional.ofNullable(startWindowHeight);
         return this;
     }
 
     public LocalBrowserBuilder withBrowserLogLevel(Level browserLogLevel) {
-        this.browserLogLevel = Optional.fromNullable(browserLogLevel);
+        this.browserLogLevel = Optional.ofNullable(browserLogLevel);
         return this;
     }
 
     public LocalBrowserBuilder withBrowserLogFile(String browserLogFile) {
-        this.browserLogFile = Optional.fromNullable(browserLogFile);
+        this.browserLogFile = Optional.ofNullable(browserLogFile);
         return this;
     }
 

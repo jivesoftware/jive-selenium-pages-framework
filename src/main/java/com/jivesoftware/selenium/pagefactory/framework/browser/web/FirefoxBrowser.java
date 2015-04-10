@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
-import com.google.common.base.Optional;
 import com.jivesoftware.selenium.pagefactory.framework.actions.FirefoxSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import org.openqa.selenium.Platform;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Optional;
 import java.util.Set;
 
 public class FirefoxBrowser extends WebBrowser {

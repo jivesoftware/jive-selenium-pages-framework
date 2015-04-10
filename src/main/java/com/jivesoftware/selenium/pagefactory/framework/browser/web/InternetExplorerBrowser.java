@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
-import com.google.common.base.Optional;
 import com.jivesoftware.selenium.pagefactory.framework.actions.InternetExplorerActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
@@ -13,6 +12,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class InternetExplorerBrowser extends WebBrowser {

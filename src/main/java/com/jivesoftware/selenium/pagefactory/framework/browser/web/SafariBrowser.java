@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser.web;
 
-import com.google.common.base.Optional;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SafariSeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutsConfig;
 import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException;
@@ -17,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 

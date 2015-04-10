@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.browser;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowserType;
@@ -21,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Created by shirand on 8/12/14.
@@ -30,7 +30,7 @@ public abstract class Browser<D extends WebDriver> {
     protected D webDriver;
     protected String baseTestUrl;
     protected TimeoutsConfig timeouts;
-    protected Optional<CachedPage> optionalCachedPage = Optional.absent();
+    protected Optional<CachedPage> optionalCachedPage = Optional.empty();
     protected static final PageUtils PAGE_UTILS = new PageUtils();
 
     protected Browser(String baseTestUrl, TimeoutsConfig timeoutsConfig) {
@@ -144,7 +144,7 @@ public abstract class Browser<D extends WebDriver> {
     }
 
     public void invalidateCachedPage() {
-        optionalCachedPage = Optional.absent();
+        optionalCachedPage = Optional.empty();
     }
 
     //--------------Private helpers------------

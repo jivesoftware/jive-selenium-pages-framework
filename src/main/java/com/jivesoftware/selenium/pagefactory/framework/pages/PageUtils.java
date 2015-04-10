@@ -1,6 +1,5 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by charles.capps on 7/29/14.
@@ -34,9 +34,9 @@ public class PageUtils {
     public Optional<String> getWebPagePathForClass(Class<? extends TopLevelPage> pageClass) {
         WebPagePath annotation = pageClass.getAnnotation(WebPagePath.class);
         if (annotation == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
-        return Optional.fromNullable(annotation.path());
+        return Optional.ofNullable(annotation.path());
     }
 
     /**
