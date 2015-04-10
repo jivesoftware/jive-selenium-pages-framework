@@ -139,7 +139,7 @@ public class LocalBrowserBuilder {
      * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.FirefoxBrowser},
      * {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.ChromeBrowser},
      * or {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.InternetExplorerBrowser}
-     * @throws JiveWebDriverException
+     * @throws JiveWebDriverException when something goes wrong with creating a new WebDriver instance.
      */
     public WebBrowser build() throws JiveWebDriverException {
         logger.info("Building Local Browser with the following config: \n{}", toString());

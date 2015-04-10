@@ -156,7 +156,7 @@ public class RemoteBrowserBuilder {
      * Creates the RemoteBrowser instance, which includes creating the actual Browser process via the underlying WebDriver.
      *
      * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.web.RemoteBrowser},
-     * @throws JiveWebDriverException
+     * @throws JiveWebDriverException when something goes wrong with creating a new WebDriver.
      */
     public RemoteBrowser build() throws JiveWebDriverException {
         logger.info("Building Remote Browser with the following config: \n{}", toString());

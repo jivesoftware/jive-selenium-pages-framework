@@ -101,6 +101,9 @@ public interface SeleniumActions {
 
     /**
      * Click a web element, then verify another element is NOT present on the DOM (so also not visible).
+     * @param locatorToClick the locator to click
+     * @param  locatorToVerifyNotPresent the locator to verify not present after clicking.
+     * @param  timeout the timeout type
      */
     void clickAndVerifyNotPresent(By locatorToClick, By locatorToVerifyNotPresent, TimeoutType timeout);
 
@@ -338,7 +341,7 @@ public interface SeleniumActions {
      *
      * @return - true if the element is present and visible, false otherwise.
      * See Selenium's docs for the definition of visible, it has to be on the page, scrolled into view,
-     * have a height and width > 0, etc.
+     * have a height and width greater than 0, etc.
      */
     boolean isVisible(By locator);
 
@@ -433,7 +436,7 @@ public interface SeleniumActions {
 
     /**
      * Wait for the HTML of a page to be stable, by verifying the length of the HTML doesn't change for a second.
-     * {@see com.thoughtworks.selenium.webdriven.commands.WaitForPageToLoad#getLengthCheckingWait(org.openqa.selenium.WebDriver)}
+     * @see com.thoughtworks.selenium.webdriven.commands.WaitForPageToLoad#getLengthCheckingWait(org.openqa.selenium.WebDriver)
      *
      * This will probably will only be useful for ordinary WebBrowsers (not mobile) at the moment.
      */

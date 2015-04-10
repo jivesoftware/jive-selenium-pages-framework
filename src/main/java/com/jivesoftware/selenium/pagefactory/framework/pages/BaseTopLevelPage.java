@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 /**
  * Base abstract class for a TopLevelPage. Implements the default pageLoadHook that waits for the page identifier to be present.
- * <p/>
  * Subclasses should call super.pageLoadHook() if they want to wait on the page identifier.
  */
 public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage {

@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 
 /**
  * Base class for a SubPage. Implements the default pageLoadHook that waits for the page identifier to be present.
- * <p/>
  * Subclasses should call super.pageLoadHook() if they want to wait on the page identifier.
  */
 public class BaseSubPage<S extends SeleniumActions> implements SubPage {

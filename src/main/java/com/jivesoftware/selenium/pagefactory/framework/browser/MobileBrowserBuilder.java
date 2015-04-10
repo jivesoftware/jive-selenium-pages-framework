@@ -137,7 +137,7 @@ public class MobileBrowserBuilder {
      * Server
      * @return - a {@link com.jivesoftware.selenium.pagefactory.framework.browser.mobile.AndroidMobileBrowser},
      * {@link com.jivesoftware.selenium.pagefactory.framework.browser.mobile.IOSMobileBrowser}
-     * @throws com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException
+     * @throws com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverException when something goes wrong with creating a new WebDriver
      */
     public MobileBrowser build() throws JiveWebDriverException {
         logger.info("Building Mobile Browser with the following config: \n{}", toString());

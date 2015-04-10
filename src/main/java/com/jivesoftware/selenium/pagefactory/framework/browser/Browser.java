@@ -82,6 +82,7 @@ public abstract class Browser<D extends WebDriver> {
      * Initialize the current page again by loading webelements and running page load hooks
      *
      * @param pageClass - the class of the current Page
+     * @return the new instance of a TopLevelPage
      */
     public <T extends TopLevelPage> T reloadTopLevelPage(Class<T> pageClass) {
         invalidateCachedPage();
@@ -101,7 +102,6 @@ public abstract class Browser<D extends WebDriver> {
      * If the current page is still valid, and the URL hasn't changed, and the
      * class given as input is assignable from the cached page,
      * THEN return the cached page and avoid re-initializing web elements and running page hooks.
-     * <p/>
      * Otherwise, invalidate the cache and load as normal.
      *
      * @param pageClass - the class of the current Page
