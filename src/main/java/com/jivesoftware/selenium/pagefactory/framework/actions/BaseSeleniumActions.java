@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -363,6 +364,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nullable
     public WebElement findElementContainingChild(final By parentLocator, final By childLocator) {
         List<WebElement> parents = webDriver().findElements(parentLocator);
         for (WebElement el: parents) {
@@ -379,6 +381,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
     public WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
         final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
@@ -396,6 +399,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nullable
     public WebElement findElementContainingText(By locator, String text) {
         List<WebElement> matches = findElements(locator, null);
         for (WebElement el : matches) {
@@ -413,6 +417,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
     public WebElement findElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
@@ -445,6 +450,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
     public WebElement findElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
         final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String msg = format("Failure in findElementContainingTextWithWait: never found text '%s' in element " +
@@ -466,11 +472,13 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
     public WebElement findElementWithRefresh(final By locator, TimeoutType timeout) {
         return findElementContainingTextWithRefresh(locator, "", timeout);
     }
 
     @Override
+    @Nonnull
     public List<WebElement> findElementsContainingChild(final By parentLocator, final By childLocator) {
         List<WebElement> parents = webDriver().findElements(parentLocator);
         List<WebElement> parentsWithChild = Lists.newArrayList();
@@ -488,6 +496,7 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
     public List<WebElement> findElementsContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout) {
         final int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String msg = format("Failure in findElementContainingChildWithWait: never found element " +
@@ -508,7 +517,15 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         });
     }
 
+    // --------- Find visible elements (return null when no such element is present.) -------
+
     @Override
+    public WebElement findVisibleElement(By locator) {
+        return findVisibleElementContainingText(locator, "");
+    }
+
+    @Override
+    @Nullable
     public WebElement findVisibleElementContainingText(By locator, String text) {
         List<WebElement> matches = findElements(locator, null);
         for (WebElement el : matches) {
@@ -526,6 +543,13 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
+    public WebElement findVisibleElementWithRefresh(final By locator, TimeoutType timeout) {
+        return findVisibleElementContainingTextWithRefresh(locator, "", timeout);
+    }
+
+    @Override
+    @Nonnull
     public WebElement findVisibleElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getPollingWithRefreshTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
@@ -558,6 +582,13 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
     }
 
     @Override
+    @Nonnull
+    public WebElement findVisibleElementWithWait(final By locator, TimeoutType timeout) {
+        return findVisibleElementContainingTextWithWait(locator, "", timeout);
+    }
+
+    @Override
+    @Nonnull
     public WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
         final String message = String.format("Timeout waiting %d seconds to find element containing text '%s' with locator '%s'",
@@ -578,9 +609,30 @@ public abstract class BaseSeleniumActions <B extends Browser> implements Seleniu
         });
     }
 
+    // --------- Find lists of visible elements --------
     @Override
-    public WebElement findVisibleElementWithRefresh(final By locator, TimeoutType timeout) {
-        return findVisibleElementContainingTextWithRefresh(locator, "", timeout);
+    @Nonnull
+    public List<WebElement> findVisibleElements(By locator) {
+        return findVisibleElementsContainingText(locator, "");
+    }
+
+    @Override
+    @Nonnull
+    public List<WebElement> findVisibleElementsContainingText(By locator, String text) {
+        List<WebElement> matches = findElements(locator, null);
+        List<WebElement> visible = new ArrayList<>();
+        for (WebElement el : matches) {
+            try {
+                if ((Strings.isNullOrEmpty(text) || el.getText().contains(text)) && el.isDisplayed()) {
+                    logger.info("SUCCESS: Found visible web element containing text '{}' with locator '{}'", text, locator);
+                    visible.add(el);
+                }
+            } catch (Exception e) { //Don't fail just because one web element was stale. Continue searching for the text.
+                logger.debug("Exception while searching for web elements containing text '{}' with locator '{}'", text, locator);
+                logger.debug(Throwables.getStackTraceAsString(e));
+            }
+        }
+        return visible;
     }
 
     @Override

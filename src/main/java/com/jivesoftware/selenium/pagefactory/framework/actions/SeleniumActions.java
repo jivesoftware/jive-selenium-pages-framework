@@ -10,6 +10,7 @@ import com.jivesoftware.selenium.pagefactory.framework.exception.SeleniumActions
 import com.jivesoftware.selenium.pagefactory.framework.pages.SubPage;
 import com.jivesoftware.selenium.pagefactory.framework.pages.TopLevelPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -210,6 +211,7 @@ public interface SeleniumActions {
      * @param childLocator  - relative locator to find child elements inside a parent element
      * @return - parent element that have at least 1 child element located by 'childLocator', or null if there are none.
      */
+    @Nullable
     WebElement findElementContainingChild(final By parentLocator, final By childLocator);
 
     /**
@@ -222,14 +224,28 @@ public interface SeleniumActions {
      * @param childLocator  - a locator relative to the parent to find the child element
      * @return - the parent element located by the 'locator' param
      */
+    @Nonnull
     WebElement findElementContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout);
 
+    @Nullable
     WebElement findElementContainingText(By locator, String text);
 
+    /**
+     * @throws TimeoutException if no such element is found before timeout is reached.
+     */
+    @Nonnull
     WebElement findElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout);
 
+    /**
+     * @throws TimeoutException if no such element is found before timeout is reached.
+     */
+    @Nonnull
     WebElement findElementContainingTextWithWait(By locator, String text, TimeoutType timeout);
 
+    /**
+     * @throws TimeoutException if no such element is found before timeout is reached.
+     */
+    @Nonnull
     WebElement findElementWithRefresh(By locator, TimeoutType timeout);
 
     /**
@@ -239,17 +255,58 @@ public interface SeleniumActions {
      * @param childLocator  - relative locator to find child elements inside a parent element
      * @return - parent elements that have at least 1 child element located by 'childLocator'
      */
+    @Nonnull
     List<WebElement> findElementsContainingChild(final By parentLocator, final By childLocator);
 
+    /**
+     * Waits until finding at least one element located by "childLocator" inside an element located by "parentLocator"
+     *
+     * @throws TimeoutException if no such parent-child pairs are found before timeout is reached.
+     */
+    @Nonnull
     List<WebElement> findElementsContainingChildWithWait(final By parentLocator, final By childLocator, TimeoutType timeout);
 
+    @Nullable
+    WebElement findVisibleElement(By locator);
+
+    @Nullable
     WebElement findVisibleElementContainingText(By locator, String text);
 
+    /**
+     * @throws TimeoutException if a matching visible element isn't found after the timeout.
+     * @return a visible element matching the By given
+     */
+    @Nonnull
+    WebElement findVisibleElementWithRefresh(By locator, TimeoutType timeout);
+
+    /**
+     * @param text the text that much be present in the element. You can pass in null or the empty string to ignore this value.
+     * @throws TimeoutException if a matching visible element (containing the given text) isn't found after the timeout.
+     * @return a visible element matching the By given
+     */
+    @Nonnull
     WebElement findVisibleElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout);
 
+    /**
+     * @throws TimeoutException if a matching visible element isn't found after the timeout.
+     * @return a visible element matching the By given
+     */
+    @Nonnull
+    WebElement findVisibleElementWithWait(final By locator, TimeoutType timeout);
+
+    /**
+     * @param text the text that much be present in the element. You can pass in null or the empty string to ignore this value.
+     * @throws TimeoutException if a matching visible element (containing the given text) isn't found after the timeout.
+     * @return a visible element matching the By given
+     */
+    @Nonnull
     WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout);
 
-    WebElement findVisibleElementWithRefresh(By locator, TimeoutType timeout);
+    @Nonnull
+    List<WebElement> findVisibleElements(By locator);
+
+    @Nonnull
+    List<WebElement> findVisibleElementsContainingText(By locator, String text);
 
     /**
      * Get a {@link org.openqa.selenium.interactions.Actions} object--used to build sequences of actions like clicking + dragging
@@ -266,6 +323,7 @@ public interface SeleniumActions {
     @Nonnull
     WebElement getChildElementWithWait(By locator, WebElement parentEl);
 
+    @Nonnull
     List<WebElement> getChildElements(By locator, WebElement parentEl);
 
     /**
@@ -404,7 +462,7 @@ public interface SeleniumActions {
      * This method assumes that the given By uniquely defines an element. It may act unexpectedly if
      * there are multiple elements on the page matching the By, some visible and some invisible.
      *
-     * @throws org.openqa.selenium.TimeoutException if the element is not found
+     * @throws TimeoutException if the element is not found
      * @return - the visible, matching web element
      * @see #verifyAnyElementVisible
      */
