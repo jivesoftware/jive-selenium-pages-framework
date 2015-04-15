@@ -231,10 +231,33 @@ public interface SeleniumActions {
     WebElement findElementContainingText(By locator, String text);
 
     /**
+     * @param caseSensitive whether to require that the element contains this exact text, case-sensitively, or not.
+     * @return
+     */
+    @Nullable
+    WebElement findElementContainingText(By locator, String text, boolean caseSensitive);
+
+    /**
      * @throws TimeoutException if no such element is found before timeout is reached.
      */
     @Nonnull
     WebElement findElementContainingTextWithRefresh(final By locator, final String text, TimeoutType timeout);
+
+    /**
+     * @param caseSensitive whether to require that the element contains this exact text, case-sensitively, or not.
+     *
+     * @throws TimeoutException if no such element is found before timeout is reached.
+     */
+    @Nonnull
+    WebElement findElementContainingTextWithRefresh(final By locator, final String text, boolean caseSensitive, TimeoutType timeout);
+
+    /**
+     * @param caseSensitive whether to require that the element contains this exact text, case-sensitively, or not.
+     *
+     * @throws TimeoutException if no such element is found before timeout is reached.
+     */
+    @Nonnull
+    WebElement findElementContainingTextWithWait(final By locator, final String text, boolean caseSensitive, TimeoutType timeout);
 
     /**
      * @throws TimeoutException if no such element is found before timeout is reached.
@@ -272,6 +295,9 @@ public interface SeleniumActions {
     @Nullable
     WebElement findVisibleElementContainingText(By locator, String text);
 
+    @Nullable
+    WebElement findVisibleElementContainingText(By locator, String text, boolean caseSensitive);
+
     /**
      * @throws TimeoutException if a matching visible element isn't found after the timeout.
      * @return a visible element matching the By given
@@ -307,6 +333,9 @@ public interface SeleniumActions {
 
     @Nonnull
     List<WebElement> findVisibleElementsContainingText(By locator, String text);
+
+    @Nonnull
+    List<WebElement> findVisibleElementsContainingText(By locator, String text, boolean caseSensitive);
 
     /**
      * Get a {@link org.openqa.selenium.interactions.Actions} object--used to build sequences of actions like clicking + dragging
