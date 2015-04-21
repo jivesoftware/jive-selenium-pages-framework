@@ -108,6 +108,60 @@ public class PageUtils {
         }
     }
 
+    public void initSubPagesWithoutPageLoadHooks(Page page, SeleniumActions a) {
+        Preconditions.checkNotNull(a);
+        Preconditions.checkNotNull(page);
+        List<Field> fields = getAllSubpageFields(page.getClass());
+        for (Field field : fields) {
+            Class type = field.getType();
+            if (!SubPage.class.isAssignableFrom(type)) {
+                logger.warn("Invalid @SubPageField in class '%s'. Must be a subclass of SubPage.");
+                continue;
+            }
+
+            SubPage subPage = PageFactory.initElements(a.getBrowser().getWebDriver(), (Class<? extends SubPage>) field.getType());
+            subPage.setActions(a);
+            subPage.setParent(page);
+            initSubPagesWithoutPageLoadHooks(subPage, a);
+
+            //Set the subpage field
+            try {
+                field.setAccessible(true);
+                field.set(page, subPage);
+            } catch (IllegalAccessException ex) {
+                logger.error("Error instantiating SubPage field: " + field, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    public void runPageLoadHooksForSubPages(Page page, SeleniumActions a) {
+        Preconditions.checkNotNull(a);
+        Preconditions.checkNotNull(page);
+        List<Field> fields = getAllSubpageFields(page.getClass());
+        for (Field field : fields) {
+            Class type = field.getType();
+            if (!SubPage.class.isAssignableFrom(type)) {
+                logger.warn("Invalid @SubPageField in class '%s'. Must be a subclass of SubPage.");
+                continue;
+            }
+
+            //Get the subpage field
+            SubPage subPage;
+            try {
+                field.setAccessible(true);
+                subPage = (SubPage) field.get(page);
+            } catch (IllegalAccessException ex) {
+                logger.error("Error instantiating SubPage field: " + field, ex);
+                throw new RuntimeException(ex);
+            }
+            if (subPage != null) {
+                subPage.pageLoadHook();
+                runPageLoadHooksForSubPages(subPage, a);
+            }
+        }
+    }
+
     public <T extends Page> T loadPageFromURL(URI absoluteURL, Class<T> pageClass, WebDriver driver, SeleniumActions actions) {
         Preconditions.checkNotNull(absoluteURL, "Error: URI provided cannot be null in PageUtils#loadPageFromURL");
         Preconditions.checkNotNull(pageClass);
@@ -123,6 +177,13 @@ public class PageUtils {
         page.setActions(actions);
         page.initSubPages();
         page.pageLoadHook();
+        return page;
+    }
+
+    public <T extends Page> T loadCurrentPageWithoutPageLoadHook(Class<T> pageClass, WebDriver driver, SeleniumActions actions) {
+        T page = PageFactory.initElements(driver, pageClass);
+        page.setActions(actions);
+        initSubPagesWithoutPageLoadHooks(page, actions);
         return page;
     }
 }

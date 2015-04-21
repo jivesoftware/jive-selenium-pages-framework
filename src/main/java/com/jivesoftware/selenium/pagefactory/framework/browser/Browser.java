@@ -72,6 +72,10 @@ public abstract class Browser<D extends WebDriver> {
         return timeouts.getImplicitWaitTimeoutMillis();
     }
 
+    public Optional<CachedPage> getOptionalCachedPage() {
+        return optionalCachedPage;
+    }
+
     /**
      * Invalidate cached page, and return a fresh TopLevelPage with newly initialized WebElements.
      *
@@ -116,8 +120,15 @@ public abstract class Browser<D extends WebDriver> {
         // If the page wasn't valid, then invalidate the cache.
         runLeavePageHook();
         invalidateCachedPage();
-        T page = PAGE_UTILS.loadCurrentPage(pageClass, webDriver, getActions());
+
+        // First load the page without the page load hook so that we can store the failing page in the cache
+        T page = PAGE_UTILS.loadCurrentPageWithoutPageLoadHook(pageClass, webDriver, getActions());
         setCachedPage(page);
+
+        // Next, run page load hook and sub-page load hooks
+        page.pageLoadHook();
+        PAGE_UTILS.runPageLoadHooksForSubPages(page, getActions());
+
         return page;
     }
 

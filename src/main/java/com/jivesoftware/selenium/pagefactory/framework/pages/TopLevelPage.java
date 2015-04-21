@@ -12,4 +12,6 @@ public interface TopLevelPage extends Page {
 
     void leavePageHook();
 
+    long getPageLoadTime();
+
 }

@@ -23,6 +23,9 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
     private static Logger logger = LoggerFactory.getLogger(BaseTopLevelPage.class);
 
     private static final PageUtils PAGE_UTILS = new PageUtils();
+
+    private long pageLoadTime;
+
     protected S a;
 
     public final S getActions() {
@@ -45,6 +48,10 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
 
     @Override
     public void pageLoadHook() {
+        if (pageLoadTime == 0) {
+            pageLoadTime = System.currentTimeMillis();
+        }
+
         // First do the default load hook, which verifies an element is present
         PAGE_UTILS.defaultPageLoadHook(this, a);
 
@@ -128,7 +135,6 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
         pageLoadHook();
     }
 
-
     @Override
     public void refreshPage() {
         getActions().getBrowser().refreshPage();
@@ -138,5 +144,10 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
     @Override
     public void leavePageHook() {
 
+    }
+
+    @Override
+    public long getPageLoadTime() {
+        return pageLoadTime;
     }
 }
