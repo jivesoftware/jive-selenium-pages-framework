@@ -1,0 +1,26 @@
+WORKSPACE=${WORKSPACE:-`pwd`}
+GIT=git
+if [ -f "/opt/tools/maven/apache-maven-3.0.4/bin/mvn" ]; then
+    MVN="/opt/tools/maven/apache-maven-3.0.4/bin/mvn -U --batch-mode --define maven.repo.local=$WORKSPACE/.repository"
+else
+    MVN="mvn"
+fi
+
+echo "MVN=$MVN"
+
+PYTHON=/usr/bin/python2.6
+if [ -d "/opt/tools/java/jdk1.8.0_31" ]; then
+    export JAVA_HOME="/opt/tools/java/jdk1.8.0_31"
+fi
+
+if [ ! -f $PYTHON ]; 
+then
+	PYTHON=python
+	
+	# if 'python2.6' dones't exist, make sure python is 2.6 or later
+	PYTHON_OK=`$PYTHON -c 'import sys; print (sys.version_info >= (2, 6) and "1" or "0")'`
+	if [ "$PYTHON_OK" = '0' ]; then
+    	   echo "Python version too old"
+	   exit 1
+	fi
+fi

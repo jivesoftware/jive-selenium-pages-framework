@@ -1,0 +1,12 @@
+. tools/ci/DEFS
+
+# First deploy the SNAPSHOT version
+$MVN deploy -Prelease -DsnapshotRepoId=${SNAPSHOT_REPO_ID} -DsnapshotRepoUrl=${SNAPSHOT_REPO_URL} -DreleaseRepoId=${RELEASE_REPO_ID} -DreleaseRepoUrl=${RELEASE_REPO_URL} -DskipTests
+
+# Next deploy the RELEASE version
+# 2.0.4-6-g012333 : version number
+version=$(./tools/ci/commit/j-version)
+echo "Deploying version: $version"
+
+$MVN versions:set -DnewVersion=$version
+$MVN deploy -DskipTests

@@ -1,0 +1,19 @@
+#version based on commit count since last tag
+last_tag=$(git rev-list --tags --max-count=1)
+base_version=$(git describe --tags $last_tag)
+
+artifactPattern="<artifactId>jive-gui-pages-tests<\/artifactId>"
+
+# First get the 2 lines surrounding the main <artifactId> tag
+# Next get the line with the <version>
+# Next use sed to get everything before "SNAPSHOT"
+# Example result: 8.0.0.0-8c6
+pom_version=$(grep -2 ${artifactPattern} pom.xml | \
+               grep -Eo "<version>[^<>\s]*-SNAPSHOT<\/version>" | \
+               sed -E "s/<version>([^<>\s]*)-SNAPSHOT<\/version>/\1/")
+
+last_commitish=$(git rev-list --max-count=1 $base_version --)
+commit_count=$(git rev-list $last_commitish..HEAD | wc -w)
+head_short_sha=$(git rev-parse --short HEAD)
+
+printf "%s-%s-g%s\n" $pom_version $commit_count $head_short_sha
