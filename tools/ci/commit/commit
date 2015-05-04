@@ -9,4 +9,4 @@ version=$(./tools/ci/commit/j-version)
 echo "Deploying version: $version"
 
 $MVN versions:set -DnewVersion=$version
-$MVN deploy -DskipTests
+$MVN deploy -Prelease -DsnapshotRepoId=${SNAPSHOT_REPO_ID} -DsnapshotRepoUrl=${SNAPSHOT_REPO_URL} -DreleaseRepoId=${RELEASE_REPO_ID} -DreleaseRepoUrl=${RELEASE_REPO_URL} -DskipTests
