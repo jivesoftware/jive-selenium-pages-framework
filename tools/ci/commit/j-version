@@ -2,7 +2,7 @@
 last_tag=$(git rev-list --tags --max-count=1)
 base_version=$(git describe --tags $last_tag)
 
-artifactPattern="<artifactId>jive-gui-pages-tests<\/artifactId>"
+artifactPattern="<artifactId>jive-selenium-pages-framework<\/artifactId>"
 
 # First get the 2 lines surrounding the main <artifactId> tag
 # Next get the line with the <version>
