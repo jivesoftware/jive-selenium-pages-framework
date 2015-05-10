@@ -94,9 +94,9 @@ public class IOSMobileBrowser extends MobileBrowser {
     public void dragDown() {
         int midScreen = getScreenWidth() / 2;
         webDriver.swipe(midScreen, 140, midScreen, getScreenHeight() - 140, 1500);
-        HashMap<String, String> scrollObject = new HashMap<String, String>();
-        scrollObject.put("direction", "up");
-        webDriver.executeScript("mobile: scroll", scrollObject);
+        //HashMap<String, String> scrollObject = new HashMap<String, String>();
+        //scrollObject.put("direction", "up");
+        //webDriver.executeScript("mobile: scroll", scrollObject);
     }
 
     /**
@@ -105,9 +105,9 @@ public class IOSMobileBrowser extends MobileBrowser {
     public void dragUp() {
         int midScreen = getScreenWidth() / 2;
         webDriver.swipe(midScreen, getScreenHeight() - 140, midScreen, 140, 1500);
-        HashMap<String, String> scrollObject = new HashMap<String, String>();
-        scrollObject.put("direction", "down");
-        webDriver.executeScript("mobile: scroll", scrollObject);
+       // HashMap<String, String> scrollObject = new HashMap<String, String>();
+        //scrollObject.put("direction", "down");
+        //webDriver.executeScript("mobile: scroll", scrollObject);
     }
 
     /**
