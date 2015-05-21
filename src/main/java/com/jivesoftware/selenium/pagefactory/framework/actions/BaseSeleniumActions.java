@@ -907,7 +907,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
 
     @Override
     public void scrollIntoView(WebElement el) {
-        int scrollHeight = webDriver().manage().window().getSize().getHeight();
+        int scrollHeight = getWindowInnerHeight();
         int y = Math.max(0, el.getLocation().getY() - scrollHeight / 2); //Subtract half the window height so its in the middle of the viewable area.
         executeJavascript(format("window.scrollTo(%d, %d)", 0, y));
     }
@@ -1405,4 +1405,19 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
         return wait.until(expectedCondition);
     }
 
+    /**
+     * Get the window inner height in a cross-browser compatible way.
+     * @see <a href="http://www.w3schools.com/jsref/prop_win_innerheight.asp">Window innerWidth and innerHeight Properties</a>
+     * @return the inner height of the current window.
+     */
+    private int getWindowInnerHeight() {
+        Object innerHeight = executeJavascript(
+            "return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;");
+        if (!(innerHeight instanceof Long)) {
+            logger.warn("Error getting the inner height, a null value was returned from Javascript. Using outer window height.");
+            return webDriver().manage().window().getSize().getHeight();
+        }
+
+        return ((Long) innerHeight).intValue();
+    }
 }
