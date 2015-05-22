@@ -220,7 +220,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
      */
     @Override
     public WebElement clickAndVerifySelected(By locatorToSelect, TimeoutType timeout) {
-        WebElement el = webDriver().findElement(locatorToSelect);
+        WebElement el = verifyAnyElementVisible(locatorToSelect, timeout);
         if (isSelected(el)) {
             return el;
         }
