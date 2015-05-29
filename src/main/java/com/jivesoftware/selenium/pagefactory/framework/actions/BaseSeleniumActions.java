@@ -652,7 +652,6 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
         for (WebElement el : matches) {
             try {
                 if (containsText(el, text, caseSensitive) && el.isDisplayed()) {
-                    logger.info("SUCCESS: Found visible web element containing text '{}' with locator '{}'", text, locator);
                     visible.add(el);
                 }
             } catch (Exception e) { //Don't fail just because one web element was stale. Continue searching for the text.
