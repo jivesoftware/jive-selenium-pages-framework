@@ -2,6 +2,7 @@ package com.jivesoftware.selenium.pagefactory.framework.pages;
 
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
 import com.jivesoftware.selenium.pagefactory.framework.browser.web.WebBrowser;
+import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import com.jivesoftware.selenium.pagefactory.framework.exception.InvalidPageUrlException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.PageFactory;
@@ -53,10 +54,15 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
         }
 
         // First do the default load hook, which verifies an element is present
-        PAGE_UTILS.defaultPageLoadHook(this, a);
+        PAGE_UTILS.defaultPageLoadHook(this, a, getPageLoadTimeout());
 
         // Next, verify that the current URL matches the value annotated with @WebPagePath
         verifyCurrentURL();
+    }
+
+    @Override
+    public TimeoutType getPageLoadTimeout() {
+        return TimeoutType.PAGE_LOAD_TIMEOUT;
     }
 
     /**

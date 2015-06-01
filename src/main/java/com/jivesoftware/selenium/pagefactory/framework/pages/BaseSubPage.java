@@ -1,6 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.PageFactory;
 import org.slf4j.Logger;
@@ -40,7 +41,11 @@ public class BaseSubPage<S extends SeleniumActions> implements SubPage {
     }
 
     public void pageLoadHook() {
-        PAGE_UTILS.defaultPageLoadHook(this, a);
+        PAGE_UTILS.defaultPageLoadHook(this, a, getPageLoadTimeout());
+    }
+
+    public TimeoutType getPageLoadTimeout() {
+        return TimeoutType.PAGE_LOAD_TIMEOUT;
     }
 
     @Nullable

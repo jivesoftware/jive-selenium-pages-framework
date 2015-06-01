@@ -55,6 +55,22 @@ public class PageUtils {
     }
 
     /**
+     * Overloaded default implementation of pageLoadHook().
+     *
+     * Just verify the page identifier Locator is present on the DOM.
+     *
+     * @param page
+     * @param a
+     * @param timeout
+     */
+    public void defaultPageLoadHook(Page page, SeleniumActions a, TimeoutType timeout) {
+        By pageIdentifier = page.getPageIdentifier();
+        if (pageIdentifier != null) {
+            a.verifyElementPresented(pageIdentifier, timeout);
+        }
+    }
+
+    /**
      * Use reflection to recursively get all fields annotated with {@link SubPageField} on a given class.
      * @param type
      * @return - List of Fields that are annotated with {@link com.jivesoftware.selenium.pagefactory.framework.pages.SubPageField}

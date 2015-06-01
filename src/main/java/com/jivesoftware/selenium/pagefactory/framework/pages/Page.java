@@ -1,6 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.pages;
 
 import com.jivesoftware.selenium.pagefactory.framework.actions.SeleniumActions;
+import com.jivesoftware.selenium.pagefactory.framework.config.TimeoutType;
 import org.openqa.selenium.By;
 
 import javax.annotation.Nullable;
@@ -22,6 +23,8 @@ public interface Page{
      * Make sure to call super.pageLoadHook(), since the BasicPage class defines the check that the page identifier is present.
      */
     void pageLoadHook();
+
+    TimeoutType getPageLoadTimeout();
 
     /**
      * A Selenium Locator that uniquely identifies a page as being successfully loaded.
