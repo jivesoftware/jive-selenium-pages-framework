@@ -111,6 +111,16 @@ public final class TimeoutsConfig {
                 return 20;
             case SIXTY_SECONDS:
                 return 60;
+            case NINETY_SECONDS:
+                return 90;
+            case TWO_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(2);
+            case THREE_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(3);
+            case FIVE_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(5);
+            case TEN_MINUTES:
+                return (int)TimeUnit.MINUTES.toSeconds(10);
             case THIRTY_MINUTES:
                 return (int)TimeUnit.MINUTES.toSeconds(30);
             case SIXTY_MINUTES:
