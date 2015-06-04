@@ -54,15 +54,15 @@ public class BaseTopLevelPage<S extends SeleniumActions> implements TopLevelPage
         }
 
         // First do the default load hook, which verifies an element is present
-        PAGE_UTILS.defaultPageLoadHook(this, a, getPageLoadTimeout());
+        PAGE_UTILS.defaultPageLoadHook(this, a, getPageReadyTimeout());
 
         // Next, verify that the current URL matches the value annotated with @WebPagePath
         verifyCurrentURL();
     }
 
     @Override
-    public TimeoutType getPageLoadTimeout() {
-        return TimeoutType.PAGE_LOAD_TIMEOUT;
+    public TimeoutType getPageReadyTimeout() {
+        return TimeoutType.PAGE_READY_TIMEOUT;
     }
 
     /**

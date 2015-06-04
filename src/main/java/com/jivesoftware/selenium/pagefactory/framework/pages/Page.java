@@ -24,7 +24,7 @@ public interface Page{
      */
     void pageLoadHook();
 
-    TimeoutType getPageLoadTimeout();
+    TimeoutType getPageReadyTimeout();
 
     /**
      * A Selenium Locator that uniquely identifies a page as being successfully loaded.

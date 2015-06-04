@@ -1,6 +1,7 @@
 package com.jivesoftware.selenium.pagefactory.framework.config;
 
 import com.google.common.base.Preconditions;
+import com.jivesoftware.selenium.pagefactory.framework.pages.Page;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +35,7 @@ public final class TimeoutsConfig {
 
     // Timeouts used for configuring the underlying WebDriver
     private final int pageLoadTimeoutSeconds;
+    private final int pageReadyTimeoutSeconds;
     private final int implicitWaitTimeoutMillis;
 
     /**
@@ -55,7 +57,7 @@ public final class TimeoutsConfig {
     private TimeoutsConfig(int clickTimeoutSeconds, int webElementPresenceTimeoutSeconds, int pollingWithRefreshTimeoutSeconds,
                           int pageRefreshTimeoutSeconds, int shortTimeoutSeconds, int mediumTimeoutSeconds, int longTimeoutSeconds,
                           int pauseBetweenKeysMillis, int pauseBetweenTriesMillis, int pauseBetweenRefreshSeconds,
-                          int pageLoadTimeoutSeconds, int implicitWaitTimeoutMillis) {
+                          int pageLoadTimeoutSeconds, int pageReadyTimeoutSeconds, int implicitWaitTimeoutMillis) {
         this.clickTimeoutSeconds = clickTimeoutSeconds;
         this.webElementPresenceTimeoutSeconds = webElementPresenceTimeoutSeconds;
         this.pollingWithRefreshTimeoutSeconds = pollingWithRefreshTimeoutSeconds;
@@ -67,6 +69,7 @@ public final class TimeoutsConfig {
         this.pauseBetweenTriesMillis = pauseBetweenTriesMillis;
         this.pauseBetweenRefreshSeconds = pauseBetweenRefreshSeconds;
         this.pageLoadTimeoutSeconds = pageLoadTimeoutSeconds;
+        this.pageReadyTimeoutSeconds = pageReadyTimeoutSeconds;
         this.implicitWaitTimeoutMillis = implicitWaitTimeoutMillis;
     }
 
@@ -93,6 +96,8 @@ public final class TimeoutsConfig {
                 return getPageRefreshTimeoutSeconds();
             case PAGE_LOAD_TIMEOUT:
                 return getPageLoadTimeoutSeconds();
+            case PAGE_READY_TIMEOUT:
+                return getPageReadyTimeoutSeconds();
             case SHORT:
                 return getShortTimeoutSeconds();
             case MEDIUM:
@@ -178,6 +183,10 @@ public final class TimeoutsConfig {
         return pageLoadTimeoutSeconds;
     }
 
+    public int getPageReadyTimeoutSeconds() {
+        return pageReadyTimeoutSeconds;
+    }
+
     public int getImplicitWaitTimeoutMillis() {
         return implicitWaitTimeoutMillis;
     }
@@ -195,6 +204,7 @@ public final class TimeoutsConfig {
             this.pauseBetweenTriesMillis = DefaultTimeouts.PAUSE_BETWEEN_TRIES_MILLIS;
             this.pauseBetweenRefreshSeconds = DefaultTimeouts.PAUSE_BETWEEN_REFRESH_SECONDS;
             this.pageLoadTimeoutSeconds = DefaultTimeouts.PAGE_LOAD_TIMEOUT_SECONDS;
+            this.pageReadyTimeoutSeconds = DefaultTimeouts.PAGE_READY_TIMEOUT_SECONDS;
             this.implicitWaitTimeoutMillis = DefaultTimeouts.IMPLICIT_WAIT_TIMEOUT_MILLIS;
         }
 
@@ -210,6 +220,7 @@ public final class TimeoutsConfig {
                                       pauseBetweenTriesMillis,
                                       pauseBetweenRefreshSeconds,
                                       pageLoadTimeoutSeconds,
+                                      pageReadyTimeoutSeconds,
                                       implicitWaitTimeoutMillis);
         }
 
@@ -322,6 +333,18 @@ public final class TimeoutsConfig {
         }
 
         /**
+         * Set the timeout waiting for a new page to have elements on the page that are checked after the page loads.
+         * @see Page#getPageIdentifier()
+         * This is both used by the framework and passed on to the Selenium WebDriver for its configuration.
+         * @param pageReadyTimeoutSeconds - time in seconds
+         * @return - the Builder
+         */
+        public Builder pageReadyTimoutSeconds(int pageReadyTimeoutSeconds) {
+            this.pageReadyTimeoutSeconds = pageReadyTimeoutSeconds;
+            return this;
+        }
+
+        /**
          * Set the implicit wait timeout for checking if a web element is present.
          * This is used when configuring a Selenium WebDriver.
          * @param implicitWaitTimeoutMillis
@@ -350,6 +373,7 @@ public final class TimeoutsConfig {
 
         // Timeouts used for configuring the underlying WebDriver
         private int pageLoadTimeoutSeconds;
+        private int pageReadyTimeoutSeconds;
         private int implicitWaitTimeoutMillis;
     }
 }

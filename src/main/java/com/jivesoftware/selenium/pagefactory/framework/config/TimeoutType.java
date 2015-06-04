@@ -30,8 +30,10 @@ public enum TimeoutType {
     WEB_ELEMENT_PRESENCE_TIMEOUT,
     /** Timeout waiting for the page to refresh, or for an element to become stale or removed from the DOM. **/
     PAGE_REFRESH_TIMEOUT,
-    /** Timeout waiting for a new page to load **/
+    /** Timeout waiting for a new page to load, used to set the internal Selenium page load timeout **/
     PAGE_LOAD_TIMEOUT,
+    /** Timeout waiting for elements to be present on a page after page load **/
+    PAGE_READY_TIMEOUT,
     /** Timeout waiting on anything that requires refreshing the page many times, e.g. something like an Activity Stream.
     *  Used by SeleniumActions#findElementContainingTextWithRefresh and other methods that refresh the page until something is present. **/
     POLLING_WITH_REFRESH_TIMEOUT,

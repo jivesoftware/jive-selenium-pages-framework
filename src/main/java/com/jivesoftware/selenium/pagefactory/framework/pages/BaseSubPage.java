@@ -41,11 +41,11 @@ public class BaseSubPage<S extends SeleniumActions> implements SubPage {
     }
 
     public void pageLoadHook() {
-        PAGE_UTILS.defaultPageLoadHook(this, a, getPageLoadTimeout());
+        PAGE_UTILS.defaultPageLoadHook(this, a, getPageReadyTimeout());
     }
 
-    public TimeoutType getPageLoadTimeout() {
-        return TimeoutType.PAGE_LOAD_TIMEOUT;
+    public TimeoutType getPageReadyTimeout() {
+        return TimeoutType.PAGE_READY_TIMEOUT;
     }
 
     @Nullable
