@@ -444,6 +444,11 @@ public interface SeleniumActions {
     <T extends TopLevelPage> T loadTopLevelPage(Class<T> pageClass);
 
     /**
+     * Scroll to the top of the page
+     */
+    void scrollToTop();
+
+    /**
      * Scroll so that the element is in the middle of the page.
      */
     void scrollIntoView(By locator);

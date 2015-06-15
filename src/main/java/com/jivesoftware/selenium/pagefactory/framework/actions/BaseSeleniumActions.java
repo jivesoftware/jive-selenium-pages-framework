@@ -907,6 +907,11 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
     }
 
     @Override
+    public void scrollToTop() {
+        executeJavascript("window.scrollTo(0, 0)");
+    }
+
+    @Override
     public void scrollIntoView(By locator) {
         WebElement el = verifyElementPresented(locator, TimeoutType.DEFAULT);
         scrollIntoView(el);
