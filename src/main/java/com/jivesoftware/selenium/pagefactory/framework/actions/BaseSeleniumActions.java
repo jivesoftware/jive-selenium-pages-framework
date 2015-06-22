@@ -1211,7 +1211,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
 
     @Override
     public <T, V> V waitOnFunction(Function<T, V> function, T input, String message, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getMediumTimeoutSeconds(), timeout);
+        int waitSeconds = getTimeout(timeoutsConfig.getLongTimeoutSeconds(), timeout);
         FluentWait<T> fluentWait = new FluentWait<T>(input)
             .withTimeout(waitSeconds, TimeUnit.SECONDS)
             .pollingEvery(DEFAULT_POLL_MILLIS, TimeUnit.MILLISECONDS)
@@ -1244,7 +1244,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
 
     @Override
     public <T> void waitOnPredicate(Predicate<T> predicate, T input, String message, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getMediumTimeoutSeconds(), timeout);
+        int waitSeconds = getTimeout(timeoutsConfig.getLongTimeoutSeconds(), timeout);
         FluentWait<T> fluentWait = new FluentWait<T>(input)
             .withTimeout(waitSeconds, TimeUnit.SECONDS)
             .pollingEvery(DEFAULT_POLL_MILLIS, TimeUnit.MILLISECONDS)
@@ -1261,7 +1261,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
 
     @Override
     public <T> void waitOnPredicateWithRefresh(final Predicate<T> predicate, final T input, String message, TimeoutType timeout) {
-        int waitSeconds = getTimeout(timeoutsConfig.getMediumTimeoutSeconds(), timeout);
+        int waitSeconds = getTimeout(timeoutsConfig.getPageLoadTimeoutSeconds(), timeout);
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds, DEFAULT_POLL_MILLIS);
         wait.withMessage(message)
             .ignoring(StaleElementReferenceException.class);
