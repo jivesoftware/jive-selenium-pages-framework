@@ -32,9 +32,10 @@ public class IOSMobileBrowser extends MobileBrowser {
                             String version,
                             String autoLaunch,
                             String app,
+                            boolean fullReset,
                             TimeoutsConfig timeouts) throws JiveWebDriverException {
         super(baseTestUrl, timeouts, browserName, platform, platformName, platformVersion, deviceName,
-                newCommandTimeout, automationName, version, autoLaunch, app);
+                newCommandTimeout, automationName, version, autoLaunch, app, fullReset);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class IOSMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("version", version);
         desiredCapabilities.setCapability("autoLaunch", autoLaunch);
         desiredCapabilities.setCapability("app", app);
-        desiredCapabilities.setCapability("fullReset", "true");
+        desiredCapabilities.setCapability("fullReset", fullReset);
         desiredCapabilities.setCapability("rotatable", "true");
         return desiredCapabilities;
     }

@@ -35,6 +35,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
     protected String version;
     protected String autoLaunch;
     protected String app;
+    protected boolean fullReset;
 
     protected MobileBrowser(String baseTestUrl,
                             TimeoutsConfig timeoutsConfig, String browserName,
@@ -46,7 +47,8 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
                             String automationName,
                             String version,
                             String autoLaunch,
-                            String app) throws JiveWebDriverException {
+                            String app,
+                            boolean fullReset) throws JiveWebDriverException {
         super(baseTestUrl, timeoutsConfig);
         this.browserName = browserName;
         this.platform = platform;
@@ -58,6 +60,7 @@ public abstract class MobileBrowser extends Browser<AppiumDriver> {
         this.version = version;
         this.autoLaunch = autoLaunch;
         this.app = app;
+        this.fullReset = fullReset;
     }
 
     public void initializeBrowser() throws JiveWebDriverException {

@@ -36,9 +36,10 @@ public class AndroidMobileBrowser extends MobileBrowser {
                                 String appPackage,
                                 String appActivity,
                                 TimeoutsConfig timeouts,
-                                boolean touchMode) throws JiveWebDriverException {
+                                boolean touchMode,
+                                boolean fullReset) throws JiveWebDriverException {
         super(baseTestUrl, timeouts, browserName, platform, platformName, platformVersion, deviceName,
-                newCommandTimeout, automationName, version, autoLaunch, app);
+                newCommandTimeout, automationName, version, autoLaunch, app, fullReset);
         this.touchMode = touchMode;
         this.appPackage = appPackage;
         this.appActivity = appActivity;
@@ -59,7 +60,7 @@ public class AndroidMobileBrowser extends MobileBrowser {
         desiredCapabilities.setCapability("app", app);
         desiredCapabilities.setCapability("appPackage", appPackage);
         desiredCapabilities.setCapability("appWaitActivity", appActivity);
-        desiredCapabilities.setCapability("fullReset", true);
+        desiredCapabilities.setCapability("fullReset", fullReset);
         desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
         return desiredCapabilities;
     }

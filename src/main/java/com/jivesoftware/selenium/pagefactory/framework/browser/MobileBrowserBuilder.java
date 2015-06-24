@@ -43,6 +43,7 @@ public class MobileBrowserBuilder {
     private String automationName;
     private String version;
     private String autoLaunch;
+    private boolean fullReset;
     private boolean touchMode;
 
 
@@ -51,6 +52,7 @@ public class MobileBrowserBuilder {
         this.baseTestUrl = Preconditions.checkNotNull(baseTestUrl, "You must provide a non-null baseTestUrl!");
         this.timeoutsConfig = TimeoutsConfig.defaultTimeoutsConfig();
         this.platformName = Preconditions.checkNotNull(platformName, "You must provide a non-null platformName!");
+        this.fullReset = true;
 
     }
 
@@ -115,6 +117,10 @@ public class MobileBrowserBuilder {
         return touchMode;
     }
 
+    public boolean isFullReset() {
+        return fullReset;
+    }
+
     /**
      * Get a MobileBrowserBuilder for Android and base URL for the webapp you are testing against.
      * @param baseTestUrl - base URL for your webapp, e.g. http://my.site.com/base
@@ -146,12 +152,12 @@ public class MobileBrowserBuilder {
             case ANDROID:
                 browser = new AndroidMobileBrowser(baseTestUrl, browserName, platform, platformName.getPlatformName(),
                         platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
-                        app, appPackage, appActivity, timeoutsConfig, touchMode);
+                        app, appPackage, appActivity, timeoutsConfig, touchMode, fullReset);
                 break;
             case IOS:
                 browser = new IOSMobileBrowser(baseTestUrl, browserName, platform, platformName.getPlatformName(),
                         platformVersion, deviceName, newCommandTimeout, automationName, version, autoLaunch,
-                        app, timeoutsConfig);
+                        app, fullReset, timeoutsConfig);
                 break;
             default:
                 throw new IllegalArgumentException("Only IOS and Android are currently supported!");
@@ -227,6 +233,11 @@ public class MobileBrowserBuilder {
 
     public MobileBrowserBuilder withPlatform(String platform) {
         this.platform = platform;
+        return this;
+    }
+
+    public MobileBrowserBuilder withFullReset(boolean fullReset) {
+        this.fullReset = fullReset;
         return this;
     }
 
