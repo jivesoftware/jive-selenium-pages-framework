@@ -621,8 +621,12 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
     @Nonnull
     public WebElement findVisibleElementContainingTextWithWait(final By locator, final String text, TimeoutType timeout) {
         int waitSeconds = getTimeout(timeoutsConfig.getWebElementPresenceTimeoutSeconds(), timeout);
-        final String message = String.format("Timeout waiting %d seconds to find element containing text '%s' with locator '%s'",
-                                             waitSeconds, text, locator.toString());
+        final String message = Strings.isNullOrEmpty(text) ?
+            String.format("Timeout waiting %d seconds to find element with locator '%s'",
+                          waitSeconds, locator.toString())
+            :
+            String.format("Timeout waiting %d seconds to find element containing text '%s' with locator '%s'",
+                          waitSeconds, text, locator.toString());
         WebDriverWait wait = new WebDriverWait(webDriver(), waitSeconds);
         wait.ignoring(StaleElementReferenceException.class)
             .withMessage(message);
@@ -632,7 +636,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
             public WebElement apply(@Nullable WebDriver input) {
                 WebElement el = findVisibleElementContainingText(locator, text);
                 if (el == null) {
-                    GeneralUtils.waitOneSecond();
+                    GeneralUtils.waitMillis(500);
                 }
                 return el;
             }
@@ -1084,7 +1088,7 @@ public abstract class BaseSeleniumActions<B extends Browser> implements Selenium
 
     @Override
     public WebElement verifyAnyElementVisible(By locator, TimeoutType timeout) {
-        return findVisibleElementContainingTextWithWait(locator, "", timeout);
+        return findVisibleElementContainingTextWithWait(locator, "", timeout == TimeoutType.DEFAULT ? TimeoutType.LONG : timeout);
     }
 
     @Override
