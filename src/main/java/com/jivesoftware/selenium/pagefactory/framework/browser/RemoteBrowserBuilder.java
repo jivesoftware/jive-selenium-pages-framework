@@ -178,7 +178,7 @@ public class RemoteBrowserBuilder {
                                             browserLogLevel, browserLogFile, Optional.empty());
                 break;
             default:
-                throw new IllegalArgumentException("Only Firefox, Chrome, and IE are currently supported!");
+                throw new IllegalArgumentException("Only FIREFOX, CHROME, IE, and SAFARI are currently supported!");
         }
         RemoteBrowser remoteBrowser = new RemoteBrowser(browser, seleniumHubURL);
         remoteBrowser.initializeBrowser();

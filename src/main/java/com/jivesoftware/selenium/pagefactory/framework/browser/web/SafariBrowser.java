@@ -65,7 +65,11 @@ public class SafariBrowser extends WebBrowser {
         SafariOptions safariOptions = new SafariOptions();
         safariOptions.setUseCleanSession(true);
 
-        desiredCapabilities.setCapability(SafariOptions.CAPABILITY, safariOptions);
+        // Selenium seems to be broken if we specify SafariOptions for a RemoteWebDriver.
+        // java.lang.ClassCastException: org.json.JSONObject cannot be cast to java.lang.String
+        // at org.openqa.selenium.remote.BeanToJsonConverter.convertObject(BeanToJsonConverter.java:202)
+        
+        // desiredCapabilities.setCapability(SafariOptions.CAPABILITY, safariOptions);
 
         return desiredCapabilities;
     }
