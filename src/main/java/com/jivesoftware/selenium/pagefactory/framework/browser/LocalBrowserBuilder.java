@@ -13,6 +13,7 @@ import com.jivesoftware.selenium.pagefactory.framework.exception.JiveWebDriverEx
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -53,6 +54,7 @@ public class LocalBrowserBuilder {
     private Optional<Integer> startWindowHeight = Optional.empty();
     private Optional<Level> browserLogLevel = Optional.empty();
     private Optional<String> browserLogFile = Optional.empty();
+    private Optional<List<String>> options = Optional.empty();
 
     private LocalBrowserBuilder(WebBrowserType browserType, String baseTestUrl) {
         this.browserType = Preconditions.checkNotNull(browserType, "You must provide a non-null browserType!");
@@ -99,6 +101,10 @@ public class LocalBrowserBuilder {
 
     public Optional<String> getBrowserLogFile() {
         return browserLogFile;
+    }
+
+    public Optional<List<String>> getOptions() {
+        return options;
     }
 
     /**
@@ -150,7 +156,7 @@ public class LocalBrowserBuilder {
                 break;
             case CHROME:
                 browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.empty(), browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile, Optional.empty());
+                        browserLogLevel, browserLogFile, Optional.empty(), options);
                 break;
             case IE:
                 browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, webDriverPath, browserBinaryPath, Optional.empty(), browserLocale, startWindowWidth, startWindowHeight,
@@ -207,6 +213,11 @@ public class LocalBrowserBuilder {
         return this;
     }
 
+    public LocalBrowserBuilder withOptions(List<String> options) {
+        this.options = Optional.ofNullable(options);
+        return this;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -219,6 +230,7 @@ public class LocalBrowserBuilder {
                 .add("startWindowHeight", startWindowHeight)
                 .add("browserLogLevel", browserLogLevel)
                 .add("browserLogFile", browserLogFile)
+                .add("options", options)
                 .toString();
     }
 }

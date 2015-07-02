@@ -15,6 +15,7 @@ import org.openqa.selenium.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -50,6 +51,7 @@ public class RemoteBrowserBuilder {
     private Optional<Level> browserLogLevel = Optional.empty();
     private Optional<String> browserLogFile = Optional.empty();
     private Optional<Platform> platform = Optional.empty();
+    private Optional<List<String>> options = Optional.empty();
 
     private RemoteBrowserBuilder(WebBrowserType browserType,
                                  String baseTestUrl,
@@ -167,7 +169,7 @@ public class RemoteBrowserBuilder {
                 break;
             case CHROME:
                 browser = new ChromeBrowser(baseTestUrl, timeoutsConfig, Optional.empty(), Optional.empty(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,
-                        browserLogLevel, browserLogFile, platform);
+                        browserLogLevel, browserLogFile, platform, options);
                 break;
             case IE:
                 browser = new InternetExplorerBrowser(baseTestUrl, timeoutsConfig, Optional.empty(), Optional.empty(), browserVersion, browserLocale, startWindowWidth, startWindowHeight,

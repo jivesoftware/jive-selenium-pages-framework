@@ -8,6 +8,7 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
@@ -19,12 +20,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ChromeBrowser extends WebBrowser {
+    private Optional<List<String>> options;
+
     public ChromeBrowser(String baseTestUrl,
                          TimeoutsConfig timeouts,
                          Optional<String> driverPath,
@@ -35,10 +36,12 @@ public class ChromeBrowser extends WebBrowser {
                          Optional<Integer> startWindowHeight,
                          Optional<Level> browserLogLevel,
                          Optional<String> browserLogFile,
-                         Optional<Platform> platform) {
+                         Optional<Platform> platform,
+                         Optional<List<String>> options) {
 
         super(baseTestUrl, timeouts, driverPath, browserBinaryPath, browserVersion, browserLocale,
                 startWindowWidth, startWindowHeight, browserLogLevel, browserLogFile, platform);
+            this.options = options;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ChromeBrowser.class);
@@ -81,14 +84,16 @@ public class ChromeBrowser extends WebBrowser {
         }
 
         // ChromeOptions
-        //ChromeOptions options = new ChromeOptions();
+        ChromeOptions options = new ChromeOptions();
 
         // This tells Chromedriver we're running tests.
         // This eliminates the banner with the message "You are using an unsupported command-line flag --ignore-certificate-errors"
-        //options.addArguments("test-type");
+        if (!this.options.get().contains("test-type")) {
+            this.options.get().add("test-type");
+        }
 
-        //desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
-
+        options.addArguments(this.options.get());
+        desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
         return desiredCapabilities;
     }
 
