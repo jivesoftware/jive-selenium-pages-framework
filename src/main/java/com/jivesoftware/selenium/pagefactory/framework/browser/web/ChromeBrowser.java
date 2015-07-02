@@ -84,16 +84,18 @@ public class ChromeBrowser extends WebBrowser {
         }
 
         // ChromeOptions
-        ChromeOptions options = new ChromeOptions();
+        ChromeOptions chromeOptions = new ChromeOptions();
 
         // This tells Chromedriver we're running tests.
         // This eliminates the banner with the message "You are using an unsupported command-line flag --ignore-certificate-errors"
-        if (!this.options.get().contains("test-type")) {
-            this.options.get().add("test-type");
-        }
+        if(options.isPresent()) {
+            if (!options.get().contains("test-type")) {
+                options.get().add("test-type");
+            }
 
-        options.addArguments(this.options.get());
-        desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
+            chromeOptions.addArguments(options.get());
+            desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+        }
         return desiredCapabilities;
     }
 
