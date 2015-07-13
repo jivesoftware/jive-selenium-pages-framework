@@ -107,6 +107,11 @@ public class RemoteBrowserBuilder {
         return platform;
     }
 
+    public Optional<List<String>> getOptions() {
+        return options;
+    }
+
+
     /**
      * Get a RemoteBrowserBuilder used to construct a RemoteBrowser instance that helps you to run Selenium tests
      * against a remote Browser running in a Selenium Grid.
@@ -227,6 +232,11 @@ public class RemoteBrowserBuilder {
         return this;
     }
 
+    public RemoteBrowserBuilder withOptions(List<String> options) {
+        this.options = Optional.ofNullable(options);
+        return this;
+    }
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -240,6 +250,7 @@ public class RemoteBrowserBuilder {
                 .add("browserLogLevel", browserLogLevel)
                 .add("browserLogFile", browserLogFile)
                 .add("platform", platform)
+                .add("options", options)
                 .toString();
     }
 
