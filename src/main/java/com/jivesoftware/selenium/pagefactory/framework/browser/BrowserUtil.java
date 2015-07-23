@@ -42,7 +42,12 @@ public class BrowserUtil {
         final long START = System.currentTimeMillis();
         WaitForPageToLoad waitForPageToLoad = new WaitForPageToLoad();
         Wait lengthWait = waitForPageToLoad.getLengthCheckingWait(browser.getWebDriver());
-        lengthWait.wait("Timeout waiting for the page HTML to be stable with !", TIMEOUT_MILLIS);
+        try {
+            lengthWait.wait("Timeout waiting for the page HTML to be stable with !", TIMEOUT_MILLIS);
+        } catch (Exception e) {
+            logger.warn("Error waiting for the page HTML to be stable. {}: {} ", e.getClass().getName(), e.getMessage());
+            logger.info(Throwables.getStackTraceAsString(e));
+        }
         final long END = System.currentTimeMillis();
         logger.info("Success - waited for the page HTML to be stable! Took {} ms", END - START);
     }
