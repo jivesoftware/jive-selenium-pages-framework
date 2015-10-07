@@ -42,8 +42,11 @@ public class InternetExplorerBrowser extends WebBrowser {
         setCommonWebBrowserCapabilities(desiredCapabilities);
 
         desiredCapabilities.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
-        desiredCapabilities.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
+        desiredCapabilities.setCapability(InternetExplorerDriver.NATIVE_EVENTS, false);
+        desiredCapabilities.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
         desiredCapabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
+        desiredCapabilities.setCapability(InternetExplorerDriver.ENABLE_PERSISTENT_HOVERING, true);
+
 
         Level logLevel = getLogLevel();
         desiredCapabilities.setCapability(InternetExplorerDriver.LOG_LEVEL, convertJavaLogLevelToIeLogLevel(logLevel.toString()));
