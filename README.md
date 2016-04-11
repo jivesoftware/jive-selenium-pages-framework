@@ -4,9 +4,9 @@ jive-selenium-pages-framework
 <h2>Jive Selenium Pages Framework</h2>
 
 <h4>Author: Charles Capps</h4>
-<h4>Email: charles.capps@jivesoftware.com</h4>
+<h4>Contact Email: qa.automators@jivesoftware.com</h4>
 <h4>Javadoc can be found 
-    <a href="http://charlescapps.github.io/jive-selenium-pages-framework/javadoc/" title="Jive Selenium Pages Framework Javadoc">here</a>
+    <a href="http://jivesoftware.github.io/jive-selenium-pages-framework/javadoc/" title="Jive Selenium Pages Framework Javadoc">here</a>
 </h4>
 
 <p>
